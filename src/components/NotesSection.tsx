@@ -24,6 +24,14 @@ const NotesSection = () => {
 
   const updateNoteMutation = useMutation({
     mutationFn: async ({ category, content }: { category: string, content: string }) => {
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
+      if (userError) throw userError;
+      if (!user) throw new Error("User not authenticated");
+
       const existingNote = notes?.find(note => note.category === category);
       
       if (existingNote) {
@@ -36,7 +44,11 @@ const NotesSection = () => {
       } else {
         const { error } = await supabase
           .from('notes')
-          .insert([{ category, content }]);
+          .insert([{ 
+            category, 
+            content,
+            user_id: user.id 
+          }]);
         
         if (error) throw error;
       }
