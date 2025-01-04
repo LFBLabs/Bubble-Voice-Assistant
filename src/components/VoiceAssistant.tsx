@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
-import VoiceRecorder from "./VoiceRecorder";
 import { supabase } from "@/integrations/supabase/client";
 import AuthUI from "./AuthUI";
+import Header from "./Header";
+import VoiceContainer from "./VoiceContainer";
 
 const VoiceAssistant = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -89,29 +89,18 @@ const VoiceAssistant = () => {
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white p-6">
       <div className="max-w-4xl mx-auto">
-        <header className="text-center mb-12">
-          <div className="flex justify-end mb-4">
-            <Button
-              variant="outline"
-              onClick={() => supabase.auth.signOut()}
-              className="text-sm"
-            >
-              Sign Out
-            </Button>
-          </div>
-          <h1 className="text-4xl font-bold text-primary mb-4">Bubble.io Voice Assistant</h1>
-          <p className="text-gray-600">Ask questions about Bubble.io and get instant voice responses</p>
-        </header>
+        <Header 
+          title="Bubble.io Voice Assistant"
+          description="Ask questions about Bubble.io and get instant voice responses"
+        />
 
-        <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <VoiceRecorder
-            isRecording={isRecording}
-            isProcessing={isProcessing}
-            toggleRecording={toggleRecording}
-            transcript={transcript}
-            response={response}
-          />
-        </div>
+        <VoiceContainer
+          isRecording={isRecording}
+          isProcessing={isProcessing}
+          toggleRecording={toggleRecording}
+          transcript={transcript}
+          response={response}
+        />
 
         <div className="text-center text-sm text-gray-500">
           <p>Tip: Click the microphone button to start asking your question about Bubble.io</p>
