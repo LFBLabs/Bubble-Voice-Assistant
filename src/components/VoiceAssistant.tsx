@@ -58,45 +58,41 @@ const VoiceAssistant = () => {
       mediaRecorder.current = new MediaRecorder(stream);
       audioChunks.current = [];
 
+      // Create speech recognition instance
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        toast({
+          title: "Error",
+          description: "Speech recognition is not supported in your browser.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      recognition.current = new SpeechRecognition();
+      recognition.current.continuous = true;
+      recognition.current.interimResults = true;
+      
+      recognition.current.onresult = (event: SpeechRecognitionEvent) => {
+        const currentTranscript = Array.from(event.results)
+          .map(result => result[0].transcript)
+          .join('');
+        setTranscript(currentTranscript);
+      };
+
+      recognition.current.onend = () => {
+        if (transcript) {
+          processAudioResponse(transcript);
+        }
+      };
+
       mediaRecorder.current.ondataavailable = (event) => {
         audioChunks.current.push(event.data);
       };
 
-      mediaRecorder.current.onstop = async () => {
-        const audioBlob = new Blob(audioChunks.current, { type: 'audio/wav' });
-        
-        // Create speech recognition instance with proper type checking
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (!SpeechRecognition) {
-          toast({
-            title: "Error",
-            description: "Speech recognition is not supported in your browser.",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        recognition.current = new SpeechRecognition();
-        recognition.current.continuous = true;
-        recognition.current.interimResults = true;
-        
-        recognition.current.onresult = (event: SpeechRecognitionEvent) => {
-          const transcript = Array.from(event.results)
-            .map(result => result[0].transcript)
-            .join('');
-          setTranscript(transcript);
-        };
-
-        recognition.current.onend = () => {
-          if (isRecording) {
-            processAudioResponse(transcript);
-          }
-        };
-        
-        recognition.current.start();
-      };
-
+      // Start both recording and recognition
       mediaRecorder.current.start();
+      recognition.current.start();
       setIsRecording(true);
     } catch (error) {
       console.error("Error starting recording:", error);
@@ -113,7 +109,6 @@ const VoiceAssistant = () => {
       mediaRecorder.current.stop();
       mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
       
-      // Stop speech recognition if it's active
       if (recognition.current) {
         recognition.current.stop();
       }
