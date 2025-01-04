@@ -26,10 +26,13 @@ serve(async (req) => {
   }
 
   try {
-    const { text } = await req.json();
+    const requestData = await req.json();
+    const { text } = requestData;
     
-    if (!text || typeof text !== 'string') {
-      throw new Error('Invalid or missing text input');
+    console.log('Received request with text:', text);
+
+    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+      throw new Error('Invalid or empty text input');
     }
 
     console.log('Processing text input:', text);
@@ -64,6 +67,14 @@ serve(async (req) => {
       console.log('Technical response generated, length:', responseText.length);
     }
 
+    // Sanitize the response text for SSML
+    const sanitizedText = responseText
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
+
     // Initialize AWS Polly with optimal configuration for high-quality speech
     const polly = new Polly({
       region: "us-east-1",
@@ -77,9 +88,11 @@ serve(async (req) => {
       throw new Error('Failed to initialize AWS Polly');
     }
 
+    console.log('Synthesizing speech with AWS Polly...');
+
     // Convert text to speech using AWS Polly with optimized settings for premium quality
     const speechResponse = await polly.synthesizeSpeech({
-      Text: `<speak><prosody rate="95%" pitch="+0%">${responseText}</prosody></speak>`,
+      Text: `<speak><prosody rate="95%" pitch="+0%">${sanitizedText}</prosody></speak>`,
       OutputFormat: "mp3",
       VoiceId: "Ruth", // Using Ruth, which has a clearer and more natural voice
       Engine: "neural",
@@ -91,10 +104,14 @@ serve(async (req) => {
       throw new Error('No audio stream returned from AWS Polly');
     }
 
+    console.log('Successfully generated audio stream');
+
     // Convert audio stream to base64 with proper handling
     const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
     const audioBase64 = btoa(String.fromCharCode(...audioData));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
+
+    console.log('Successfully converted audio to base64');
 
     return new Response(
       JSON.stringify({ 
