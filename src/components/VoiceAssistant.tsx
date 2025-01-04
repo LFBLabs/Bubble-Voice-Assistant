@@ -63,12 +63,22 @@ const VoiceAssistant = () => {
       mediaRecorder.current.onstop = async () => {
         const audioBlob = new Blob(audioChunks.current, { type: 'audio/wav' });
         
-        // Convert audio to text using Web Speech API
-        const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
+        // Create speech recognition instance with proper type checking
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) {
+          toast({
+            title: "Error",
+            description: "Speech recognition is not supported in your browser.",
+            variant: "destructive",
+          });
+          return;
+        }
+
+        const recognition = new SpeechRecognition();
         recognition.continuous = true;
         recognition.interimResults = true;
         
-        recognition.onresult = (event) => {
+        recognition.onresult = (event: SpeechRecognitionEvent) => {
           const transcript = Array.from(event.results)
             .map(result => result[0].transcript)
             .join('');
