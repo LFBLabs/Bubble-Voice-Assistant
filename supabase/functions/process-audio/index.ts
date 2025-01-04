@@ -41,11 +41,12 @@ serve(async (req) => {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       const result = await model.generateContent([
-        { text: "You are a helpful voice assistant that explains Bubble.io concepts. Keep responses clear and concise. Never use special characters or asterisks in your responses. Format text in a natural, conversational way." },
+        { text: "You are a helpful voice assistant that explains Bubble.io concepts. Keep responses under 400 characters. Be direct and concise. Focus on the most important information. Avoid unnecessary details. Never use special characters or asterisks." },
         { text }
       ]);
       const response = await result.response;
-      responseText = response.text();
+      responseText = response.text().slice(0, 400); // Ensure response is not longer than 400 chars
+      console.log('Technical response generated, length:', responseText.length);
     }
 
     // Initialize AWS Polly
