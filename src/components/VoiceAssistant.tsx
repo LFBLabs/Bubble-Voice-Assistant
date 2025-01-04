@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,9 +21,32 @@ const VoiceAssistant = () => {
   const audioChunks = useRef<Blob[]>([]);
   const recognition = useRef<any>(null);
 
+  // Check authentication status on component mount
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error || !session) {
+        // Redirect to auth if no valid session
+        window.location.href = '/';
+      }
+    };
+    checkAuth();
+  }, []);
+
   const processAudioResponse = async (text: string) => {
     try {
       setIsProcessing(true);
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        toast({
+          title: "Error",
+          description: "Please sign in to continue.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const result = await supabase.functions.invoke('process-audio', {
         body: { text }
       });
@@ -35,7 +58,6 @@ const VoiceAssistant = () => {
       const responseText = result.data.response;
       setResponse(responseText);
 
-      // Play audio response
       const audio = new Audio(result.data.audioUrl);
       setIsPlaying(true);
       audio.play();
@@ -58,7 +80,6 @@ const VoiceAssistant = () => {
       mediaRecorder.current = new MediaRecorder(stream);
       audioChunks.current = [];
 
-      // Create speech recognition instance
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (!SpeechRecognition) {
         toast({
@@ -81,8 +102,7 @@ const VoiceAssistant = () => {
       };
 
       recognition.current.onend = () => {
-        // Only process if we have a transcript and we're stopping intentionally
-        if (transcript && !isRecording) {
+        if (!isRecording && transcript) {
           processAudioResponse(transcript);
         }
       };
@@ -91,7 +111,6 @@ const VoiceAssistant = () => {
         audioChunks.current.push(event.data);
       };
 
-      // Start both recording and recognition
       mediaRecorder.current.start();
       recognition.current.start();
       setIsRecording(true);
@@ -107,19 +126,15 @@ const VoiceAssistant = () => {
 
   const stopRecording = () => {
     if (mediaRecorder.current && isRecording) {
-      // First set recording state to false
       setIsRecording(false);
       
-      // Stop media recorder and tracks
-      mediaRecorder.current.stop();
-      mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
-      
-      // Stop speech recognition
       if (recognition.current) {
         recognition.current.stop();
       }
       
-      // Process the transcript immediately if we have one
+      mediaRecorder.current.stop();
+      mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
+      
       if (transcript) {
         processAudioResponse(transcript);
       }
