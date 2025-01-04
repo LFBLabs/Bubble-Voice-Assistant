@@ -64,7 +64,7 @@ serve(async (req) => {
       console.log('Technical response generated, length:', responseText.length);
     }
 
-    // Initialize AWS Polly
+    // Initialize AWS Polly with improved configuration
     const polly = new Polly({
       region: "us-east-1",
       credentials: {
@@ -77,19 +77,20 @@ serve(async (req) => {
       throw new Error('Failed to initialize AWS Polly');
     }
 
-    // Convert text to speech using AWS Polly
+    // Convert text to speech using AWS Polly with enhanced settings
     const speechResponse = await polly.synthesizeSpeech({
       Text: responseText,
       OutputFormat: "mp3",
-      VoiceId: "Joanna"
+      VoiceId: "Joanna",
+      Engine: "neural", // Use the neural engine for better quality
+      SampleRate: "24000", // Higher sample rate for better quality
     });
 
     if (!speechResponse.AudioStream) {
       throw new Error('No audio stream returned from AWS Polly');
     }
 
-    // Convert audio stream to base64
-    // AWS SDK v3 returns a Uint8Array directly
+    // Convert audio stream to base64 with proper handling
     const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
     const audioBase64 = btoa(String.fromCharCode(...audioData));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
