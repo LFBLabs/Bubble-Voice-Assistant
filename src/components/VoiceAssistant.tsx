@@ -3,7 +3,6 @@ import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import VoiceRecorder from "./VoiceRecorder";
-import { initializeGemini, synthesizeSpeech } from "@/utils/aiServices";
 import { supabase } from "@/integrations/supabase/client";
 import AuthUI from "./AuthUI";
 
