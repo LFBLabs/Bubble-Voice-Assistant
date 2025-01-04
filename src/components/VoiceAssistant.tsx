@@ -19,6 +19,7 @@ const VoiceAssistant = () => {
   const { toast } = useToast();
   const mediaRecorder = useRef<MediaRecorder | null>(null);
   const audioChunks = useRef<Blob[]>([]);
+  const recognition = useRef<any>(null);
 
   const processAudioResponse = async (text: string) => {
     try {
@@ -75,19 +76,24 @@ const VoiceAssistant = () => {
           return;
         }
 
-        const recognition = new SpeechRecognition();
-        recognition.continuous = true;
-        recognition.interimResults = true;
+        recognition.current = new SpeechRecognition();
+        recognition.current.continuous = true;
+        recognition.current.interimResults = true;
         
-        recognition.onresult = (event: SpeechRecognitionEvent) => {
+        recognition.current.onresult = (event: SpeechRecognitionEvent) => {
           const transcript = Array.from(event.results)
             .map(result => result[0].transcript)
             .join('');
           setTranscript(transcript);
-          processAudioResponse(transcript);
+        };
+
+        recognition.current.onend = () => {
+          if (isRecording) {
+            processAudioResponse(transcript);
+          }
         };
         
-        recognition.start();
+        recognition.current.start();
       };
 
       mediaRecorder.current.start();
@@ -106,6 +112,12 @@ const VoiceAssistant = () => {
     if (mediaRecorder.current && isRecording) {
       mediaRecorder.current.stop();
       mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
+      
+      // Stop speech recognition if it's active
+      if (recognition.current) {
+        recognition.current.stop();
+      }
+      
       setIsRecording(false);
     }
   };
