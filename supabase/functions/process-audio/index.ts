@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
+import { Polly } from "npm:@aws-sdk/client-polly";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -26,34 +27,29 @@ serve(async (req) => {
     const response = await result.response;
     const responseText = response.text();
 
-    // Convert text to speech using ElevenLabs
-    const voiceId = "21m00Tcm4TlvDq8ikWAM"; // Rachel voice - clear and professional female voice
-    const elevenLabsResponse = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "xi-api-key": Deno.env.get('ELEVEN_LABS_API_KEY') || '',
-        },
-        body: JSON.stringify({
-          text: responseText,
-          model_id: "eleven_monolingual_v1",
-          voice_settings: {
-            stability: 0.75,
-            similarity_boost: 0.75,
-            style: 0.5,
-            use_speaker_boost: true
-          }
-        }),
+    // Initialize AWS Polly
+    const polly = new Polly({
+      region: "us-east-1",
+      credentials: {
+        accessKeyId: Deno.env.get('AWS_ACCESS_KEY'),
+        secretAccessKey: Deno.env.get('AWS_SECRET_KEY')
       }
-    );
+    });
 
-    if (!elevenLabsResponse.ok) {
-      throw new Error('Failed to generate speech');
+    // Convert text to speech using AWS Polly
+    const speechResponse = await polly.synthesizeSpeech({
+      Text: responseText,
+      OutputFormat: "mp3",
+      VoiceId: "Joanna"
+    });
+
+    const audioStream = speechResponse.AudioStream;
+    if (!audioStream) {
+      throw new Error('No audio stream returned');
     }
 
-    const audioArrayBuffer = await elevenLabsResponse.arrayBuffer();
+    // Convert audio stream to base64
+    const audioArrayBuffer = await audioStream.arrayBuffer();
     const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioArrayBuffer)));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
 
