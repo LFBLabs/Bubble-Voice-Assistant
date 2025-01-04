@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,6 +6,7 @@ import AuthUI from "./AuthUI";
 import Header from "./Header";
 import VoiceContainer from "./VoiceContainer";
 import NotesSection from "./NotesSection";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 const VoiceAssistant = () => {
   const [isRecording, setIsRecording] = useState(false);
@@ -13,24 +14,8 @@ const VoiceAssistant = () => {
   const [transcript, setTranscript] = useState("");
   const [response, setResponse] = useState("");
   const [isPlaying, setIsPlaying] = useState(false);
-  const [session, setSession] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { session, loading } = useSupabaseAuth();
   const { toast } = useToast();
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
 
   const processAudioResponse = async (text: string) => {
     try {
