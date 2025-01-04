@@ -90,14 +90,14 @@ serve(async (req) => {
 
     console.log('Synthesizing speech with AWS Polly...');
 
-    // Convert text to speech using AWS Polly with optimized settings for premium quality
+    // Convert text to speech using AWS Polly with simpler SSML that's compatible with Neural engine
     const speechResponse = await polly.synthesizeSpeech({
-      Text: `<speak><prosody rate="95%" pitch="+0%">${sanitizedText}</prosody></speak>`,
+      Text: `<speak>${sanitizedText}</speak>`,
       OutputFormat: "mp3",
-      VoiceId: "Ruth", // Using Ruth, which has a clearer and more natural voice
+      VoiceId: "Ruth",
       Engine: "neural",
-      TextType: "ssml", // Enable SSML for better control over speech
-      SampleRate: "48000", // Highest available sample rate
+      TextType: "ssml",
+      SampleRate: "48000",
     });
 
     if (!speechResponse.AudioStream) {
