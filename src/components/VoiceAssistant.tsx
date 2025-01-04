@@ -197,6 +197,7 @@ const VoiceAssistant = () => {
             supabaseClient={supabase}
             appearance={{ theme: ThemeSupa }}
             theme="light"
+            providers={['google']}
           />
         </div>
       </div>
