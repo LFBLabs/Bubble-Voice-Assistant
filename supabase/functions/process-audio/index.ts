@@ -90,13 +90,14 @@ serve(async (req) => {
 
     console.log('Synthesizing speech with AWS Polly...');
 
-    // Convert text to speech using AWS Polly with standard configuration
+    // Convert text to speech using AWS Polly with optimized settings for Matthew voice
     const speechResponse = await polly.synthesizeSpeech({
-      Text: sanitizedText,
+      Text: `<speak><break time="100ms"/>${sanitizedText}</speak>`,
       OutputFormat: "mp3",
-      VoiceId: "Joanna",
-      Engine: "standard",
-      TextType: "text",
+      VoiceId: "Matthew",
+      Engine: "neural",
+      TextType: "ssml",
+      SampleRate: "24000"
     });
 
     if (!speechResponse.AudioStream) {
