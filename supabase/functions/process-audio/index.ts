@@ -90,14 +90,13 @@ serve(async (req) => {
 
     console.log('Synthesizing speech with AWS Polly...');
 
-    // Convert text to speech using AWS Polly with simpler SSML that's compatible with Neural engine
+    // Convert text to speech using AWS Polly with standard configuration
     const speechResponse = await polly.synthesizeSpeech({
-      Text: `<speak>${sanitizedText}</speak>`,
+      Text: sanitizedText,
       OutputFormat: "mp3",
-      VoiceId: "Ruth",
-      Engine: "neural",
-      TextType: "ssml",
-      SampleRate: "48000",
+      VoiceId: "Joanna",
+      Engine: "standard",
+      TextType: "text",
     });
 
     if (!speechResponse.AudioStream) {
