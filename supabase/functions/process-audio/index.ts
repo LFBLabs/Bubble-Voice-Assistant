@@ -20,12 +20,19 @@ const greetingResponses = [
 ];
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { text } = await req.json();
+    
+    if (!text || typeof text !== 'string') {
+      throw new Error('Invalid or missing text input');
+    }
+
+    console.log('Processing text input:', text);
     let responseText: string;
 
     // Check if input is a greeting
@@ -38,12 +45,20 @@ serve(async (req) => {
     } else {
       // Process regular Bubble.io related question
       const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'));
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      if (!genAI) {
+        throw new Error('Failed to initialize Gemini AI');
+      }
 
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent([
         { text: "You are a helpful voice assistant that explains Bubble.io concepts. Keep responses under 400 characters. Be direct and concise. Focus on the most important information. Avoid unnecessary details. Never use special characters or asterisks." },
         { text }
       ]);
+
+      if (!result || !result.response) {
+        throw new Error('Failed to generate AI response');
+      }
+
       const response = await result.response;
       responseText = response.text().slice(0, 400); // Ensure response is not longer than 400 chars
       console.log('Technical response generated, length:', responseText.length);
@@ -58,6 +73,10 @@ serve(async (req) => {
       }
     });
 
+    if (!polly) {
+      throw new Error('Failed to initialize AWS Polly');
+    }
+
     // Convert text to speech using AWS Polly
     const speechResponse = await polly.synthesizeSpeech({
       Text: responseText,
@@ -67,7 +86,7 @@ serve(async (req) => {
 
     const audioStream = speechResponse.AudioStream;
     if (!audioStream) {
-      throw new Error('No audio stream returned');
+      throw new Error('No audio stream returned from AWS Polly');
     }
 
     // Convert audio stream to base64
@@ -88,9 +107,11 @@ serve(async (req) => {
       }
     );
   } catch (error) {
-    console.error('Error:', error);
+    console.error('Error in process-audio function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'An unknown error occurred'
+      }),
       { 
         headers: {
           ...corsHeaders,
