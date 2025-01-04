@@ -2,6 +2,7 @@ import React, { useState, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import type { SpeechRecognitionEvent } from "@/types/speech-recognition";
 import AuthUI from "./AuthUI";
 import Header from "./Header";
 import VoiceContainer from "./VoiceContainer";
