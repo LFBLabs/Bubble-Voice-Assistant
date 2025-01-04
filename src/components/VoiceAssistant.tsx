@@ -7,7 +7,7 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { useNavigate } from "react-router-dom";
 import Waveform from "./Waveform";
-import { initializeGemini, initializePolly, synthesizeSpeech } from "@/utils/aiServices";
+import { initializeGemini, synthesizeSpeech } from "@/utils/aiServices";
 import { supabase } from "@/integrations/supabase/client";
 
 const VoiceAssistant = () => {
@@ -132,17 +132,16 @@ const VoiceAssistant = () => {
 
   const processAudioResponse = async (text: string) => {
     try {
-      if (!geminiKey || !awsAccessKey || !awsSecretKey) {
+      if (!geminiKey) {
         toast({
-          title: "Missing API Keys",
-          description: "Please enter all required API keys.",
+          title: "Missing API Key",
+          description: "Please enter your Gemini API key.",
           variant: "destructive",
         });
         return;
       }
 
       const model = initializeGemini(geminiKey);
-      const polly = initializePolly(awsAccessKey, awsSecretKey);
 
       // Generate response using Gemini
       const result = await model.generateContent(text);
@@ -150,8 +149,8 @@ const VoiceAssistant = () => {
       const responseText = response.text();
       setResponse(responseText);
 
-      // Convert response to speech using Amazon Polly
-      const audioUrl = await synthesizeSpeech(polly, responseText);
+      // Convert response to speech using Edge Function
+      const audioUrl = await synthesizeSpeech(responseText);
       const audio = new Audio(audioUrl);
       setIsPlaying(true);
       audio.play();
