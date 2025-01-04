@@ -84,14 +84,14 @@ serve(async (req) => {
       VoiceId: "Joanna"
     });
 
-    const audioStream = speechResponse.AudioStream;
-    if (!audioStream) {
+    if (!speechResponse.AudioStream) {
       throw new Error('No audio stream returned from AWS Polly');
     }
 
     // Convert audio stream to base64
-    const audioArrayBuffer = await audioStream.arrayBuffer();
-    const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioArrayBuffer)));
+    // AWS SDK v3 returns a Uint8Array directly
+    const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
+    const audioBase64 = btoa(String.fromCharCode(...audioData));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
 
     return new Response(
