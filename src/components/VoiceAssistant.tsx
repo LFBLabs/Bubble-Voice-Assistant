@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Loader2 } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +16,8 @@ const VoiceAssistant = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const { session, loading } = useSupabaseAuth();
   const { toast } = useToast();
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const audioChunks = useRef<Blob[]>([]);
 
   const processAudioResponse = async (text: string) => {
     try {
@@ -48,15 +50,60 @@ const VoiceAssistant = () => {
     }
   };
 
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      mediaRecorder.current = new MediaRecorder(stream);
+      audioChunks.current = [];
+
+      mediaRecorder.current.ondataavailable = (event) => {
+        audioChunks.current.push(event.data);
+      };
+
+      mediaRecorder.current.onstop = async () => {
+        const audioBlob = new Blob(audioChunks.current, { type: 'audio/wav' });
+        
+        // Convert audio to text using Web Speech API
+        const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
+        recognition.continuous = true;
+        recognition.interimResults = true;
+        
+        recognition.onresult = (event) => {
+          const transcript = Array.from(event.results)
+            .map(result => result[0].transcript)
+            .join('');
+          setTranscript(transcript);
+          processAudioResponse(transcript);
+        };
+        
+        recognition.start();
+      };
+
+      mediaRecorder.current.start();
+      setIsRecording(true);
+    } catch (error) {
+      console.error("Error starting recording:", error);
+      toast({
+        title: "Error",
+        description: "Could not access microphone. Please check your permissions.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const stopRecording = () => {
+    if (mediaRecorder.current && isRecording) {
+      mediaRecorder.current.stop();
+      mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
+      setIsRecording(false);
+    }
+  };
+
   const toggleRecording = () => {
-    setIsRecording(!isRecording);
     if (!isRecording) {
-      setTranscript("");
+      startRecording();
     } else {
-      // Simulated transcript for now - replace with actual speech-to-text
-      const sampleTranscript = "How do I create a new page in Bubble.io?";
-      setTranscript(sampleTranscript);
-      processAudioResponse(sampleTranscript);
+      stopRecording();
     }
   };
 
