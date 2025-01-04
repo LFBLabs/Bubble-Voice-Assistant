@@ -21,23 +21,9 @@ const VoiceAssistant = () => {
   const audioChunks = useRef<Blob[]>([]);
   const recognition = useRef<any>(null);
 
-  // Check authentication status on component mount
-  useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error || !session) {
-        // Redirect to auth if no valid session
-        window.location.href = '/';
-      }
-    };
-    checkAuth();
-  }, []);
-
   const processAudioResponse = async (text: string) => {
     try {
       setIsProcessing(true);
-      const { data: { session } } = await supabase.auth.getSession();
-      
       if (!session) {
         toast({
           title: "Error",
