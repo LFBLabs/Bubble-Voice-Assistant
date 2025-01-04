@@ -81,7 +81,8 @@ const VoiceAssistant = () => {
       };
 
       recognition.current.onend = () => {
-        if (transcript) {
+        // Only process if we have a transcript and we're stopping intentionally
+        if (transcript && !isRecording) {
           processAudioResponse(transcript);
         }
       };
@@ -106,15 +107,19 @@ const VoiceAssistant = () => {
 
   const stopRecording = () => {
     if (mediaRecorder.current && isRecording) {
+      // First set recording state to false
+      setIsRecording(false);
+      
+      // Stop media recorder and tracks
       mediaRecorder.current.stop();
       mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
       
+      // Stop speech recognition
       if (recognition.current) {
         recognition.current.stop();
       }
       
-      setIsRecording(false);
-      
+      // Process the transcript immediately if we have one
       if (transcript) {
         processAudioResponse(transcript);
       }
