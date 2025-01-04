@@ -1,12 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Mic, MicOff, Loader2, Key } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
-import { useNavigate } from "react-router-dom";
-import Waveform from "./Waveform";
+import ApiKeysForm from "./ApiKeysForm";
+import VoiceRecorder from "./VoiceRecorder";
 import { initializeGemini, synthesizeSpeech } from "@/utils/aiServices";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -19,7 +18,6 @@ const VoiceAssistant = () => {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   // API Keys state
   const [geminiKey, setGeminiKey] = useState("");
@@ -57,7 +55,7 @@ const VoiceAssistant = () => {
         .single();
 
       if (error) {
-        if (error.code !== 'PGRST116') { // No rows found is not an error for us
+        if (error.code !== 'PGRST116') {
           console.error('Error loading API keys:', error);
           toast({
             title: "Error",
@@ -78,53 +76,6 @@ const VoiceAssistant = () => {
       toast({
         title: "Error",
         description: "Failed to load API keys",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const saveKeys = async () => {
-    try {
-      const { data: existingKeys } = await supabase
-        .from('api_keys')
-        .select('*')
-        .single();
-
-      if (existingKeys) {
-        const { error } = await supabase
-          .from('api_keys')
-          .update({
-            gemini_key: geminiKey,
-            aws_access_key: awsAccessKey,
-            aws_secret_key: awsSecretKey,
-          })
-          .eq('user_id', session.user.id);
-
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('api_keys')
-          .insert([
-            {
-              user_id: session.user.id,
-              gemini_key: geminiKey,
-              aws_access_key: awsAccessKey,
-              aws_secret_key: awsSecretKey,
-            },
-          ]);
-
-        if (error) throw error;
-      }
-
-      toast({
-        title: "Success",
-        description: "Your API keys have been saved securely.",
-      });
-    } catch (error) {
-      console.error('Error saving API keys:', error);
-      toast({
-        title: "Error",
-        description: "Failed to save API keys",
         variant: "destructive",
       });
     }
@@ -222,80 +173,24 @@ const VoiceAssistant = () => {
         </header>
 
         <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-          <div className="grid gap-4 mb-6">
-            <div>
-              <label className="block text-sm font-medium mb-1">Gemini API Key</label>
-              <Input
-                type="password"
-                value={geminiKey}
-                onChange={(e) => setGeminiKey(e.target.value)}
-                placeholder="Enter Gemini API Key"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">AWS Access Key</label>
-              <Input
-                type="password"
-                value={awsAccessKey}
-                onChange={(e) => setAwsAccessKey(e.target.value)}
-                placeholder="Enter AWS Access Key"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">AWS Secret Key</label>
-              <Input
-                type="password"
-                value={awsSecretKey}
-                onChange={(e) => setAwsSecretKey(e.target.value)}
-                placeholder="Enter AWS Secret Key"
-              />
-            </div>
-            <Button onClick={saveKeys} className="w-full">
-              <Key className="w-4 h-4 mr-2" />
-              Save API Keys
-            </Button>
-          </div>
+          <ApiKeysForm
+            geminiKey={geminiKey}
+            setGeminiKey={setGeminiKey}
+            awsAccessKey={awsAccessKey}
+            setAwsAccessKey={setAwsAccessKey}
+            awsSecretKey={awsSecretKey}
+            setAwsSecretKey={setAwsSecretKey}
+            session={session}
+          />
 
-          <div className="flex flex-col items-center justify-center space-y-6">
-            <div className="relative">
-              <Button
-                onClick={toggleRecording}
-                className={`w-16 h-16 rounded-full ${
-                  isRecording ? "bg-red-500 hover:bg-red-600" : "bg-primary hover:bg-primary/90"
-                }`}
-                disabled={isProcessing || !geminiKey || !awsAccessKey || !awsSecretKey}
-              >
-                {isProcessing ? (
-                  <Loader2 className="w-6 h-6 animate-spin" />
-                ) : isRecording ? (
-                  <MicOff className="w-6 h-6" />
-                ) : (
-                  <Mic className="w-6 h-6" />
-                )}
-              </Button>
-              {isRecording && (
-                <div className="absolute -inset-4">
-                  <div className="w-24 h-24 rounded-full bg-primary/20 animate-pulse" />
-                </div>
-              )}
-            </div>
-
-            {isRecording && <Waveform />}
-
-            {transcript && (
-              <div className="w-full bg-gray-50 rounded-lg p-4 mt-4">
-                <h3 className="font-semibold mb-2">Your Question:</h3>
-                <p className="text-gray-700">{transcript}</p>
-              </div>
-            )}
-
-            {response && (
-              <div className="w-full bg-purple-50 rounded-lg p-4 mt-4">
-                <h3 className="font-semibold mb-2">Assistant Response:</h3>
-                <p className="text-gray-700">{response}</p>
-              </div>
-            )}
-          </div>
+          <VoiceRecorder
+            isRecording={isRecording}
+            isProcessing={isProcessing}
+            toggleRecording={toggleRecording}
+            disabled={!geminiKey || !awsAccessKey || !awsSecretKey}
+            transcript={transcript}
+            response={response}
+          />
         </div>
 
         <div className="text-center text-sm text-gray-500">
