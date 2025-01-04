@@ -27,17 +27,18 @@ const VoiceRecorder = ({
             isRecording ? "bg-red-500 hover:bg-red-600" : "bg-primary hover:bg-primary/90"
           }`}
           disabled={isProcessing}
+          aria-label={isRecording ? "Stop recording" : "Start recording"}
         >
           {isProcessing ? (
             <Loader2 className="w-6 h-6 animate-spin" />
           ) : isRecording ? (
-            <MicOff className="w-6 h-6" />
+            <MicOff className="w-6 h-6 pointer-events-none" />
           ) : (
-            <Mic className="w-6 h-6" />
+            <Mic className="w-6 h-6 pointer-events-none" />
           )}
         </Button>
         {isRecording && (
-          <div className="absolute -inset-4">
+          <div className="absolute -inset-4 pointer-events-none">
             <div className="w-24 h-24 rounded-full bg-primary/20 animate-pulse" />
           </div>
         )}

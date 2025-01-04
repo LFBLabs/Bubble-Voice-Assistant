@@ -88,7 +88,7 @@ const VoiceAssistant = () => {
       };
 
       recognition.current.onend = () => {
-        if (!isRecording && transcript) {
+        if (isRecording && transcript) {
           processAudioResponse(transcript);
         }
       };
@@ -119,7 +119,8 @@ const VoiceAssistant = () => {
       }
       
       mediaRecorder.current.stop();
-      mediaRecorder.current.stream.getTracks().forEach(track => track.stop());
+      const tracks = mediaRecorder.current.stream.getTracks();
+      tracks.forEach(track => track.stop());
       
       if (transcript) {
         processAudioResponse(transcript);
@@ -134,6 +135,19 @@ const VoiceAssistant = () => {
       stopRecording();
     }
   };
+
+  // Cleanup function to ensure everything is properly stopped
+  useEffect(() => {
+    return () => {
+      if (mediaRecorder.current && isRecording) {
+        const tracks = mediaRecorder.current.stream.getTracks();
+        tracks.forEach(track => track.stop());
+      }
+      if (recognition.current) {
+        recognition.current.stop();
+      }
+    };
+  }, [isRecording]);
 
   if (loading) {
     return (
