@@ -9,7 +9,36 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      api_keys: {
+        Row: {
+          aws_access_key: string | null
+          aws_secret_key: string | null
+          created_at: string
+          gemini_key: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          aws_access_key?: string | null
+          aws_secret_key?: string | null
+          created_at?: string
+          gemini_key?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          aws_access_key?: string | null
+          aws_secret_key?: string | null
+          created_at?: string
+          gemini_key?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
