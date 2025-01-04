@@ -64,7 +64,7 @@ serve(async (req) => {
       console.log('Technical response generated, length:', responseText.length);
     }
 
-    // Initialize AWS Polly with improved configuration
+    // Initialize AWS Polly with optimal configuration for high-quality speech
     const polly = new Polly({
       region: "us-east-1",
       credentials: {
@@ -77,13 +77,14 @@ serve(async (req) => {
       throw new Error('Failed to initialize AWS Polly');
     }
 
-    // Convert text to speech using AWS Polly with enhanced settings
+    // Convert text to speech using AWS Polly with optimized settings for premium quality
     const speechResponse = await polly.synthesizeSpeech({
-      Text: responseText,
+      Text: `<speak><prosody rate="95%" pitch="+0%">${responseText}</prosody></speak>`,
       OutputFormat: "mp3",
-      VoiceId: "Joanna",
-      Engine: "neural", // Use the neural engine for better quality
-      SampleRate: "24000", // Higher sample rate for better quality
+      VoiceId: "Ruth", // Using Ruth, which has a clearer and more natural voice
+      Engine: "neural",
+      TextType: "ssml", // Enable SSML for better control over speech
+      SampleRate: "48000", // Highest available sample rate
     });
 
     if (!speechResponse.AudioStream) {
