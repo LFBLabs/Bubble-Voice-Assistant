@@ -52,17 +52,15 @@ const VoiceAssistant = () => {
       const { data, error } = await supabase
         .from('api_keys')
         .select('*')
-        .single();
+        .maybeSingle();
 
       if (error) {
-        if (error.code !== 'PGRST116') {
-          console.error('Error loading API keys:', error);
-          toast({
-            title: "Error",
-            description: "Failed to load API keys",
-            variant: "destructive",
-          });
-        }
+        console.error('Error loading API keys:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load API keys",
+          variant: "destructive",
+        });
         return;
       }
 

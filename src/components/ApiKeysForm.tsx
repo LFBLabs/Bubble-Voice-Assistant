@@ -28,10 +28,14 @@ const ApiKeysForm = ({
 
   const saveKeys = async () => {
     try {
-      const { data: existingKeys } = await supabase
+      const { data: existingKeys, error: fetchError } = await supabase
         .from('api_keys')
         .select('*')
-        .single();
+        .maybeSingle();
+
+      if (fetchError) {
+        throw fetchError;
+      }
 
       if (existingKeys) {
         const { error } = await supabase
