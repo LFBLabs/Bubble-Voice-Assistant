@@ -1,13 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { Save } from "lucide-react";
 
 const NotesSection = () => {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [localNotes, setLocalNotes] = useState<{ [key: string]: string }>({});
 
   const { data: notes, isLoading } = useQuery({
     queryKey: ['notes'],
@@ -70,11 +73,19 @@ const NotesSection = () => {
     },
   });
 
-  const handleNoteChange = async (category: string, content: string) => {
+  const handleNoteChange = (category: string, content: string) => {
+    setLocalNotes(prev => ({ ...prev, [category]: content }));
+  };
+
+  const handleSave = async (category: string) => {
+    const content = localNotes[category] || getNoteContent(category);
     updateNoteMutation.mutate({ category, content });
   };
 
   const getNoteContent = (category: string) => {
+    if (category in localNotes) {
+      return localNotes[category];
+    }
     return notes?.find(note => note.category === category)?.content || '';
   };
 
@@ -91,29 +102,53 @@ const NotesSection = () => {
           <TabsTrigger value="workflows">Workflows</TabsTrigger>
           <TabsTrigger value="design">Design</TabsTrigger>
         </TabsList>
-        <TabsContent value="data_types">
+        <TabsContent value="data_types" className="space-y-4">
           <Textarea
             placeholder="Take notes about Bubble.io data types here..."
             className="min-h-[200px]"
             value={getNoteContent('data_types')}
             onChange={(e) => handleNoteChange('data_types', e.target.value)}
           />
+          <Button 
+            onClick={() => handleSave('data_types')}
+            className="w-full"
+            disabled={updateNoteMutation.isPending}
+          >
+            <Save className="mr-2" />
+            Save Data Types Notes
+          </Button>
         </TabsContent>
-        <TabsContent value="workflows">
+        <TabsContent value="workflows" className="space-y-4">
           <Textarea
             placeholder="Take notes about Bubble.io workflows here..."
             className="min-h-[200px]"
             value={getNoteContent('workflows')}
             onChange={(e) => handleNoteChange('workflows', e.target.value)}
           />
+          <Button 
+            onClick={() => handleSave('workflows')}
+            className="w-full"
+            disabled={updateNoteMutation.isPending}
+          >
+            <Save className="mr-2" />
+            Save Workflows Notes
+          </Button>
         </TabsContent>
-        <TabsContent value="design">
+        <TabsContent value="design" className="space-y-4">
           <Textarea
             placeholder="Take notes about Bubble.io design here..."
             className="min-h-[200px]"
             value={getNoteContent('design')}
             onChange={(e) => handleNoteChange('design', e.target.value)}
           />
+          <Button 
+            onClick={() => handleSave('design')}
+            className="w-full"
+            disabled={updateNoteMutation.isPending}
+          >
+            <Save className="mr-2" />
+            Save Design Notes
+          </Button>
         </TabsContent>
       </Tabs>
     </div>
