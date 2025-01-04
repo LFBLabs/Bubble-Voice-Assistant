@@ -81,8 +81,9 @@ const VoiceAssistant = () => {
       };
 
       recognition.current.onend = () => {
-        if (transcript) {
+        if (isRecording) {
           processAudioResponse(transcript);
+          setIsRecording(false);
         }
       };
 
@@ -112,8 +113,6 @@ const VoiceAssistant = () => {
       if (recognition.current) {
         recognition.current.stop();
       }
-      
-      setIsRecording(false);
     }
   };
 
