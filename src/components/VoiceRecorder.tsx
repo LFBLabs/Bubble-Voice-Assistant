@@ -7,7 +7,6 @@ interface VoiceRecorderProps {
   isRecording: boolean;
   isProcessing: boolean;
   toggleRecording: () => void;
-  disabled: boolean;
   transcript: string;
   response: string;
 }
@@ -16,7 +15,6 @@ const VoiceRecorder = ({
   isRecording,
   isProcessing,
   toggleRecording,
-  disabled,
   transcript,
   response,
 }: VoiceRecorderProps) => {
@@ -28,7 +26,7 @@ const VoiceRecorder = ({
           className={`w-16 h-16 rounded-full ${
             isRecording ? "bg-red-500 hover:bg-red-600" : "bg-primary hover:bg-primary/90"
           }`}
-          disabled={isProcessing || disabled}
+          disabled={isProcessing}
         >
           {isProcessing ? (
             <Loader2 className="w-6 h-6 animate-spin" />
