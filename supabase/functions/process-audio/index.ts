@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
+import { Polly } from "npm:@aws-sdk/client-polly";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -66,49 +67,43 @@ serve(async (req) => {
       console.log('Technical response generated, length:', responseText.length);
     }
 
-    // Use ElevenLabs for text-to-speech
-    console.log('Converting to speech with ElevenLabs...');
-    
-    const ELEVEN_LABS_API_KEY = Deno.env.get('ELEVEN_LABS_API_KEY');
-    if (!ELEVEN_LABS_API_KEY) {
-      throw new Error('ElevenLabs API key not configured');
-    }
-
-    // Using the Sarah voice (EXAVITQu4vr4xnSDxMaL) which is clear and professional
-    const voiceId = 'EXAVITQu4vr4xnSDxMaL';
-    const response = await fetch(
-      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
-      {
-        method: 'POST',
-        headers: {
-          'Accept': 'audio/mpeg',
-          'Content-Type': 'application/json',
-          'xi-api-key': ELEVEN_LABS_API_KEY,
-        },
-        body: JSON.stringify({
-          text: responseText,
-          model_id: 'eleven_multilingual_v2',
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.75,
-            style: 0.5,
-            use_speaker_boost: true
-          }
-        }),
+    // Initialize AWS Polly with optimal configuration for high-quality speech
+    console.log('Initializing AWS Polly...');
+    const polly = new Polly({
+      region: "us-east-1",
+      credentials: {
+        accessKeyId: Deno.env.get('AWS_ACCESS_KEY'),
+        secretAccessKey: Deno.env.get('AWS_SECRET_KEY')
       }
-    );
+    });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('ElevenLabs API error:', error);
-      throw new Error('Failed to generate speech');
+    if (!polly) {
+      throw new Error('Failed to initialize AWS Polly');
     }
 
-    const audioBuffer = await response.arrayBuffer();
-    const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
+    console.log('Synthesizing speech with AWS Polly...');
+
+    // Convert text to speech using AWS Polly with Joanna neural voice
+    const speechResponse = await polly.synthesizeSpeech({
+      Text: responseText,
+      OutputFormat: "mp3",
+      VoiceId: "Joanna",
+      Engine: "neural",
+      SampleRate: "24000"
+    });
+
+    if (!speechResponse.AudioStream) {
+      throw new Error('No audio stream returned from AWS Polly');
+    }
+
+    console.log('Successfully generated audio stream');
+
+    // Convert audio stream to base64
+    const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
+    const audioBase64 = btoa(String.fromCharCode(...audioData));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
 
-    console.log('Successfully generated audio with ElevenLabs');
+    console.log('Successfully converted audio to base64');
 
     return new Response(
       JSON.stringify({ 
