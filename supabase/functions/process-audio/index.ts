@@ -75,6 +75,8 @@ serve(async (req) => {
           text: `You are a helpful voice assistant that explains Bubble.io concepts. Keep responses under 400 characters. 
                 Be direct and concise. Focus on the most important information. Avoid unnecessary details. 
                 Never use special characters or asterisks.
+                Write in a conversational, natural tone as if speaking to a friend.
+                Use contractions (e.g., "it's" instead of "it is") and casual language when appropriate.
                 
                 Here is some relevant documentation about Bubble.io to help inform your response:
                 ${knowledgeBaseContext}
@@ -108,11 +110,21 @@ serve(async (req) => {
 
     console.log('Synthesizing speech with AWS Polly...');
 
+    // Wrap the text in SSML tags for more natural speech
+    const ssmlText = `<speak>
+      <prosody rate="95%">
+        <amazon:domain name="conversational">
+          ${responseText}
+        </amazon:domain>
+      </prosody>
+    </speak>`;
+
     const speechResponse = await polly.synthesizeSpeech({
-      Text: responseText,
+      Text: ssmlText,
+      TextType: "ssml",
       OutputFormat: "mp3",
-      VoiceId: "Danielle", // Changed from "Daniel" to "Danielle"
-      Engine: "generative",
+      VoiceId: "Danielle",
+      Engine: "neural",
       SampleRate: "24000"
     });
 
