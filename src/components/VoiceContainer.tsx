@@ -17,7 +17,7 @@ const VoiceContainer = ({
   response,
 }: VoiceContainerProps) => {
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-gray-900/50 p-8 mb-8">
       <VoiceRecorder
         isRecording={isRecording}
         isProcessing={isProcessing}

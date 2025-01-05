@@ -88,12 +88,12 @@ const NotesSection = () => {
   };
 
   if (isLoading) {
-    return <div>Loading notes...</div>;
+    return <div className="text-gray-600 dark:text-gray-300">Loading notes...</div>;
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
-      <h2 className="text-2xl font-bold text-primary mb-6">Notes</h2>
+    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-gray-900/50 p-8 mb-8">
+      <h2 className="text-2xl font-bold text-primary dark:text-white mb-6">Notes</h2>
       <Tabs defaultValue="data_types" className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="data_types">Data Types</TabsTrigger>

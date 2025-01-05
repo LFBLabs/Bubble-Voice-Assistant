@@ -7,6 +7,7 @@ import AuthUI from "./AuthUI";
 import Header from "./Header";
 import VoiceContainer from "./VoiceContainer";
 import NotesSection from "./NotesSection";
+import KnowledgeBase from "./KnowledgeBase";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 const VoiceAssistant = () => {
@@ -151,8 +152,8 @@ const VoiceAssistant = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-6 h-6 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center dark:bg-gray-900">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
       </div>
     );
   }
@@ -162,7 +163,7 @@ const VoiceAssistant = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white p-6">
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800 p-6">
       <div className="max-w-4xl mx-auto">
         <Header 
           title="Bubble.io Voice Assistant"
@@ -178,8 +179,10 @@ const VoiceAssistant = () => {
         />
 
         <NotesSection />
+        
+        <KnowledgeBase />
 
-        <div className="text-center text-sm text-gray-500">
+        <div className="text-center text-sm text-gray-500 dark:text-gray-400">
           <p>Tip: Click the microphone button to start asking your question about Bubble.io</p>
         </div>
       </div>
