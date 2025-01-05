@@ -47,16 +47,16 @@ const VoiceRecorder = ({
       {isRecording && <Waveform />}
 
       {transcript && (
-        <div className="w-full bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mt-4">
-          <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">Your Question:</h3>
-          <p className="text-gray-700 dark:text-gray-300">{transcript}</p>
+        <div className="w-full bg-gray-50 rounded-lg p-4 mt-4">
+          <h3 className="font-semibold mb-2">Your Question:</h3>
+          <p className="text-gray-700">{transcript}</p>
         </div>
       )}
 
       {response && (
-        <div className="w-full bg-purple-50 dark:bg-purple-900/20 rounded-lg p-4 mt-4">
-          <h3 className="font-semibold mb-2 text-gray-900 dark:text-gray-100">Assistant Response:</h3>
-          <p className="text-gray-700 dark:text-gray-300">{response}</p>
+        <div className="w-full bg-purple-50 rounded-lg p-4 mt-4">
+          <h3 className="font-semibold mb-2">Assistant Response:</h3>
+          <p className="text-gray-700">{response}</p>
         </div>
       )}
     </div>
