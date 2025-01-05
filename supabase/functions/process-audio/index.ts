@@ -1,7 +1,10 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { Polly } from "aws-sdk";
+import { 
+  PollyClient, 
+  SynthesizeSpeechCommand 
+} from "npm:@aws-sdk/client-polly";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -66,7 +69,7 @@ serve(async (req) => {
     console.log('Generated response:', responseText);
 
     // Convert to speech using AWS Polly
-    const polly = new Polly({
+    const polly = new PollyClient({
       region: 'us-east-1',
       credentials: {
         accessKeyId: Deno.env.get('AWS_ACCESS_KEY'),
@@ -75,14 +78,14 @@ serve(async (req) => {
     });
 
     console.log('Synthesizing speech...');
-    const speechParams = {
+    const command = new SynthesizeSpeechCommand({
       Text: responseText,
       OutputFormat: 'mp3',
       VoiceId: 'Joanna',
       Engine: 'neural'
-    };
+    });
 
-    const audioStream = await polly.synthesizeSpeech(speechParams).promise();
+    const audioStream = await polly.send(command);
     const audioBase64 = Buffer.from(audioStream.AudioStream).toString('base64');
     const audioUrl = `data:audio/mp3;base64,${audioBase64}`;
 
