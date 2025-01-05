@@ -83,12 +83,13 @@ serve(async (req) => {
 
     console.log('Synthesizing speech with AWS Polly...');
 
-    // Convert text to speech using AWS Polly with Joanna neural voice
+    // Convert text to speech using AWS Polly with neural voice engine
     const speechResponse = await polly.synthesizeSpeech({
-      Text: responseText,
+      Text: `<speak><prosody rate="95%">${responseText}</prosody></speak>`,
       OutputFormat: "mp3",
       VoiceId: "Joanna",
       Engine: "neural",
+      TextType: "ssml",
       SampleRate: "24000"
     });
 
