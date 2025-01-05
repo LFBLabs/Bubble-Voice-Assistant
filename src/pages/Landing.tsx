@@ -58,9 +58,9 @@ const Landing = () => {
 
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
+              src="/lovable-uploads/274d4461-71f9-4e12-abb3-812c2215fb65.png"
               alt="No-code development environment"
-              className="rounded-xl shadow-2xl mx-auto"
+              className="rounded-xl shadow-2xl mx-auto w-full max-w-4xl object-cover"
               width={1200}
               height={800}
             />
