@@ -1,24 +1,37 @@
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import AuthUI from "@/components/AuthUI";
+import Index from "@/pages/Index";
+import Settings from "@/pages/Settings";
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Index from "./pages/Index";
+import "./App.css";
 
-const queryClient = new QueryClient();
+function App() {
+  const { session, loading } = useSupabaseAuth();
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
+  if (loading) {
+    return <div>Loading...</div>;
+  }
+
+  return (
+    <Router>
+      <Routes>
+        <Route
+          path="/login"
+          element={!session ? <AuthUI /> : <Navigate to="/" replace />}
+        />
+        <Route
+          path="/settings"
+          element={session ? <Settings /> : <Navigate to="/login" replace />}
+        />
+        <Route
+          path="/"
+          element={session ? <Index /> : <Navigate to="/login" replace />}
+        />
+      </Routes>
       <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+    </Router>
+  );
+}
 
 export default App;

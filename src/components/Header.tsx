@@ -1,18 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Settings2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface HeaderProps {
   title: string;
-  description: string;
+  description?: string;
 }
 
 const Header = ({ title, description }: HeaderProps) => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Check for saved theme preference or system preference
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
@@ -35,23 +36,33 @@ const Header = ({ title, description }: HeaderProps) => {
   return (
     <header className="text-center mb-12">
       <div className="flex justify-between items-center mb-4">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleTheme}
-          className="w-10 h-10"
-          aria-label="Toggle theme"
-        >
-          {theme === 'light' ? (
-            <Moon className="h-5 w-5" />
-          ) : (
-            <Sun className="h-5 w-5" />
-          )}
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            className="w-10 h-10"
+            aria-label="Toggle theme"
+          >
+            {theme === 'light' ? (
+              <Moon className="h-5 w-5" />
+            ) : (
+              <Sun className="h-5 w-5" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/settings')}
+            className="w-10 h-10"
+            aria-label="Settings"
+          >
+            <Settings2 className="h-5 w-5" />
+          </Button>
+        </div>
         <Button
           variant="outline"
           onClick={() => supabase.auth.signOut()}
-          className="text-sm"
         >
           Sign Out
         </Button>
