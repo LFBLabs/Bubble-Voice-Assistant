@@ -26,7 +26,6 @@ const Header = ({ title, description }: HeaderProps) => {
       document.documentElement.classList.add('dark');
     }
 
-    // Get the user's email
     const getUserEmail = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
@@ -44,8 +43,8 @@ const Header = ({ title, description }: HeaderProps) => {
   };
 
   return (
-    <header className="text-center mb-12">
-      <div className="flex justify-between items-center mb-4">
+    <header className="text-center mb-8">
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-4">
         <div className="flex gap-2">
           <Button
             variant="ghost"
@@ -70,21 +69,22 @@ const Header = ({ title, description }: HeaderProps) => {
             <Settings2 className="h-5 w-5" />
           </Button>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 flex-wrap justify-center">
           {userEmail && (
-            <span className="text-sm text-gray-600 dark:text-gray-300">
+            <span className="text-sm text-gray-600 dark:text-gray-300 break-all">
               {userEmail}
             </span>
           )}
           <Button
             variant="outline"
             onClick={() => supabase.auth.signOut()}
+            className="whitespace-nowrap"
           >
             Sign Out
           </Button>
         </div>
       </div>
-      <h1 className="text-4xl font-bold text-primary mb-4">{title}</h1>
+      <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-4">{title}</h1>
       <p className="text-gray-600 dark:text-gray-300">{description}</p>
     </header>
   );
