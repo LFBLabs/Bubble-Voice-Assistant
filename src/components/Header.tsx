@@ -11,6 +11,7 @@ interface HeaderProps {
 
 const Header = ({ title, description }: HeaderProps) => {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -24,6 +25,15 @@ const Header = ({ title, description }: HeaderProps) => {
       setTheme('dark');
       document.documentElement.classList.add('dark');
     }
+
+    // Get the user's email
+    const getUserEmail = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        setUserEmail(user.email);
+      }
+    };
+    getUserEmail();
   }, []);
 
   const toggleTheme = () => {
@@ -60,12 +70,19 @@ const Header = ({ title, description }: HeaderProps) => {
             <Settings2 className="h-5 w-5" />
           </Button>
         </div>
-        <Button
-          variant="outline"
-          onClick={() => supabase.auth.signOut()}
-        >
-          Sign Out
-        </Button>
+        <div className="flex items-center gap-4">
+          {userEmail && (
+            <span className="text-sm text-gray-600 dark:text-gray-300">
+              {userEmail}
+            </span>
+          )}
+          <Button
+            variant="outline"
+            onClick={() => supabase.auth.signOut()}
+          >
+            Sign Out
+          </Button>
+        </div>
       </div>
       <h1 className="text-4xl font-bold text-primary mb-4">{title}</h1>
       <p className="text-gray-600 dark:text-gray-300">{description}</p>
