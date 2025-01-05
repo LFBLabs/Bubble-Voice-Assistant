@@ -13,9 +13,9 @@ const greetingPatterns = [
 ];
 
 const greetingResponses = [
-  "Hi! How can I help you with Bubble.io today?",
-  "Hello! Ready to help with Bubble.io!",
-  "Hey there! Let's talk about Bubble.io!",
+  "Hey there! I'd love to help you with Bubble.io today. What's on your mind?",
+  "Hi! I'm here to chat about Bubble.io. What would you like to know?",
+  "Hey! Let's talk about Bubble.io - what can I help you with?",
 ];
 
 serve(async (req) => {
@@ -72,16 +72,17 @@ serve(async (req) => {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent([
         { 
-          text: `You are a helpful voice assistant that explains Bubble.io concepts. Keep responses under 400 characters. 
-                Be direct and concise. Focus on the most important information. Avoid unnecessary details. 
+          text: `You are a friendly and helpful voice assistant that explains Bubble.io concepts. Keep responses under 400 characters.
+                Use a casual, conversational tone as if chatting with a friend.
+                Start responses with phrases like "Well," "You know," "Actually," or "I'd say" to sound more natural.
+                Use contractions like "it's" and "you'll" frequently.
+                Avoid technical jargon unless necessary.
                 Never use special characters or asterisks.
-                Write in a conversational, natural tone as if speaking to a friend.
-                Use contractions (e.g., "it's" instead of "it is") and casual language when appropriate.
                 
                 Here is some relevant documentation about Bubble.io to help inform your response:
                 ${knowledgeBaseContext}
                 
-                Please use this knowledge to provide accurate information about Bubble.io.`
+                Please use this knowledge to provide accurate but conversational information about Bubble.io.`
         },
         { text }
       ]);
@@ -120,7 +121,7 @@ serve(async (req) => {
       Text: ssmlText,
       TextType: "ssml",
       OutputFormat: "mp3",
-      VoiceId: "Salli",
+      VoiceId: "Danielle",
       Engine: "standard",
       SampleRate: "24000"
     });
