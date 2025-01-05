@@ -109,9 +109,9 @@ serve(async (req) => {
     console.log('Synthesizing speech with AWS Polly...');
 
     const speechResponse = await polly.synthesizeSpeech({
-      Text: responseText,  // Removed SSML tags
+      Text: responseText,
       OutputFormat: "mp3",
-      VoiceId: "Joanna",
+      VoiceId: "Daniel", // Changed from "Joanna" to "Daniel"
       Engine: "generative",
       SampleRate: "24000"
     });
