@@ -1,153 +1,24 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
-import { supabase } from "@/integrations/supabase/client";
-import type { SpeechRecognitionEvent } from "@/types/speech-recognition";
 import AuthUI from "./AuthUI";
 import Header from "./Header";
 import VoiceContainer from "./VoiceContainer";
 import NotesSection from "./NotesSection";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useVoiceRecording } from "@/hooks/useVoiceRecording";
+import { useAudioResponse } from "@/hooks/useAudioResponse";
 
 const VoiceAssistant = () => {
-  const [isRecording, setIsRecording] = useState(false);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [transcript, setTranscript] = useState("");
-  const [response, setResponse] = useState("");
-  const [isPlaying, setIsPlaying] = useState(false);
   const { session, loading } = useSupabaseAuth();
-  const { toast } = useToast();
-  const mediaRecorder = useRef<MediaRecorder | null>(null);
-  const audioChunks = useRef<Blob[]>([]);
-  const recognition = useRef<any>(null);
+  const { isProcessing, response, processAudioResponse } = useAudioResponse();
+  const { isRecording, transcript, toggleRecording } = useVoiceRecording(processAudioResponse);
 
-  const processAudioResponse = async (text: string) => {
-    try {
-      setIsProcessing(true);
-      if (!session) {
-        toast({
-          title: "Error",
-          description: "Please sign in to continue.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      const result = await supabase.functions.invoke('process-audio', {
-        body: { text }
-      });
-
-      if (result.error) {
-        throw new Error(result.error.message);
-      }
-
-      const responseText = result.data.response;
-      setResponse(responseText);
-
-      const audio = new Audio(result.data.audioUrl);
-      setIsPlaying(true);
-      audio.play();
-      audio.onended = () => setIsPlaying(false);
-    } catch (error) {
-      console.error("Error processing response:", error);
-      toast({
-        title: "Error",
-        description: "An error occurred while processing your request.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsProcessing(false);
-    }
-  };
-
-  const startRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorder.current = new MediaRecorder(stream);
-      audioChunks.current = [];
-
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      if (!SpeechRecognition) {
-        toast({
-          title: "Error",
-          description: "Speech recognition is not supported in your browser.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      recognition.current = new SpeechRecognition();
-      recognition.current.continuous = true;
-      recognition.current.interimResults = true;
-      
-      recognition.current.onresult = (event: SpeechRecognitionEvent) => {
-        const currentTranscript = Array.from(event.results)
-          .map(result => result[0].transcript)
-          .join('');
-        setTranscript(currentTranscript);
-      };
-
-      recognition.current.onend = () => {
-        if (isRecording && transcript) {
-          processAudioResponse(transcript);
-        }
-      };
-
-      mediaRecorder.current.ondataavailable = (event) => {
-        audioChunks.current.push(event.data);
-      };
-
-      mediaRecorder.current.start();
-      recognition.current.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error("Error starting recording:", error);
-      toast({
-        title: "Error",
-        description: "Could not access microphone. Please check your permissions.",
-        variant: "destructive",
-      });
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorder.current && isRecording) {
-      setIsRecording(false);
-      
-      if (recognition.current) {
-        recognition.current.stop();
-      }
-      
-      mediaRecorder.current.stop();
-      const tracks = mediaRecorder.current.stream.getTracks();
-      tracks.forEach(track => track.stop());
-      
-      if (transcript) {
-        processAudioResponse(transcript);
-      }
-    }
-  };
-
-  const toggleRecording = () => {
-    if (!isRecording) {
-      startRecording();
-    } else {
-      stopRecording();
-    }
-  };
-
-  // Cleanup function to ensure everything is properly stopped
+  // Cleanup function
   useEffect(() => {
     return () => {
-      if (mediaRecorder.current && isRecording) {
-        const tracks = mediaRecorder.current.stream.getTracks();
-        tracks.forEach(track => track.stop());
-      }
-      if (recognition.current) {
-        recognition.current.stop();
-      }
+      // Any cleanup code if needed
     };
-  }, [isRecording]);
+  }, []);
 
   if (loading) {
     return (
