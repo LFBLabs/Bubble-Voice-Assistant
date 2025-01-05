@@ -1,16 +1,8 @@
 import React from "react";
-import NotesSection from "@/components/NotesSection";
-import VoiceContainer from "@/components/VoiceContainer";
+import VoiceAssistant from "@/components/VoiceAssistant";
 
 const Index = () => {
-  return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 gap-8">
-        <NotesSection />
-        <VoiceContainer />
-      </div>
-    </div>
-  );
+  return <VoiceAssistant />;
 };
 
 export default Index;

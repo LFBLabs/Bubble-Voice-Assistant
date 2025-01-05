@@ -7,7 +7,6 @@ import AuthUI from "./AuthUI";
 import Header from "./Header";
 import VoiceContainer from "./VoiceContainer";
 import NotesSection from "./NotesSection";
-import KnowledgeBase from "./KnowledgeBase";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 const VoiceAssistant = () => {
@@ -179,8 +178,6 @@ const VoiceAssistant = () => {
         />
 
         <NotesSection />
-        
-        <KnowledgeBase />
 
         <div className="text-center text-sm text-gray-500 dark:text-gray-400">
           <p>Tip: Click the microphone button to start asking your question about Bubble.io</p>
