@@ -13,9 +13,9 @@ const greetingPatterns = [
 ];
 
 const greetingResponses = [
-  "Hi! How can I help you with Bubble.io today?",
-  "Hello! Ready to help with Bubble.io!",
-  "Hey there! Let's talk about Bubble.io!",
+  "Hey! I'm excited to chat about Bubble.io with you. What's on your mind?",
+  "Hi there! I'd love to help you out with Bubble.io today. What can I explain?",
+  "Hey! Always happy to talk about Bubble.io. What would you like to know?",
 ];
 
 serve(async (req) => {
@@ -72,14 +72,19 @@ serve(async (req) => {
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       const result = await model.generateContent([
         { 
-          text: `You are a helpful voice assistant that explains Bubble.io concepts. Keep responses under 400 characters. 
-                Be direct and concise. Focus on the most important information. Avoid unnecessary details. 
-                Never use special characters or asterisks.
+          text: `You are a friendly and helpful voice assistant that explains Bubble.io concepts. Keep responses under 400 characters.
+                Use a conversational, natural tone like you're chatting with a friend. Start responses with phrases like:
+                - "Well, let me explain..."
+                - "You know what? ..."
+                - "Actually, ..."
+                - "That's a great question! ..."
+                Use contractions (I'm, you'll, that's) and casual language, but stay professional.
+                Avoid technical jargon unless necessary.
                 
                 Here is some relevant documentation about Bubble.io to help inform your response:
                 ${knowledgeBaseContext}
                 
-                Please use this knowledge to provide accurate information about Bubble.io.`
+                Please use this knowledge to provide accurate, friendly information about Bubble.io.`
         },
         { text }
       ]);
@@ -111,8 +116,8 @@ serve(async (req) => {
     const speechResponse = await polly.synthesizeSpeech({
       Text: responseText,
       OutputFormat: "mp3",
-      VoiceId: "Danielle", // Changed from "Daniel" to "Danielle"
-      Engine: "generative",
+      VoiceId: "Danielle",
+      Engine: "neural",
       SampleRate: "24000"
     });
 
