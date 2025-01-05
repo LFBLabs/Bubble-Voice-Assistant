@@ -110,7 +110,6 @@ serve(async (req) => {
 
     console.log('Synthesizing speech with AWS Polly...');
 
-    // Using simpler SSML tags that are widely supported
     const ssmlText = `<speak>
       <prosody rate="95%">
         ${responseText}
@@ -121,8 +120,8 @@ serve(async (req) => {
       Text: ssmlText,
       TextType: "ssml",
       OutputFormat: "mp3",
-      VoiceId: "Joanna",  // Changed to Joanna which has better SSML support
-      Engine: "neural",
+      VoiceId: "Salli",
+      Engine: "standard",
       SampleRate: "24000"
     });
 
