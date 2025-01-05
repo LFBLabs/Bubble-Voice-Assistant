@@ -58,8 +58,8 @@ const Landing = () => {
 
           <div className="relative">
             <img
-              src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b"
-              alt="AI Voice Assistant Interface"
+              src="https://images.unsplash.com/photo-1498050108023-c5249f4df085"
+              alt="No-code development environment"
               className="rounded-xl shadow-2xl mx-auto"
               width={1200}
               height={800}
