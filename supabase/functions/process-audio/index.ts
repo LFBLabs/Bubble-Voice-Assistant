@@ -9,6 +9,7 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -33,43 +34,26 @@ serve(async (req) => {
     const { data: knowledgeBaseEntries, error: fetchError } = await supabase
       .from('knowledge_base')
       .select('title, content, url, type')
-      .limit(10);
+      .limit(5); // Reduced limit to prevent memory issues
 
     if (fetchError) {
       console.error('Error fetching knowledge base:', fetchError);
       throw new Error('Failed to fetch knowledge base data');
     }
 
-    // Format knowledge base entries for context
-    const knowledgeBaseContext = knowledgeBaseEntries
-      .map(entry => `${entry.title}${entry.content ? ': ' + entry.content : ''} (${entry.url})`)
-      .join('\n');
+    // Format knowledge base entries for context - simplified to prevent recursion
+    const context = knowledgeBaseEntries
+      .map(entry => `${entry.title}: ${entry.content || ''}`).join(' ');
 
     // Initialize Gemini AI
     const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'));
-    if (!genAI) {
-      throw new Error('Failed to initialize Gemini AI');
-    }
-
-    // Generate response with proper error handling
-    console.log('Generating AI response...');
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `You are a helpful voice assistant that explains Bubble.io concepts. Keep responses under 400 characters. 
-                   Be direct and concise. Focus on the most important information. Avoid unnecessary details. 
-                   Never use special characters or asterisks.
-                   
-                   Here is some relevant documentation about Bubble.io to help inform your response:
-                   ${knowledgeBaseContext}
-                   
-                   Please use this knowledge to provide accurate information about Bubble.io.
-                   
-                   User question: ${text}`;
 
+    // Simplified prompt to prevent recursion
+    const prompt = `As a Bubble.io expert, provide a concise response (under 400 characters) to this question: ${text}. Context: ${context}`;
+
+    console.log('Generating AI response...');
     const result = await model.generateContent(prompt);
-    if (!result || !result.response) {
-      throw new Error('Failed to generate AI response');
-    }
-
     const responseText = result.response.text().slice(0, 400);
     console.log('Generated response:', responseText);
 
@@ -82,10 +66,6 @@ serve(async (req) => {
         secretAccessKey: Deno.env.get('AWS_SECRET_KEY')
       }
     });
-
-    if (!polly) {
-      throw new Error('Failed to initialize AWS Polly');
-    }
 
     // Generate speech
     console.log('Synthesizing speech...');
