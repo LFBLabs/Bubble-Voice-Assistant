@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import AuthUI from "@/components/AuthUI";
 import Index from "@/pages/Index";
 import Settings from "@/pages/Settings";
+import Landing from "@/pages/Landing";
 import { Toaster } from "@/components/ui/toaster";
 import "./App.css";
 
@@ -22,16 +23,16 @@ function App() {
       <Router>
         <Routes>
           <Route
+            path="/"
+            element={!session ? <Landing /> : <Index />}
+          />
+          <Route
             path="/login"
             element={!session ? <AuthUI /> : <Navigate to="/" replace />}
           />
           <Route
             path="/settings"
             element={session ? <Settings /> : <Navigate to="/login" replace />}
-          />
-          <Route
-            path="/"
-            element={session ? <Index /> : <Navigate to="/login" replace />}
           />
         </Routes>
         <Toaster />
