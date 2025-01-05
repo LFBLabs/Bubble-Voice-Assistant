@@ -1,6 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
-import { Polly } from "npm:@aws-sdk/client-polly";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -63,55 +62,53 @@ serve(async (req) => {
       }
 
       const response = await result.response;
-      responseText = response.text().slice(0, 400); // Ensure response is not longer than 400 chars
+      responseText = response.text().slice(0, 400);
       console.log('Technical response generated, length:', responseText.length);
     }
 
-    // Sanitize the response text for SSML
-    const sanitizedText = responseText
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&apos;');
+    // Use ElevenLabs for text-to-speech
+    console.log('Converting to speech with ElevenLabs...');
+    
+    const ELEVEN_LABS_API_KEY = Deno.env.get('ELEVEN_LABS_API_KEY');
+    if (!ELEVEN_LABS_API_KEY) {
+      throw new Error('ElevenLabs API key not configured');
+    }
 
-    // Initialize AWS Polly with optimal configuration for high-quality speech
-    const polly = new Polly({
-      region: "us-east-1",
-      credentials: {
-        accessKeyId: Deno.env.get('AWS_ACCESS_KEY'),
-        secretAccessKey: Deno.env.get('AWS_SECRET_KEY')
+    // Using the Sarah voice (EXAVITQu4vr4xnSDxMaL) which is clear and professional
+    const voiceId = 'EXAVITQu4vr4xnSDxMaL';
+    const response = await fetch(
+      `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
+      {
+        method: 'POST',
+        headers: {
+          'Accept': 'audio/mpeg',
+          'Content-Type': 'application/json',
+          'xi-api-key': ELEVEN_LABS_API_KEY,
+        },
+        body: JSON.stringify({
+          text: responseText,
+          model_id: 'eleven_multilingual_v2',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.75,
+            style: 0.5,
+            use_speaker_boost: true
+          }
+        }),
       }
-    });
+    );
 
-    if (!polly) {
-      throw new Error('Failed to initialize AWS Polly');
+    if (!response.ok) {
+      const error = await response.text();
+      console.error('ElevenLabs API error:', error);
+      throw new Error('Failed to generate speech');
     }
 
-    console.log('Synthesizing speech with AWS Polly...');
-
-    // Convert text to speech using AWS Polly with optimized settings for Matthew voice
-    const speechResponse = await polly.synthesizeSpeech({
-      Text: `<speak><break time="100ms"/>${sanitizedText}</speak>`,
-      OutputFormat: "mp3",
-      VoiceId: "Matthew",
-      Engine: "neural",
-      TextType: "ssml",
-      SampleRate: "24000"
-    });
-
-    if (!speechResponse.AudioStream) {
-      throw new Error('No audio stream returned from AWS Polly');
-    }
-
-    console.log('Successfully generated audio stream');
-
-    // Convert audio stream to base64 with proper handling
-    const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
-    const audioBase64 = btoa(String.fromCharCode(...audioData));
+    const audioBuffer = await response.arrayBuffer();
+    const audioBase64 = btoa(String.fromCharCode(...new Uint8Array(audioBuffer)));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
 
-    console.log('Successfully converted audio to base64');
+    console.log('Successfully generated audio with ElevenLabs');
 
     return new Response(
       JSON.stringify({ 
