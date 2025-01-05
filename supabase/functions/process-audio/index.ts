@@ -1,10 +1,11 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { 
   PollyClient, 
   SynthesizeSpeechCommand 
 } from "npm:@aws-sdk/client-polly";
+import { createClient } from "npm:@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
