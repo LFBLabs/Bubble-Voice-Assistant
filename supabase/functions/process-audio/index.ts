@@ -111,7 +111,7 @@ serve(async (req) => {
     const speechResponse = await polly.synthesizeSpeech({
       Text: responseText,
       OutputFormat: "mp3",
-      VoiceId: "Daniel", // Changed from "Joanna" to "Daniel"
+      VoiceId: "Danielle", // Changed from "Daniel" to "Danielle"
       Engine: "generative",
       SampleRate: "24000"
     });
