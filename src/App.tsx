@@ -6,6 +6,7 @@ import Index from "@/pages/Index";
 import Settings from "@/pages/Settings";
 import Landing from "@/pages/Landing";
 import { Toaster } from "@/components/ui/toaster";
+import PayPalProvider from "@/components/PayPalProvider";
 import "./App.css";
 
 // Create a client
@@ -20,23 +21,25 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <Routes>
-          <Route
-            path="/"
-            element={!session ? <Landing /> : <Index />}
-          />
-          <Route
-            path="/login"
-            element={!session ? <AuthUI /> : <Navigate to="/" replace />}
-          />
-          <Route
-            path="/settings"
-            element={session ? <Settings /> : <Navigate to="/login" replace />}
-          />
-        </Routes>
-        <Toaster />
-      </Router>
+      <PayPalProvider>
+        <Router>
+          <Routes>
+            <Route
+              path="/"
+              element={!session ? <Landing /> : <Index />}
+            />
+            <Route
+              path="/login"
+              element={!session ? <AuthUI /> : <Navigate to="/" replace />}
+            />
+            <Route
+              path="/settings"
+              element={session ? <Settings /> : <Navigate to="/login" replace />}
+            />
+          </Routes>
+          <Toaster />
+        </Router>
+      </PayPalProvider>
     </QueryClientProvider>
   );
 }
