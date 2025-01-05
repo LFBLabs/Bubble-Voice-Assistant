@@ -87,8 +87,14 @@ serve(async (req) => {
     });
 
     const audioStream = await polly.send(command);
-    const audioBase64 = Buffer.from(audioStream.AudioStream).toString('base64');
-    const audioUrl = `data:audio/mp3;base64,${audioBase64}`;
+    
+    // Convert AudioStream to Uint8Array
+    const audioData = await new Response(audioStream.AudioStream).arrayBuffer();
+    const uint8Array = new Uint8Array(audioData);
+    
+    // Convert to base64
+    const base64Audio = btoa(String.fromCharCode(...uint8Array));
+    const audioUrl = `data:audio/mp3;base64,${base64Audio}`;
 
     return new Response(
       JSON.stringify({ response: responseText, audioUrl }),
