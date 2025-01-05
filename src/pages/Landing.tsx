@@ -64,7 +64,7 @@ const Landing = () => {
               width={1200}
               height={800}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-purple-50 to-transparent dark:from-gray-900 opacity-50 rounded-xl" />
+            <div className="absolute inset-0 bg-gradient-to-t from-purple-50 to-transparent dark:from-gray-900 opacity-30 rounded-xl" />
           </div>
         </main>
       </div>
