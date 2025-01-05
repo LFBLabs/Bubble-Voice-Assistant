@@ -112,7 +112,7 @@ serve(async (req) => {
       Text: `<speak><prosody rate="95%">${responseText}</prosody></speak>`,
       OutputFormat: "mp3",
       VoiceId: "Joanna",
-      Engine: "neural",
+      Engine: "generative",  // Changed from "neural" to "generative"
       TextType: "ssml",
       SampleRate: "24000"
     });
