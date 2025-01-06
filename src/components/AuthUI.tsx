@@ -10,7 +10,7 @@ const AuthUI = () => {
   // Listen for auth state changes including errors
   React.useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT') {
         toast({
           variant: "destructive",
           title: "Signed Out",
