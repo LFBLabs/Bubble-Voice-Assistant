@@ -106,9 +106,13 @@ export type Database = {
           currency: string
           id: string
           payment_id: string
+          plan_type: string | null
           status: string
+          subscription_id: string | null
+          subscription_status: string | null
           updated_at: string
           user_id: string
+          valid_until: string | null
         }
         Insert: {
           amount: number
@@ -116,9 +120,13 @@ export type Database = {
           currency?: string
           id?: string
           payment_id: string
+          plan_type?: string | null
           status: string
+          subscription_id?: string | null
+          subscription_status?: string | null
           updated_at?: string
           user_id: string
+          valid_until?: string | null
         }
         Update: {
           amount?: number
@@ -126,9 +134,13 @@ export type Database = {
           currency?: string
           id?: string
           payment_id?: string
+          plan_type?: string | null
           status?: string
+          subscription_id?: string | null
+          subscription_status?: string | null
           updated_at?: string
           user_id?: string
+          valid_until?: string | null
         }
         Relationships: []
       }

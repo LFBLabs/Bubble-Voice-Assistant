@@ -4,25 +4,43 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface PayPalButtonProps {
   amount: string;
+  planType: "trial" | "monthly" | "annual";
 }
 
-const PayPalButton = ({ amount }: PayPalButtonProps) => {
+const PayPalButton = ({ amount, planType }: PayPalButtonProps) => {
   const { toast } = useToast();
 
   const handlePaymentSuccess = async (details: any) => {
     try {
+      const validUntil = new Date();
+      switch (planType) {
+        case "trial":
+          validUntil.setDate(validUntil.getDate() + 1); // 1 day
+          break;
+        case "monthly":
+          validUntil.setMonth(validUntil.getMonth() + 1);
+          break;
+        case "annual":
+          validUntil.setFullYear(validUntil.getFullYear() + 1);
+          break;
+      }
+
       const { error } = await supabase.from("payments").insert({
         payment_id: details.id,
         status: details.status,
         amount: parseFloat(amount),
         user_id: (await supabase.auth.getUser()).data.user?.id,
+        subscription_id: details.subscription_id || null,
+        subscription_status: "active",
+        plan_type: planType,
+        valid_until: validUntil.toISOString(),
       });
 
       if (error) throw error;
 
       toast({
         title: "Payment Successful",
-        description: `Payment ID: ${details.id}`,
+        description: `Your ${planType} subscription is now active`,
       });
     } catch (error) {
       console.error("Error saving payment:", error);
@@ -46,6 +64,7 @@ const PayPalButton = ({ amount }: PayPalButtonProps) => {
                 currency_code: "USD",
                 value: amount,
               },
+              description: `${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription`,
             },
           ],
         });
