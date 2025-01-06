@@ -7,6 +7,28 @@ import { useToast } from "@/hooks/use-toast";
 const AuthUI = () => {
   const { toast } = useToast();
 
+  // Listen for auth state changes including errors
+  React.useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'USER_DELETED' || event === 'SIGNED_OUT') {
+        toast({
+          variant: "destructive",
+          title: "Signed Out",
+          description: "You have been signed out.",
+        });
+      } else if (event === 'SIGNED_IN') {
+        toast({
+          title: "Signed In",
+          description: "Successfully signed in!",
+        });
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [toast]);
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white p-6">
       <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg p-8">
@@ -26,13 +48,6 @@ const AuthUI = () => {
           }}
           theme="light"
           providers={['google']}
-          onError={(error) => {
-            toast({
-              variant: "destructive",
-              title: "Authentication Error",
-              description: error.message,
-            });
-          }}
           redirectTo={window.location.origin}
         />
       </div>
