@@ -42,6 +42,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
     fetchClientId();
   }, [toast]);
 
+  // Only render PayPalScriptProvider when we have a client ID
   if (!clientId) {
     return <>{children}</>;
   }

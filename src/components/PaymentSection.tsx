@@ -7,13 +7,6 @@ const PaymentSection = () => {
   const [amount, setAmount] = useState("10.00");
   const { toast } = useToast();
 
-  const handlePaymentSuccess = () => {
-    toast({
-      title: "Payment Successful",
-      description: "Thank you for your payment!",
-    });
-  };
-
   return (
     <Card className="p-6">
       <div className="space-y-4">
