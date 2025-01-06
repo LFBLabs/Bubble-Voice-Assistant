@@ -7,15 +7,22 @@ interface PayPalButtonProps {
   planType: "trial" | "monthly" | "annual";
 }
 
-const PayPalButton = ({ amount, planType }: PayPalButtonProps) => {
+const PLAN_IDS = {
+  monthly: "P-1AB68343LD631143JM56CS7I",
+  // You'll need to add other plan IDs when you create them in PayPal
+  trial: "",
+  annual: ""
+};
+
+const PayPalButton = ({ planType }: PayPalButtonProps) => {
   const { toast } = useToast();
 
-  const handlePaymentSuccess = async (details: any) => {
+  const handleSubscriptionSuccess = async (details: any) => {
     try {
       const validUntil = new Date();
       switch (planType) {
         case "trial":
-          validUntil.setDate(validUntil.getDate() + 1); // 1 day
+          validUntil.setDate(validUntil.getDate() + 1);
           break;
         case "monthly":
           validUntil.setMonth(validUntil.getMonth() + 1);
@@ -26,11 +33,11 @@ const PayPalButton = ({ amount, planType }: PayPalButtonProps) => {
       }
 
       const { error } = await supabase.from("payments").insert({
-        payment_id: details.id,
-        status: details.status,
-        amount: parseFloat(amount),
+        payment_id: details.orderID,
+        status: "active",
+        amount: planType === "monthly" ? 29.99 : planType === "annual" ? 299.99 : 1.00,
         user_id: (await supabase.auth.getUser()).data.user?.id,
-        subscription_id: details.subscription_id || null,
+        subscription_id: details.subscriptionID,
         subscription_status: "active",
         plan_type: planType,
         valid_until: validUntil.toISOString(),
@@ -39,48 +46,50 @@ const PayPalButton = ({ amount, planType }: PayPalButtonProps) => {
       if (error) throw error;
 
       toast({
-        title: "Payment Successful",
+        title: "Subscription Successful",
         description: `Your ${planType} subscription is now active`,
       });
     } catch (error) {
-      console.error("Error saving payment:", error);
+      console.error("Error saving subscription:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to save payment details",
+        description: "Failed to save subscription details",
       });
     }
   };
 
   return (
     <PayPalButtons
-      style={{ layout: "horizontal" }}
-      createOrder={(data, actions) => {
-        return actions.order.create({
-          intent: "CAPTURE",
-          purchase_units: [
-            {
-              amount: {
-                currency_code: "USD",
-                value: amount,
-              },
-              description: `${planType.charAt(0).toUpperCase() + planType.slice(1)} Subscription`,
-            },
-          ],
+      style={{ 
+        shape: "pill",
+        color: "blue",
+        layout: "vertical",
+        label: "subscribe"
+      }}
+      createSubscription={(data, actions) => {
+        const planId = PLAN_IDS[planType];
+        if (!planId) {
+          toast({
+            variant: "destructive",
+            title: "Configuration Error",
+            description: "This plan is not yet configured",
+          });
+          return Promise.reject("Plan not configured");
+        }
+        return actions.subscription.create({
+          plan_id: planId
         });
       }}
       onApprove={async (data, actions) => {
-        if (actions.order) {
-          const details = await actions.order.capture();
-          await handlePaymentSuccess(details);
-        }
+        await handleSubscriptionSuccess(data);
       }}
       onError={(err) => {
         console.error("PayPal Error:", err);
         toast({
           variant: "destructive",
-          title: "Payment Error",
-          description: "There was an error processing your payment",
+          title: "Subscription Error",
+          description: "There was an error processing your subscription",
         });
       }}
     />
