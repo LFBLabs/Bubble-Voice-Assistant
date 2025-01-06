@@ -42,6 +42,7 @@ const PayPalButton = ({ amount }: PayPalButtonProps) => {
           purchase_units: [
             {
               amount: {
+                currency_code: "USD",
                 value: amount,
               },
             },
