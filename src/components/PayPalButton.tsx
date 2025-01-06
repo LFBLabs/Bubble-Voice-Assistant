@@ -9,9 +9,9 @@ interface PayPalButtonProps {
 
 const PLAN_IDS = {
   monthly: "P-1AB68343LD631143JM56CS7I",
-  // You'll need to add other plan IDs when you create them in PayPal
-  trial: "",
-  annual: ""
+  annual: "P-8YB29232KR6927945M56CYPQ",
+  // You'll need to add the trial plan ID when you create it in PayPal
+  trial: ""
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
