@@ -9,6 +9,7 @@ interface PayPalProviderProps {
 
 const PayPalProvider = ({ children }: PayPalProviderProps) => {
   const [clientId, setClientId] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -36,21 +37,23 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
           title: "Configuration Error",
           description: "Unable to load PayPal configuration.",
         });
+      } finally {
+        setIsLoading(true);
       }
     };
 
     fetchClientId();
   }, [toast]);
 
-  // Only render PayPalScriptProvider when we have a client ID
-  if (!clientId) {
-    return <>{children}</>;
+  if (isLoading && !clientId) {
+    return <div>Loading PayPal configuration...</div>;
   }
 
+  // Always render with PayPalScriptProvider, even if we don't have a client ID
   return (
     <PayPalScriptProvider
       options={{
-        clientId,
+        clientId: clientId || "test", // Fallback to prevent provider initialization errors
         currency: "USD",
         intent: "capture",
         components: ["buttons"],
