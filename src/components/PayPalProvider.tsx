@@ -52,6 +52,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         clientId,
         currency: "USD",
         intent: "capture",
+        components: ["buttons"],
       }}
     >
       {children}
