@@ -16,7 +16,7 @@ export const useSubscriptionStatus = (userId: string | undefined) => {
         .gt("valid_until", new Date().toISOString())
         .order("created_at", { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching subscription:", error);
