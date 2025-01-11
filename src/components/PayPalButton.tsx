@@ -79,7 +79,9 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         return actions.subscription.create({
           plan_id: planId,
           application_context: {
-            shipping_preference: "NO_SHIPPING"
+            shipping_preference: "NO_SHIPPING",
+            return_url: window.location.href,
+            cancel_url: window.location.href
           }
         });
       }}
