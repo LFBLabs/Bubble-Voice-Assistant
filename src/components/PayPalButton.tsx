@@ -8,9 +8,9 @@ interface PayPalButtonProps {
 }
 
 const PLAN_IDS = {
-  monthly: "P-8UV93284A0400005PM6A6CEA", // Your monthly plan ID
-  annual: "YOUR_ANNUAL_PLAN_ID", // Replace with your annual plan ID
-  trial: "YOUR_TRIAL_PLAN_ID", // Replace with your trial plan ID
+  monthly: "P-8UV93284A0400005PM6A6CEA",
+  annual: "P-72L64754J81152604M6A6HYY", // Updated annual plan ID
+  trial: "YOUR_TRIAL_PLAN_ID", // Replace with your trial plan ID when available
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
