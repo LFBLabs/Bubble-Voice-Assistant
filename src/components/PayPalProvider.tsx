@@ -38,24 +38,23 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
           description: "Unable to load PayPal configuration.",
         });
       } finally {
-        setIsLoading(true);
+        setIsLoading(false);
       }
     };
 
     fetchClientId();
   }, [toast]);
 
-  if (isLoading && !clientId) {
+  if (isLoading) {
     return <div>Loading PayPal configuration...</div>;
   }
 
-  // Always render with PayPalScriptProvider, even if we don't have a client ID
   return (
     <PayPalScriptProvider
       options={{
-        clientId: clientId || "test", // Fallback to prevent provider initialization errors
-        currency: "USD",
-        intent: "capture",
+        clientId: clientId || "test",
+        vault: true,
+        intent: "subscription",
         components: ["buttons"],
       }}
     >

@@ -3,7 +3,6 @@ import { Card } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import PayPalButton from "./PayPalButton";
-import { useToast } from "@/hooks/use-toast";
 
 type PlanType = "trial" | "monthly" | "annual";
 
@@ -37,7 +36,6 @@ const plans: Plan[] = [
 
 const PaymentSection = () => {
   const [selectedPlan, setSelectedPlan] = useState<PlanType>("monthly");
-  const { toast } = useToast();
 
   const currentPlan = plans.find((plan) => plan.type === selectedPlan)!;
 
@@ -72,7 +70,7 @@ const PaymentSection = () => {
             ))}
           </RadioGroup>
         </div>
-        <div className="w-full max-w-md">
+        <div className="w-full max-w-md mx-auto">
           <PayPalButton amount={currentPlan.price} planType={currentPlan.type} />
         </div>
       </div>
