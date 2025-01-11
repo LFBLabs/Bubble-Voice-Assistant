@@ -8,8 +8,8 @@ interface PayPalButtonProps {
 }
 
 const PLAN_IDS = {
-  monthly: "P-8UV93284A0400005PM6A6CEA", // Updated to sandbox plan ID
-  annual: "P-8YB29232KR6927945M56CYPQ",
+  monthly: "P-8UV93284A0400005PM6A6CEA", // Sandbox monthly plan ID
+  annual: "P-72L64754J81152604M6A6HYY", // Updated to sandbox annual plan ID
   trial: ""
 };
 
