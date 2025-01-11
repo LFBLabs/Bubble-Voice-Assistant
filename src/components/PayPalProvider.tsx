@@ -49,17 +49,20 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
     return <div>Loading PayPal configuration...</div>;
   }
 
+  if (!clientId) {
+    return <div>PayPal configuration is missing. Please check your settings.</div>;
+  }
+
   return (
     <PayPalScriptProvider
       options={{
-        clientId: clientId,
-        vault: true,
-        intent: "subscription",
-        components: "buttons",
-        "enable-funding": "card",
-        "disable-funding": "paylater,venmo",
+        clientId,
         currency: "USD",
-        env: "sandbox"
+        intent: "subscription",
+        vault: true,
+        components: "buttons",
+        enableFunding: "card",
+        disableFunding: "paylater,venmo"
       }}
     >
       {children}

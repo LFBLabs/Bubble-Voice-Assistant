@@ -62,8 +62,8 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
     <div className="w-full">
       <PayPalButtons
         style={{ 
-          shape: "pill",
-          color: "blue",
+          shape: "rect",
+          color: "gold",
           layout: "vertical",
           label: "subscribe"
         }}
@@ -78,12 +78,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
             return Promise.reject("Plan not configured");
           }
           return actions.subscription.create({
-            plan_id: planId,
-            application_context: {
-              shipping_preference: "NO_SHIPPING",
-              return_url: window.location.href,
-              cancel_url: window.location.href
-            }
+            plan_id: planId
           });
         }}
         onApprove={async (data, actions) => {
