@@ -9,7 +9,7 @@ interface PayPalButtonProps {
 
 const PLAN_IDS = {
   monthly: "P-8UV93284A0400005PM6A6CEA", // Sandbox monthly plan ID
-  annual: "P-72L64754J81152604M6A6HYY", // Updated to sandbox annual plan ID
+  annual: "P-72L64754J81152604M6A6HYY", // Sandbox annual plan ID
   trial: ""
 };
 
@@ -77,7 +77,10 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
           return Promise.reject("Plan not configured");
         }
         return actions.subscription.create({
-          plan_id: planId
+          plan_id: planId,
+          application_context: {
+            shipping_preference: "NO_SHIPPING"
+          }
         });
       }}
       onApprove={async (data, actions) => {
