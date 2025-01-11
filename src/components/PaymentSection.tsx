@@ -4,7 +4,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import PayPalButton from "./PayPalButton";
 
-type PlanType = "trial" | "monthly" | "annual";
+type PlanType = "monthly" | "annual";
 
 interface Plan {
   type: PlanType;
@@ -14,12 +14,6 @@ interface Plan {
 }
 
 const plans: Plan[] = [
-  {
-    type: "trial",
-    name: "1-Day Trial",
-    price: "1.00",
-    description: "Try all features for 24 hours",
-  },
   {
     type: "monthly",
     name: "Monthly Plan",
