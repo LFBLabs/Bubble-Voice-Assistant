@@ -61,8 +61,6 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         intent: "subscription",
         vault: true,
         components: "buttons",
-        enableFunding: "card",
-        disableFunding: "paylater,venmo"
       }}
     >
       {children}
