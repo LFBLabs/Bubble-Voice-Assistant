@@ -59,7 +59,11 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         "enable-funding": ["card"],
         "disable-funding": ["paylater", "venmo"],
         "data-namespace": "PayPalSDK",
-        environment: "sandbox" // Explicitly set to sandbox mode
+        environment: "sandbox",
+        // Add merchant-id for sandbox testing
+        "merchant-id": "YOUR_SANDBOX_MERCHANT_ID",
+        // Add debug mode for development
+        debug: true
       }}
     >
       {children}
