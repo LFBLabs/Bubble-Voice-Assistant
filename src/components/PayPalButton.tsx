@@ -59,44 +59,46 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
   };
 
   return (
-    <PayPalButtons
-      style={{ 
-        shape: "pill",
-        color: "blue",
-        layout: "vertical",
-        label: "subscribe"
-      }}
-      createSubscription={(data, actions) => {
-        const planId = PLAN_IDS[planType];
-        if (!planId) {
+    <div className="w-full">
+      <PayPalButtons
+        style={{ 
+          shape: "pill",
+          color: "blue",
+          layout: "vertical",
+          label: "subscribe"
+        }}
+        createSubscription={(data, actions) => {
+          const planId = PLAN_IDS[planType];
+          if (!planId) {
+            toast({
+              variant: "destructive",
+              title: "Configuration Error",
+              description: "This plan is not yet configured",
+            });
+            return Promise.reject("Plan not configured");
+          }
+          return actions.subscription.create({
+            plan_id: planId,
+            application_context: {
+              shipping_preference: "NO_SHIPPING",
+              return_url: window.location.href,
+              cancel_url: window.location.href
+            }
+          });
+        }}
+        onApprove={async (data, actions) => {
+          await handleSubscriptionSuccess(data);
+        }}
+        onError={(err) => {
+          console.error("PayPal Error:", err);
           toast({
             variant: "destructive",
-            title: "Configuration Error",
-            description: "This plan is not yet configured",
+            title: "Subscription Error",
+            description: "There was an error processing your subscription",
           });
-          return Promise.reject("Plan not configured");
-        }
-        return actions.subscription.create({
-          plan_id: planId,
-          application_context: {
-            shipping_preference: "NO_SHIPPING",
-            return_url: window.location.href,
-            cancel_url: window.location.href
-          }
-        });
-      }}
-      onApprove={async (data, actions) => {
-        await handleSubscriptionSuccess(data);
-      }}
-      onError={(err) => {
-        console.error("PayPal Error:", err);
-        toast({
-          variant: "destructive",
-          title: "Subscription Error",
-          description: "There was an error processing your subscription",
-        });
-      }}
-    />
+        }}
+      />
+    </div>
   );
 };
 
