@@ -52,7 +52,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
   return (
     <PayPalScriptProvider
       options={{
-        "client-id": clientId,
+        clientId: clientId,
         vault: true,
         intent: "subscription",
         components: "buttons",
