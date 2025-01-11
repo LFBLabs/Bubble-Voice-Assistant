@@ -56,6 +56,10 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         vault: true,
         intent: "subscription",
         components: ["buttons"],
+        "enable-funding": ["card"],
+        "disable-funding": ["paylater", "venmo"],
+        "data-namespace": "PayPalSDK",
+        environment: "sandbox" // Explicitly set to sandbox mode
       }}
     >
       {children}
