@@ -15,10 +15,17 @@ import "./App.css";
 const queryClient = new QueryClient();
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { data: subscription, isLoading } = useSubscriptionStatus();
+  const { data: subscription, isLoading, error } = useSubscriptionStatus();
   
   if (isLoading) {
-    return <div>Loading subscription status...</div>;
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="text-lg">Loading subscription status...</div>
+    </div>;
+  }
+
+  if (error) {
+    console.error("Subscription error:", error);
+    return <Navigate to="/payment" replace />;
   }
   
   if (!subscription) {
