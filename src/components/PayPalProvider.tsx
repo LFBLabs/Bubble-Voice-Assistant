@@ -23,6 +23,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         
         if (PAYPAL_CLIENT_ID) {
           setClientId(PAYPAL_CLIENT_ID);
+          console.log("PayPal Client ID fetched successfully");
         } else {
           toast({
             variant: "destructive",
@@ -60,6 +61,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         "disable-funding": ["paylater", "venmo"],
         "data-namespace": "PayPalSDK",
         environment: "sandbox",
+        debug: true // Enable debug mode to see detailed logs
       }}
     >
       {children}
