@@ -15,28 +15,24 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
   useEffect(() => {
     const fetchClientId = async () => {
       try {
-        const { data: { PAYPAL_CLIENT_ID }, error } = await supabase.functions.invoke('get-secret', {
+        const { data, error } = await supabase.functions.invoke('get-secret', {
           body: { secretName: 'PAYPAL_CLIENT_ID' }
         });
         
         if (error) throw error;
         
-        if (PAYPAL_CLIENT_ID) {
-          setClientId(PAYPAL_CLIENT_ID);
+        if (data?.PAYPAL_CLIENT_ID) {
+          setClientId(data.PAYPAL_CLIENT_ID);
           console.log("PayPal Client ID fetched successfully");
         } else {
-          toast({
-            variant: "destructive",
-            title: "PayPal Setup Required",
-            description: "Please configure your PayPal client ID in the settings.",
-          });
+          throw new Error('PayPal Client ID not found');
         }
       } catch (error) {
         console.error('Error fetching PayPal client ID:', error);
         toast({
           variant: "destructive",
           title: "Configuration Error",
-          description: "Unable to load PayPal configuration.",
+          description: "Unable to load PayPal configuration. Please check your credentials.",
         });
       } finally {
         setIsLoading(false);
@@ -47,21 +43,28 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
   }, [toast]);
 
   if (isLoading) {
-    return <div>Loading PayPal configuration...</div>;
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="text-lg">Loading PayPal configuration...</div>
+    </div>;
+  }
+
+  if (!clientId) {
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="text-lg text-red-500">PayPal configuration error. Please check your credentials.</div>
+    </div>;
   }
 
   return (
     <PayPalScriptProvider
       options={{
-        clientId: clientId || "test",
+        clientId,
         vault: true,
         intent: "subscription",
-        components: ["buttons"],
-        "enable-funding": ["card"],
-        "disable-funding": ["paylater", "venmo"],
+        components: "buttons",
+        "enable-funding": "card",
+        "disable-funding": "paylater,venmo",
         "data-namespace": "PayPalSDK",
-        environment: "sandbox",
-        debug: true // Enable debug mode to see detailed logs
+        currency: "USD",
       }}
     >
       {children}
