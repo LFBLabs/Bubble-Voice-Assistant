@@ -57,7 +57,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
   return (
     <PayPalScriptProvider
       options={{
-        "client-id": clientId,
+        clientId: clientId,
         currency: "USD",
         intent: "subscription",
         vault: true,
