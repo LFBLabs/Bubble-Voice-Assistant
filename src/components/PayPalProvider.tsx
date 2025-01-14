@@ -65,6 +65,9 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         "disable-funding": "paylater,venmo",
         "data-namespace": "PayPalSDK",
         currency: "USD",
+        "client-id": clientId, // Add this line
+        "merchant-id": "sb", // Add this line for sandbox testing
+        "data-client-token": "sandbox_8hj2m9vz_dcpspy2jw4x9p32q", // Add this line for sandbox testing
       }}
     >
       {children}
