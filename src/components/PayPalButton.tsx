@@ -1,6 +1,7 @@
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useState } from "react";
 
 interface PayPalButtonProps {
   amount: string;
@@ -14,9 +15,11 @@ const PLAN_IDS = {
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
   const { toast } = useToast();
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubscriptionSuccess = async (details: any) => {
     try {
+      setIsProcessing(true);
       const validUntil = new Date();
       switch (planType) {
         case "monthly":
@@ -51,34 +54,43 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         title: "Error",
         description: "Failed to save subscription details",
       });
+    } finally {
+      setIsProcessing(false);
     }
   };
 
   return (
-    <PayPalButtons
-      style={{
-        shape: "pill",
-        color: "blue",
-        layout: "vertical",
-        label: "subscribe"
-      }}
-      createSubscription={(data, actions) => {
-        return actions.subscription.create({
-          plan_id: PLAN_IDS[planType],
-        });
-      }}
-      onApprove={async (data, actions) => {
-        await handleSubscriptionSuccess(data);
-      }}
-      onError={(err) => {
-        console.error("PayPal Error:", err);
-        toast({
-          variant: "destructive",
-          title: "Subscription Error",
-          description: "There was an error processing your subscription",
-        });
-      }}
-    />
+    <div className="relative">
+      {isProcessing && (
+        <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+          <div className="text-lg">Processing payment...</div>
+        </div>
+      )}
+      <PayPalButtons
+        style={{
+          shape: "rect",
+          color: "blue",
+          layout: "vertical",
+          label: "subscribe"
+        }}
+        createSubscription={(data, actions) => {
+          return actions.subscription.create({
+            plan_id: PLAN_IDS[planType],
+          });
+        }}
+        onApprove={async (data, actions) => {
+          await handleSubscriptionSuccess(data);
+        }}
+        onError={(err) => {
+          console.error("PayPal Error:", err);
+          toast({
+            variant: "destructive",
+            title: "Subscription Error",
+            description: "There was an error processing your subscription",
+          });
+        }}
+      />
+    </div>
   );
 };
 

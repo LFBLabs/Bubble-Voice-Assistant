@@ -57,17 +57,13 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
   return (
     <PayPalScriptProvider
       options={{
-        clientId,
-        vault: true,
+        "client-id": clientId,
+        currency: "USD",
         intent: "subscription",
+        vault: true,
         components: "buttons",
         "enable-funding": "card",
-        "disable-funding": "paylater,venmo",
-        "data-namespace": "PayPalSDK",
-        currency: "USD",
-        "client-id": clientId, // Add this line
-        "merchant-id": "sb", // Add this line for sandbox testing
-        "data-client-token": "sandbox_8hj2m9vz_dcpspy2jw4x9p32q", // Add this line for sandbox testing
+        "disable-funding": "paylater,venmo"
       }}
     >
       {children}
