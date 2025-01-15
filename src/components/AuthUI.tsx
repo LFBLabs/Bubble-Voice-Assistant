@@ -11,44 +11,74 @@ const AuthUI = () => {
 
   // Initialize session state
   React.useEffect(() => {
-    // Check for existing session on mount
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error("Error checking session:", error);
+    const initializeAuth = async () => {
+      try {
+        // Check for existing session on mount
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error("Session error:", sessionError);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "There was a problem checking your login status.",
+          });
+          return;
+        }
+
+        if (session) {
+          // If we have a valid session, navigate to home
+          navigate("/");
+          return;
+        }
+
+        // Set up auth state change listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log("Auth state changed:", event);
+          
+          switch (event) {
+            case 'SIGNED_OUT':
+              toast({
+                variant: "destructive",
+                title: "Signed Out",
+                description: "You have been signed out.",
+              });
+              break;
+              
+            case 'SIGNED_IN':
+              if (session) {
+                toast({
+                  title: "Signed In",
+                  description: "Successfully signed in!",
+                });
+                navigate("/");
+              }
+              break;
+              
+            case 'TOKEN_REFRESHED':
+              console.log("Session token refreshed");
+              break;
+              
+            case 'USER_UPDATED':
+              console.log("User data updated");
+              break;
+          }
+        });
+
+        return () => {
+          subscription.unsubscribe();
+        };
+      } catch (error) {
+        console.error("Auth initialization error:", error);
         toast({
           variant: "destructive",
           title: "Authentication Error",
-          description: "There was a problem checking your login status.",
+          description: "There was a problem initializing authentication.",
         });
-      } else if (session) {
-        navigate("/");
       }
-    });
-
-    // Listen for auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth state changed:", event, session);
-      
-      if (event === 'SIGNED_OUT') {
-        toast({
-          variant: "destructive",
-          title: "Signed Out",
-          description: "You have been signed out.",
-        });
-      } else if (event === 'SIGNED_IN') {
-        toast({
-          title: "Signed In",
-          description: "Successfully signed in!",
-        });
-        navigate("/");
-      } else if (event === 'USER_UPDATED') {
-        console.log("User updated");
-      }
-    });
-
-    return () => {
-      subscription.unsubscribe();
     };
+
+    initializeAuth();
   }, [toast, navigate]);
 
   return (
@@ -70,7 +100,7 @@ const AuthUI = () => {
           }}
           theme="light"
           providers={['google']}
-          redirectTo={window.location.origin}
+          redirectTo={`${window.location.origin}/login`}
         />
       </div>
     </div>
