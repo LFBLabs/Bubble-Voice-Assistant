@@ -3,6 +3,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 
 interface PayPalProviderProps {
   children: ReactNode;
@@ -13,76 +14,44 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { session } = useSupabaseAuth();
 
   useEffect(() => {
     let isSubscribed = true;
 
     const initializePayPal = async () => {
       try {
-        // First check if we have a valid session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Session error:', sessionError);
-          toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: "Please sign in again.",
-          });
-          navigate('/login');
-          return;
-        }
-
         if (!session) {
-          console.log('No active session found');
-          navigate('/login');
+          console.log('No active session, skipping PayPal initialization');
           return;
         }
 
-        // Refresh the session to ensure we have a valid token
-        const { error: refreshError } = await supabase.auth.refreshSession();
-        if (refreshError) {
-          console.error('Session refresh error:', refreshError);
-          toast({
-            variant: "destructive",
-            title: "Session Error",
-            description: "Unable to refresh your session. Please sign in again.",
-          });
-          navigate('/login');
-          return;
-        }
-
-        // Set up auth state change listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-          if (event === 'SIGNED_OUT' || !session) {
-            navigate('/login');
-          }
-        });
-
-        // Only proceed if component is still mounted
-        if (!isSubscribed) return;
-
+        // Fetch PayPal client ID
         const { data, error } = await supabase.functions.invoke('get-secret', {
           body: { secretName: 'PAYPAL_CLIENT_ID' }
         });
         
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching PayPal client ID:', error);
+          throw error;
+        }
         
-        if (data?.PAYPAL_CLIENT_ID) {
+        if (!data?.PAYPAL_CLIENT_ID) {
+          throw new Error('PayPal Client ID not found in response');
+        }
+
+        if (isSubscribed) {
           setClientId(data.PAYPAL_CLIENT_ID);
           console.log("PayPal Client ID fetched successfully");
-        } else {
-          throw new Error('PayPal Client ID not found');
         }
-      } catch (error) {
-        console.error('Error fetching PayPal client ID:', error);
+      } catch (error: any) {
+        console.error('PayPal initialization error:', error);
         if (isSubscribed) {
           toast({
             variant: "destructive",
-            title: "Configuration Error",
-            description: "Unable to load PayPal configuration. Please try again later.",
+            title: "PayPal Configuration Error",
+            description: "Unable to initialize PayPal. Please try again later.",
           });
-          navigate('/login');
         }
       } finally {
         if (isSubscribed) {
@@ -93,21 +62,22 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
 
     initializePayPal();
 
-    // Cleanup function
     return () => {
       isSubscribed = false;
-      // Cleanup auth subscription
-      supabase.auth.onAuthStateChange(() => {}).data.subscription.unsubscribe();
     };
-  }, [toast, navigate]);
+  }, [session, toast]);
 
-  if (isLoading) {
+  if (isLoading && session) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="text-lg">Loading PayPal configuration...</div>
     </div>;
   }
 
-  if (!clientId) {
+  if (!session) {
+    return <>{children}</>;
+  }
+
+  if (!clientId && !isLoading) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="text-lg text-red-500">PayPal configuration error. Please try again later.</div>
     </div>;
