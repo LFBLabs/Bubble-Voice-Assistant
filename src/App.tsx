@@ -35,6 +35,22 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
+function AuthenticatedRoute({ children }: { children: React.ReactNode }) {
+  const { session, loading } = useSupabaseAuth();
+
+  if (loading) {
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="text-lg">Loading...</div>
+    </div>;
+  }
+
+  if (!session) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+}
+
 function App() {
   const { session, loading } = useSupabaseAuth();
 
@@ -61,18 +77,20 @@ function App() {
             />
             <Route
               path="/payment"
-              element={session ? <Payment /> : <Navigate to="/login" replace />}
+              element={
+                <AuthenticatedRoute>
+                  <Payment />
+                </AuthenticatedRoute>
+              }
             />
             <Route
               path="/settings"
               element={
-                session ? (
+                <AuthenticatedRoute>
                   <ProtectedRoute>
                     <Settings />
                   </ProtectedRoute>
-                ) : (
-                  <Navigate to="/login" replace />
-                )
+                </AuthenticatedRoute>
               }
             />
           </Routes>
