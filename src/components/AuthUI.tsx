@@ -3,13 +3,32 @@ import { Auth } from "@supabase/auth-ui-react";
 import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const AuthUI = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  // Listen for auth state changes including errors
+  // Initialize session state
   React.useEffect(() => {
+    // Check for existing session on mount
+    supabase.auth.getSession().then(({ data: { session }, error }) => {
+      if (error) {
+        console.error("Error checking session:", error);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "There was a problem checking your login status.",
+        });
+      } else if (session) {
+        navigate("/");
+      }
+    });
+
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth state changed:", event, session);
+      
       if (event === 'SIGNED_OUT') {
         toast({
           variant: "destructive",
@@ -21,13 +40,16 @@ const AuthUI = () => {
           title: "Signed In",
           description: "Successfully signed in!",
         });
+        navigate("/");
+      } else if (event === 'USER_UPDATED') {
+        console.log("User updated");
       }
     });
 
     return () => {
       subscription.unsubscribe();
     };
-  }, [toast]);
+  }, [toast, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white p-6">
@@ -49,6 +71,14 @@ const AuthUI = () => {
           theme="light"
           providers={['google']}
           redirectTo={window.location.origin}
+          onError={(error) => {
+            console.error("Auth error:", error);
+            toast({
+              variant: "destructive",
+              title: "Authentication Error",
+              description: error.message,
+            });
+          }}
         />
       </div>
     </div>
