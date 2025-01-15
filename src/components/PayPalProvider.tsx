@@ -97,7 +97,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         "enable-funding": "card",
         "disable-funding": "paylater,venmo",
         // Set environment based on the client ID
-        environment: isSandbox ? "sandbox" : "live"
+        environment: isSandbox ? "sandbox" : "production"
       }}
     >
       {children}
