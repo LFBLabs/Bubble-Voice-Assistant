@@ -8,9 +8,10 @@ interface PayPalButtonProps {
   planType: "monthly" | "annual";
 }
 
+// Updated plan IDs - these should match your PayPal subscription plans
 const PLAN_IDS = {
-  monthly: "P-8UV93284A0400005PM6A6CEA",
-  annual: "P-72L64754J81152604M6A6HYY",
+  monthly: "P-5ML4271244454362XMXYZ", // Replace with your actual monthly plan ID
+  annual: "P-3RX63537H5544925PMXYZ",  // Replace with your actual annual plan ID
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
@@ -47,6 +48,10 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         title: "Subscription Successful",
         description: `Your ${planType} subscription is now active`,
       });
+      
+      // Redirect to the main page after successful subscription
+      window.location.href = '/';
+      
     } catch (error) {
       console.error("Error saving subscription:", error);
       toast({
@@ -62,7 +67,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
   return (
     <div className="relative">
       {isProcessing && (
-        <div className="absolute inset-0 bg-white/50 flex items-center justify-center">
+        <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
           <div className="text-lg">Processing payment...</div>
         </div>
       )}
@@ -76,9 +81,13 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         createSubscription={(data, actions) => {
           return actions.subscription.create({
             plan_id: PLAN_IDS[planType],
+            application_context: {
+              shipping_preference: "NO_SHIPPING"
+            }
           });
         }}
         onApprove={async (data, actions) => {
+          console.log("Subscription approved:", data);
           await handleSubscriptionSuccess(data);
         }}
         onError={(err) => {
@@ -86,7 +95,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
           toast({
             variant: "destructive",
             title: "Subscription Error",
-            description: "There was an error processing your subscription",
+            description: "There was an error processing your subscription. Please try again.",
           });
         }}
       />
