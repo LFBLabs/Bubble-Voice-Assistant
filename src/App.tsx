@@ -60,8 +60,8 @@ function App() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <PayPalProvider>
-        <Router>
+      <Router>
+        <PayPalProvider>
           <Routes>
             <Route
               path="/"
@@ -95,8 +95,8 @@ function App() {
             />
           </Routes>
           <Toaster />
-        </Router>
-      </PayPalProvider>
+        </PayPalProvider>
+      </Router>
     </QueryClientProvider>
   );
 }
