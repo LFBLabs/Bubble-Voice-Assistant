@@ -9,16 +9,25 @@ interface PayPalButtonProps {
   planType: "monthly" | "annual";
 }
 
-// Updated plan IDs - these should match your PayPal subscription plans
+// Replace these with your actual PayPal plan IDs from your PayPal Business account
 const PLAN_IDS = {
-  monthly: "P-5ML4271244454362XMXYZ", // Replace with your actual monthly plan ID
-  annual: "P-3RX63537H5544925PMXYZ",  // Replace with your actual annual plan ID
+  // Example format: "P-5AS4543XXXXXXXXX"
+  monthly: process.env.PAYPAL_MONTHLY_PLAN_ID || "", // You need to set this up in PayPal
+  annual: process.env.PAYPAL_ANNUAL_PLAN_ID || "",  // You need to set this up in PayPal
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
   const { toast } = useToast();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  const planId = PLAN_IDS[planType];
+
+  // Validate plan ID
+  if (!planId) {
+    console.error(`No plan ID found for plan type: ${planType}`);
+    return <div className="text-red-500">Configuration error: Invalid plan ID</div>;
+  }
 
   const handleSubscriptionSuccess = async (details: any) => {
     try {
@@ -93,8 +102,9 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
           label: "subscribe"
         }}
         createSubscription={(data, actions) => {
+          console.log("Creating subscription with plan ID:", planId);
           return actions.subscription.create({
-            plan_id: PLAN_IDS[planType],
+            plan_id: planId,
             application_context: {
               shipping_preference: "NO_SHIPPING",
               return_url: `${window.location.origin}/`,
