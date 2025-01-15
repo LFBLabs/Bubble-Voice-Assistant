@@ -43,6 +43,13 @@ const AuthUI = () => {
         navigate("/");
       } else if (event === 'USER_UPDATED') {
         console.log("User updated");
+      } else if (event === 'AUTH_ERROR') {
+        console.error("Auth error occurred:", session);
+        toast({
+          variant: "destructive",
+          title: "Authentication Error",
+          description: "There was a problem with authentication.",
+        });
       }
     });
 
@@ -71,14 +78,6 @@ const AuthUI = () => {
           theme="light"
           providers={['google']}
           redirectTo={window.location.origin}
-          onError={(error) => {
-            console.error("Auth error:", error);
-            toast({
-              variant: "destructive",
-              title: "Authentication Error",
-              description: error.message,
-            });
-          }}
         />
       </div>
     </div>
