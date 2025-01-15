@@ -2,6 +2,7 @@ import { PayPalButtons } from "@paypal/react-paypal-js";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 interface PayPalButtonProps {
   amount: string;
@@ -16,11 +17,20 @@ const PLAN_IDS = {
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
 
   const handleSubscriptionSuccess = async (details: any) => {
     try {
       setIsProcessing(true);
+      
+      // Get current session
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError || !session) {
+        throw new Error("No valid session found. Please log in again.");
+      }
+
       const validUntil = new Date();
       switch (planType) {
         case "monthly":
@@ -31,34 +41,38 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
           break;
       }
 
-      const { error } = await supabase.from("payments").insert({
+      const { error: insertError } = await supabase.from("payments").insert({
         payment_id: details.orderID,
         status: "active",
         amount: planType === "monthly" ? 29.99 : 299.99,
-        user_id: (await supabase.auth.getUser()).data.user?.id,
+        user_id: session.user.id,
         subscription_id: details.subscriptionID,
         subscription_status: "active",
         plan_type: planType,
         valid_until: validUntil.toISOString(),
       });
 
-      if (error) throw error;
+      if (insertError) throw insertError;
 
       toast({
         title: "Subscription Successful",
         description: `Your ${planType} subscription is now active`,
       });
       
-      // Redirect to the main page after successful subscription
-      window.location.href = '/';
+      navigate('/');
       
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error saving subscription:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to save subscription details",
+        description: error.message || "Failed to save subscription details",
       });
+      
+      // If session error, redirect to login
+      if (error.message.includes("session")) {
+        navigate('/login');
+      }
     } finally {
       setIsProcessing(false);
     }
