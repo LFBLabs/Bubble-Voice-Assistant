@@ -15,7 +15,9 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchClientId = async () => {
+    let isSubscribed = true;
+
+    const initializePayPal = async () => {
       try {
         // First check if we have a valid session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -37,12 +39,28 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
           return;
         }
 
+        // Refresh the session to ensure we have a valid token
+        const { error: refreshError } = await supabase.auth.refreshSession();
+        if (refreshError) {
+          console.error('Session refresh error:', refreshError);
+          toast({
+            variant: "destructive",
+            title: "Session Error",
+            description: "Unable to refresh your session. Please sign in again.",
+          });
+          navigate('/login');
+          return;
+        }
+
         // Set up auth state change listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           if (event === 'SIGNED_OUT' || !session) {
             navigate('/login');
           }
         });
+
+        // Only proceed if component is still mounted
+        if (!isSubscribed) return;
 
         const { data, error } = await supabase.functions.invoke('get-secret', {
           body: { secretName: 'PAYPAL_CLIENT_ID' }
@@ -58,21 +76,27 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         }
       } catch (error) {
         console.error('Error fetching PayPal client ID:', error);
-        toast({
-          variant: "destructive",
-          title: "Configuration Error",
-          description: "Unable to load PayPal configuration. Please try again later.",
-        });
-        navigate('/login');
+        if (isSubscribed) {
+          toast({
+            variant: "destructive",
+            title: "Configuration Error",
+            description: "Unable to load PayPal configuration. Please try again later.",
+          });
+          navigate('/login');
+        }
       } finally {
-        setIsLoading(false);
+        if (isSubscribed) {
+          setIsLoading(false);
+        }
       }
     };
 
-    fetchClientId();
+    initializePayPal();
 
-    // Cleanup subscription on unmount
+    // Cleanup function
     return () => {
+      isSubscribed = false;
+      // Cleanup auth subscription
       supabase.auth.onAuthStateChange(() => {}).data.subscription.unsubscribe();
     };
   }, [toast, navigate]);
