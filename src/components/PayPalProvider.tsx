@@ -20,11 +20,29 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         // First check if we have a valid session
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (sessionError || !session) {
+        if (sessionError) {
           console.error('Session error:', sessionError);
+          toast({
+            variant: "destructive",
+            title: "Authentication Error",
+            description: "Please sign in again.",
+          });
           navigate('/login');
           return;
         }
+
+        if (!session) {
+          console.log('No active session found');
+          navigate('/login');
+          return;
+        }
+
+        // Set up auth state change listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+          if (event === 'SIGNED_OUT' || !session) {
+            navigate('/login');
+          }
+        });
 
         const { data, error } = await supabase.functions.invoke('get-secret', {
           body: { secretName: 'PAYPAL_CLIENT_ID' }
@@ -43,18 +61,20 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         toast({
           variant: "destructive",
           title: "Configuration Error",
-          description: "Unable to load PayPal configuration. Please check your credentials.",
+          description: "Unable to load PayPal configuration. Please try again later.",
         });
-        // If there's an authentication error, redirect to login
-        if (error instanceof Error && error.message.includes('session')) {
-          navigate('/login');
-        }
+        navigate('/login');
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchClientId();
+
+    // Cleanup subscription on unmount
+    return () => {
+      supabase.auth.onAuthStateChange(() => {}).data.subscription.unsubscribe();
+    };
   }, [toast, navigate]);
 
   if (isLoading) {
@@ -65,7 +85,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
 
   if (!clientId) {
     return <div className="flex items-center justify-center min-h-screen">
-      <div className="text-lg text-red-500">PayPal configuration error. Please check your credentials.</div>
+      <div className="text-lg text-red-500">PayPal configuration error. Please try again later.</div>
     </div>;
   }
 
