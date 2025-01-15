@@ -83,6 +83,9 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
     </div>;
   }
 
+  // Determine if we're using sandbox credentials based on the client ID
+  const isSandbox = clientId.includes('sb');
+
   return (
     <PayPalScriptProvider
       options={{
@@ -92,7 +95,9 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         vault: true,
         components: "buttons",
         "enable-funding": "card",
-        "disable-funding": "paylater,venmo"
+        "disable-funding": "paylater,venmo",
+        // Set environment based on the client ID
+        environment: isSandbox ? "sandbox" : "live"
       }}
     >
       {children}
