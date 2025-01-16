@@ -9,11 +9,10 @@ interface PayPalButtonProps {
   planType: "monthly" | "annual";
 }
 
-// Replace these with your actual PayPal plan IDs from your PayPal Business account
+// Sandbox subscription plan IDs
 const PLAN_IDS = {
-  // Example format: "P-5AS4543XXXXXXXXX"
-  monthly: process.env.PAYPAL_MONTHLY_PLAN_ID || "", // You need to set this up in PayPal
-  annual: process.env.PAYPAL_ANNUAL_PLAN_ID || "",  // You need to set this up in PayPal
+  monthly: "P-3RX63537H5544925PMXYZ", // Monthly sandbox plan ID
+  annual: "P-5ML4271244454362XMXYZ",  // Annual sandbox plan ID
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
