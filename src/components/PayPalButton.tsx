@@ -11,7 +11,7 @@ interface PayPalButtonProps {
 
 // Sandbox subscription plan IDs
 const PLAN_IDS = {
-  monthly: "P-3RX63537H5544925PMXYZ", // Monthly sandbox plan ID
+  monthly: "P-8UV93284A0400005PM6A6CEA", // Monthly sandbox plan ID
   annual: "P-5ML4271244454362XMXYZ",  // Annual sandbox plan ID
 };
 
