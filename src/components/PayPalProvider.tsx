@@ -41,8 +41,8 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         }
 
         if (isSubscribed) {
+          console.log("Initializing PayPal with client ID:", data.PAYPAL_CLIENT_ID);
           setClientId(data.PAYPAL_CLIENT_ID);
-          console.log("PayPal Client ID fetched successfully");
         }
       } catch (error: any) {
         console.error('PayPal initialization error:', error);

@@ -105,9 +105,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
           return actions.subscription.create({
             plan_id: planId,
             application_context: {
-              shipping_preference: "NO_SHIPPING",
-              return_url: `${window.location.origin}/`,
-              cancel_url: `${window.location.origin}/payment`
+              shipping_preference: "NO_SHIPPING"
             }
           });
         }}
@@ -120,7 +118,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
           toast({
             variant: "destructive",
             title: "Subscription Error",
-            description: "There was an error processing your subscription. Please try again.",
+            description: "There was an error processing your subscription. Please check the console for more details.",
           });
         }}
       />
