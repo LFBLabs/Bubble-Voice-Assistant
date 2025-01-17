@@ -21,10 +21,36 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
 
     const initializePayPal = async () => {
       try {
-        if (!session) {
-          console.log('No active session, skipping PayPal initialization');
+        // Check for valid session
+        const { data: { session: currentSession }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError) {
+          console.error('Session error:', sessionError);
+          // Clear any stale session data
+          await supabase.auth.signOut();
+          navigate('/login');
           return;
         }
+
+        if (!currentSession) {
+          console.log('No active session, skipping PayPal initialization');
+          setIsLoading(false);
+          return;
+        }
+
+        // Set up auth state change listener
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+          console.log("Auth state changed:", event);
+          
+          if (event === 'TOKEN_REFRESHED') {
+            console.log('Token refreshed successfully');
+          }
+          
+          if (event === 'SIGNED_OUT') {
+            setClientId("");
+            navigate('/login');
+          }
+        });
 
         // Fetch PayPal client ID
         const { data, error } = await supabase.functions.invoke('get-secret', {
@@ -52,6 +78,11 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
             title: "PayPal Configuration Error",
             description: "Unable to initialize PayPal. Please try again later.",
           });
+          
+          // If there's an auth error, redirect to login
+          if (error.message?.includes('auth')) {
+            navigate('/login');
+          }
         }
       } finally {
         if (isSubscribed) {
@@ -65,7 +96,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
     return () => {
       isSubscribed = false;
     };
-  }, [session, toast]);
+  }, [session, toast, navigate]);
 
   if (isLoading && session) {
     return <div className="flex items-center justify-center min-h-screen">
