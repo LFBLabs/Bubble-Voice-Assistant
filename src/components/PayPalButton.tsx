@@ -9,10 +9,10 @@ interface PayPalButtonProps {
   planType: "monthly" | "annual";
 }
 
-// Updated monthly plan ID with the new one
+// Updated plan IDs with the new ones
 const PLAN_IDS = {
-  monthly: "P-85M1675421680423TM6FMVGA", // New Monthly plan ID
-  annual: "P-3RX065706M3469222MRKSWRA",  // Keeping existing annual plan ID
+  monthly: "P-85M1675421680423TM6FMVGA", // Monthly plan ID
+  annual: "P-1PE850798P928170PM6FMXLA",  // New Annual plan ID
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
