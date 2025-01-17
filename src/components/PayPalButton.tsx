@@ -31,6 +31,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
   const handleSubscriptionSuccess = async (details: any) => {
     try {
       setIsProcessing(true);
+      console.log("Processing subscription with details:", details);
       
       // Get current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
@@ -118,7 +119,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
           toast({
             variant: "destructive",
             title: "Subscription Error",
-            description: "There was an error processing your subscription. Please check the console for more details.",
+            description: "There was an error processing your subscription. Please try again later.",
           });
         }}
       />

@@ -41,7 +41,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         }
 
         if (isSubscribed) {
-          console.log("Initializing PayPal with client ID:", data.PAYPAL_CLIENT_ID);
+          console.log("Successfully fetched PayPal client ID");
           setClientId(data.PAYPAL_CLIENT_ID);
         }
       } catch (error: any) {
@@ -93,7 +93,6 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         components: "buttons",
         "enable-funding": "card",
         "disable-funding": "paylater,venmo",
-        // Always use sandbox environment for testing
         environment: "sandbox"
       }}
     >
