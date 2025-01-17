@@ -9,10 +9,10 @@ interface PayPalButtonProps {
   planType: "monthly" | "annual";
 }
 
-// Sandbox subscription plan IDs
+// These plan IDs need to be updated with your actual PayPal sandbox plan IDs
 const PLAN_IDS = {
-  monthly: "P-8UV93284A0400005PM6A6CEA", // Monthly sandbox plan ID
-  annual: "P-72L64754J81152604M6A6HYY",  // Annual sandbox plan ID
+  monthly: "P-5ML4271244454362AMRKSINQ", // Update with your monthly plan ID
+  annual: "P-3RX065706M3469222MRKSWRA",  // Update with your annual plan ID
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
@@ -106,7 +106,9 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
           return actions.subscription.create({
             plan_id: planId,
             application_context: {
-              shipping_preference: "NO_SHIPPING"
+              shipping_preference: "NO_SHIPPING",
+              return_url: window.location.href,
+              cancel_url: window.location.href
             }
           });
         }}
