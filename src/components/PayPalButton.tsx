@@ -11,8 +11,8 @@ interface PayPalButtonProps {
 
 // These plan IDs need to be updated with your actual PayPal sandbox plan IDs
 const PLAN_IDS = {
-  monthly: "P-5ML4271244454362AMRKSINQ", // Update with your monthly plan ID
-  annual: "P-3RX065706M3469222MRKSWRA",  // Update with your annual plan ID
+  monthly: "P-8UV93284A0400005PM6A6CEA", // Monthly plan ID
+  annual: "P-3RX065706M3469222MRKSWRA",  // Annual plan ID
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
@@ -107,8 +107,9 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
             plan_id: planId,
             application_context: {
               shipping_preference: "NO_SHIPPING",
-              return_url: window.location.href,
-              cancel_url: window.location.href
+              user_action: "SUBSCRIBE_NOW",
+              return_url: window.location.origin,
+              cancel_url: window.location.origin
             }
           });
         }}
