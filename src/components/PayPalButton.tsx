@@ -9,10 +9,10 @@ interface PayPalButtonProps {
   planType: "monthly" | "annual";
 }
 
-// These plan IDs need to be updated with your actual PayPal sandbox plan IDs
+// Updated monthly plan ID with the new one
 const PLAN_IDS = {
-  monthly: "P-8UV93284A0400005PM6A6CEA", // Monthly plan ID
-  annual: "P-3RX065706M3469222MRKSWRA",  // Annual plan ID
+  monthly: "P-85M1675421680423TM6FMVGA", // New Monthly plan ID
+  annual: "P-3RX065706M3469222MRKSWRA",  // Keeping existing annual plan ID
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
