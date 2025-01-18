@@ -9,10 +9,9 @@ interface PayPalButtonProps {
   planType: "monthly" | "annual";
 }
 
-// Updated plan IDs with the new ones
 const PLAN_IDS = {
-  monthly: "P-85M1675421680423TM6FMVGA", // Monthly plan ID
-  annual: "P-1PE850798P928170PM6FMXLA",  // New Annual plan ID
+  monthly: "P-85M1675421680423TM6FMVGA",
+  annual: "P-1PE850798P928170PM6FMXLA",
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
@@ -22,7 +21,6 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
 
   const planId = PLAN_IDS[planType];
 
-  // Validate plan ID
   if (!planId) {
     console.error(`No plan ID found for plan type: ${planType}`);
     return <div className="text-red-500">Configuration error: Invalid plan ID</div>;
@@ -33,7 +31,6 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
       setIsProcessing(true);
       console.log("Processing subscription with details:", details);
       
-      // Get current session
       const { data: { session }, error: sessionError } = await supabase.auth.getSession();
       
       if (sessionError || !session) {
@@ -78,7 +75,6 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         description: error.message || "Failed to save subscription details",
       });
       
-      // If session error, redirect to login
       if (error.message.includes("session")) {
         navigate('/login');
       }
@@ -108,14 +104,29 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
             application_context: {
               shipping_preference: "NO_SHIPPING",
               user_action: "SUBSCRIBE_NOW",
-              return_url: window.location.origin,
-              cancel_url: window.location.origin
+              return_url: window.location.origin + "/payment",
+              cancel_url: window.location.origin + "/payment"
             }
+          }).catch(err => {
+            console.error("Subscription creation error:", err);
+            toast({
+              variant: "destructive",
+              title: "Subscription Error",
+              description: "Failed to create subscription. Please try again.",
+            });
+            throw err;
           });
         }}
         onApprove={async (data, actions) => {
           console.log("Subscription approved:", data);
           await handleSubscriptionSuccess(data);
+        }}
+        onCancel={() => {
+          console.log("Subscription cancelled by user");
+          toast({
+            title: "Subscription Cancelled",
+            description: "You have cancelled the subscription process.",
+          });
         }}
         onError={(err) => {
           console.error("PayPal Error:", err);
