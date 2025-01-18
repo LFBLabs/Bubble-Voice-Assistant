@@ -4,42 +4,50 @@ import { ThemeSupa } from "@supabase/auth-ui-shared";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { AuthError } from "@supabase/supabase-js";
 
 const AuthUI = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Initialize session state
+  const handleAuthError = (error: AuthError) => {
+    console.error("Authentication error:", error);
+    let errorMessage = "There was a problem with authentication.";
+    
+    if (error.message.includes("Invalid login credentials")) {
+      errorMessage = "Invalid email or password. Please check your credentials and try again.";
+    } else if (error.message.includes("Email not confirmed")) {
+      errorMessage = "Please verify your email address before signing in.";
+    }
+
+    toast({
+      variant: "destructive",
+      title: "Authentication Error",
+      description: errorMessage,
+    });
+  };
+
   React.useEffect(() => {
     const initializeAuth = async () => {
       try {
-        // Check for existing session on mount
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError) {
-          console.error("Session error:", sessionError);
-          toast({
-            variant: "destructive",
-            title: "Authentication Error",
-            description: "There was a problem checking your login status.",
-          });
+          handleAuthError(sessionError);
           return;
         }
 
         if (session) {
-          // If we have a valid session, navigate to home
           navigate("/");
           return;
         }
 
-        // Set up auth state change listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
           console.log("Auth state changed:", event);
           
           switch (event) {
             case 'SIGNED_OUT':
               toast({
-                variant: "destructive",
                 title: "Signed Out",
                 description: "You have been signed out.",
               });
@@ -48,19 +56,19 @@ const AuthUI = () => {
             case 'SIGNED_IN':
               if (session) {
                 toast({
-                  title: "Signed In",
+                  title: "Welcome Back",
                   description: "Successfully signed in!",
                 });
                 navigate("/");
               }
               break;
               
-            case 'TOKEN_REFRESHED':
-              console.log("Session token refreshed");
-              break;
-              
             case 'USER_UPDATED':
               console.log("User data updated");
+              break;
+
+            case 'TOKEN_REFRESHED':
+              console.log("Session token refreshed");
               break;
           }
         });
@@ -69,12 +77,16 @@ const AuthUI = () => {
           subscription.unsubscribe();
         };
       } catch (error) {
-        console.error("Auth initialization error:", error);
-        toast({
-          variant: "destructive",
-          title: "Authentication Error",
-          description: "There was a problem initializing authentication.",
-        });
+        if (error instanceof AuthError) {
+          handleAuthError(error);
+        } else {
+          console.error("Unexpected error:", error);
+          toast({
+            variant: "destructive",
+            title: "Error",
+            description: "An unexpected error occurred. Please try again.",
+          });
+        }
       }
     };
 
@@ -101,6 +113,9 @@ const AuthUI = () => {
           theme="light"
           providers={['google']}
           redirectTo={`${window.location.origin}/login`}
+          onError={(error) => {
+            handleAuthError(error);
+          }}
         />
       </div>
     </div>
