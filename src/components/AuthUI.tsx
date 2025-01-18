@@ -45,14 +45,6 @@ const AuthUI = () => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
           console.log("Auth state changed:", event);
           
-          if (event === 'AUTH_ERROR') {
-            const { error } = await supabase.auth.getSession();
-            if (error) {
-              handleAuthError(error);
-            }
-            return;
-          }
-          
           switch (event) {
             case 'SIGNED_OUT':
               toast({
