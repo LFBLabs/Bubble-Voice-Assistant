@@ -17,14 +17,14 @@ const plans: Plan[] = [
   {
     type: "monthly",
     name: "Monthly Plan",
-    price: "29.99",
+    price: "24.00",
     description: "Billed monthly",
   },
   {
     type: "annual",
     name: "Annual Plan",
-    price: "299.99",
-    description: "Billed annually (Save 16%)",
+    price: "245.00",
+    description: "Billed annually (Save 15%)",
   },
 ];
 

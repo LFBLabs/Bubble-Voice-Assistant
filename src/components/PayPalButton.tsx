@@ -50,7 +50,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
       const { error: insertError } = await supabase.from("payments").insert({
         payment_id: details.orderID,
         status: "active",
-        amount: planType === "monthly" ? 29.99 : 299.99,
+        amount: planType === "monthly" ? 24.00 : 245.00,
         user_id: session.user.id,
         subscription_id: details.subscriptionID,
         subscription_status: "active",
