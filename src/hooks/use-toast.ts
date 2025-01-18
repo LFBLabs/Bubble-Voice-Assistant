@@ -1,6 +1,6 @@
 import * as React from "react";
 import { ToasterToast, State, Action } from "@/lib/toast-types";
-import { reducer } from "@/lib/toast-reducer";
+import { reducer, createAddToRemoveQueue } from "@/lib/toast-reducer";
 
 let count = 0;
 
@@ -19,6 +19,8 @@ function dispatch(action: Action) {
     listener(memoryState);
   });
 }
+
+const addToRemoveQueue = createAddToRemoveQueue(dispatch);
 
 type Toast = Omit<ToasterToast, "id">;
 

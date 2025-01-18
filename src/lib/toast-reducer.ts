@@ -5,7 +5,7 @@ const TOAST_REMOVE_DELAY = 1000000;
 
 export const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
-export const addToRemoveQueue = (toastId: string) => {
+export const createAddToRemoveQueue = (dispatch: (action: Action) => void) => (toastId: string) => {
   if (toastTimeouts.has(toastId)) {
     return;
   }
@@ -39,14 +39,6 @@ export const reducer = (state: State, action: Action): State => {
 
     case "DISMISS_TOAST": {
       const { toastId } = action;
-
-      if (toastId) {
-        addToRemoveQueue(toastId);
-      } else {
-        state.toasts.forEach((toast) => {
-          addToRemoveQueue(toast.id);
-        });
-      }
 
       return {
         ...state,
