@@ -30,16 +30,18 @@ const Landing = () => {
             get explanations, and streamline your workflow - all through natural conversation.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          <div className="flex flex-col items-center gap-4 justify-center mb-16">
             <Button
               size="lg"
               className="text-lg gap-2"
               onClick={() => navigate("/login")}
             >
-              <DollarSign className="w-5 h-5" />
-              Get Started for $1
+              Get Started for Free
               <ArrowRight className="w-5 h-5" />
             </Button>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Includes a 1-day free trial, then $24/month
+            </p>
           </div>
 
           <div className="grid sm:grid-cols-3 gap-8 mb-16">
