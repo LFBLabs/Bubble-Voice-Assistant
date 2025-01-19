@@ -76,9 +76,9 @@ const Header = ({ title, description }: HeaderProps) => {
             </span>
           )}
           <Button
-            variant="outline"
+            variant="destructive"
             onClick={() => supabase.auth.signOut()}
-            className="whitespace-nowrap"
+            className="whitespace-nowrap font-semibold"
           >
             Sign Out
           </Button>
