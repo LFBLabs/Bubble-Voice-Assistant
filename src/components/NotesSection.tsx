@@ -20,22 +20,22 @@ const NotesSection = () => {
     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg dark:shadow-gray-900/50 p-4 sm:p-8 mb-8">
       <h2 className="text-xl sm:text-2xl font-bold text-primary dark:text-white mb-6">Notes</h2>
       <Tabs defaultValue="data_types" className="w-full">
-        <TabsList className="grid w-full grid-cols-3 gap-8">
+        <TabsList className="grid w-full grid-cols-3 gap-2 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
           <TabsTrigger 
             value="data_types" 
-            className="w-full px-4 py-2 text-sm sm:text-base"
+            className="w-full px-3 py-2 text-sm sm:text-base rounded-md"
           >
             Data
           </TabsTrigger>
           <TabsTrigger 
             value="workflows" 
-            className="w-full px-4 py-2 text-sm sm:text-base"
+            className="w-full px-3 py-2 text-sm sm:text-base rounded-md"
           >
             Workflows
           </TabsTrigger>
           <TabsTrigger 
             value="design" 
-            className="w-full px-4 py-2 text-sm sm:text-base"
+            className="w-full px-3 py-2 text-sm sm:text-base rounded-md"
           >
             Design
           </TabsTrigger>
