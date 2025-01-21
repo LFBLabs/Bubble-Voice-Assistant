@@ -23,19 +23,19 @@ const NotesSection = () => {
         <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-700 rounded-lg overflow-hidden">
           <TabsTrigger 
             value="data_types" 
-            className="w-full px-3 py-2 text-sm sm:text-base"
+            className="w-full px-3 py-2 text-sm sm:text-base text-center flex items-center justify-center"
           >
             Data
           </TabsTrigger>
           <TabsTrigger 
             value="workflows" 
-            className="w-full px-3 py-2 text-sm sm:text-base"
+            className="w-full px-3 py-2 text-sm sm:text-base text-center flex items-center justify-center"
           >
             Workflow
           </TabsTrigger>
           <TabsTrigger 
             value="design" 
-            className="w-full px-3 py-2 text-sm sm:text-base"
+            className="w-full px-3 py-2 text-sm sm:text-base text-center flex items-center justify-center"
           >
             Design
           </TabsTrigger>
