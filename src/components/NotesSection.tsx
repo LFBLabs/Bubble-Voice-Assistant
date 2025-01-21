@@ -43,7 +43,7 @@ const NotesSection = () => {
         <TabsContent value="data_types">
           <NoteTabContent
             category="Data Types"
-            placeholder="Take notes about Bubble.io data types here..."
+            placeholder="Take notes about new data type note here..."
             content={getNoteContent('data_types')}
             onChange={(content) => handleNoteChange('data_types', content)}
             onSave={() => handleSave('data_types')}
