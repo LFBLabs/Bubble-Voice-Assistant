@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Moon, Sun, Settings2 } from "lucide-react";
+import { Moon, Sun, Settings2, MessageSquarePlus } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface HeaderProps {
@@ -67,6 +67,15 @@ const Header = ({ title, description }: HeaderProps) => {
             aria-label="Settings"
           >
             <Settings2 className="h-5 w-5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/feedback')}
+            className="w-10 h-10"
+            aria-label="Provide feedback"
+          >
+            <MessageSquarePlus className="h-5 w-5" />
           </Button>
         </div>
         <div className="flex items-center gap-3 flex-wrap justify-center">

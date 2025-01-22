@@ -6,6 +6,7 @@ import Index from "@/pages/Index";
 import Settings from "@/pages/Settings";
 import Landing from "@/pages/Landing";
 import Payment from "@/pages/Payment";
+import Feedback from "@/pages/Feedback";
 import { Toaster } from "@/components/ui/toaster";
 import PayPalProvider from "@/components/PayPalProvider";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
@@ -53,6 +54,14 @@ function App() {
                   <ProtectedRoute>
                     <Settings />
                   </ProtectedRoute>
+                </AuthenticatedRoute>
+              }
+            />
+            <Route
+              path="/feedback"
+              element={
+                <AuthenticatedRoute>
+                  <Feedback />
                 </AuthenticatedRoute>
               }
             />
