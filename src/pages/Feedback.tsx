@@ -28,14 +28,19 @@ const Feedback = () => {
 
   const onSubmit = async (data: FeedbackForm) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
       const { error } = await supabase
         .from("feedback")
-        .insert([
-          {
-            type: data.type,
-            content: data.content,
-          },
-        ]);
+        .insert({
+          type: data.type,
+          content: data.content,
+          user_id: user.id
+        });
 
       if (error) throw error;
 
