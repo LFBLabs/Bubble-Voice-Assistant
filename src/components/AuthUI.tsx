@@ -11,15 +11,29 @@ const AuthUI = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // Check and refresh session on component mount
+    const checkSession = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Session check error:', error);
+        setErrorMessage(getErrorMessage(error));
+        // Clear any invalid session data
+        await supabase.auth.signOut();
+      } else if (session) {
+        navigate('/', { replace: true });
+      }
+    };
+    
+    checkSession();
+
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log('Auth event:', event);
+      
       if (event === 'SIGNED_IN' && session) {
         navigate('/', { replace: true });
       }
-      if (event === 'USER_UPDATED') {
-        const { error } = await supabase.auth.getSession();
-        if (error) {
-          setErrorMessage(getErrorMessage(error));
-        }
+      if (event === 'TOKEN_REFRESHED' && session) {
+        console.log('Token refreshed successfully');
       }
       if (event === 'SIGNED_OUT') {
         setErrorMessage('');
@@ -86,6 +100,10 @@ const AuthUI = () => {
                 },
               }}
               providers={[]}
+              onError={(error) => {
+                console.error('Auth error:', error);
+                setErrorMessage(getErrorMessage(error));
+              }}
             />
           </div>
         </div>
