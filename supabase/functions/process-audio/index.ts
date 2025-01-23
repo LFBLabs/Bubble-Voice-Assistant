@@ -27,73 +27,48 @@ serve(async (req) => {
     const requestData = await req.json();
     const { text } = requestData;
     
-    console.log('Received request with text:', text);
-
     if (!text || typeof text !== 'string' || text.trim().length === 0) {
       throw new Error('Invalid or empty text input');
     }
 
-    console.log('Processing text input:', text);
     let responseText: string;
-
     const isGreeting = greetingPatterns.some(pattern => pattern.test(text.trim()));
 
     if (isGreeting) {
       responseText = greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
-      console.log('Greeting detected, sending quick response');
     } else {
-      // Initialize Supabase client
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
       const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
       const supabase = createClient(supabaseUrl, supabaseKey);
 
-      // Fetch only relevant knowledge base entries based on the query
-      console.log('Fetching knowledge base entries...');
       const { data: knowledgeBaseEntries, error: fetchError } = await supabase
         .from('knowledge_base')
         .select('title, content')
-        .limit(5); // Reduced limit to prevent large context
+        .limit(3); // Further reduced limit
 
       if (fetchError) {
         console.error('Error fetching knowledge base:', fetchError);
         throw new Error('Failed to fetch knowledge base data');
       }
 
-      // Format knowledge base entries more efficiently
-      const knowledgeBaseContext = knowledgeBaseEntries
-        .slice(0, 5) // Extra safety to limit entries
-        .map(entry => `${entry.title}: ${entry.content || ''}`)
+      const context = knowledgeBaseEntries
+        .map(entry => `${entry.title}: ${entry.content || ''}`.slice(0, 200))
         .join('\n')
-        .slice(0, 1000); // Limit context length
-
-      console.log('Knowledge base context length:', knowledgeBaseContext.length);
+        .slice(0, 500); // Further reduced context length
 
       const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'));
-      if (!genAI) {
-        throw new Error('Failed to initialize Gemini AI');
-      }
-
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      // Simplified prompt structure
-      const prompt = `As a Bubble.io expert, answer this question using the following context:
-      ${knowledgeBaseContext}
-      
-      Question: ${text}
-      
-      Keep your response under 400 characters and use a friendly, conversational tone.`;
-
+      const prompt = `Answer this Bubble.io question concisely:\n${text}\n\nContext:\n${context}`;
       const result = await model.generateContent(prompt);
       
-      if (!result || !result.response) {
-        throw new Error('Failed to generate AI response');
+      if (!result?.response) {
+        throw new Error('No response from AI model');
       }
 
-      responseText = result.response.text().slice(0, 400);
-      console.log('Generated response length:', responseText.length);
+      responseText = result.response.text().slice(0, 300); // Reduced max length
     }
 
-    console.log('Initializing AWS Polly...');
     const polly = new Polly({
       region: "us-east-1",
       credentials: {
@@ -101,12 +76,6 @@ serve(async (req) => {
         secretAccessKey: Deno.env.get('AWS_SECRET_KEY')
       }
     });
-
-    if (!polly) {
-      throw new Error('Failed to initialize AWS Polly');
-    }
-
-    console.log('Synthesizing speech with AWS Polly...');
 
     const speechResponse = await polly.synthesizeSpeech({
       Text: responseText,
@@ -120,13 +89,9 @@ serve(async (req) => {
       throw new Error('No audio stream returned from AWS Polly');
     }
 
-    console.log('Successfully generated audio stream');
-
     const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
     const audioBase64 = btoa(String.fromCharCode(...audioData));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
-
-    console.log('Successfully converted audio to base64');
 
     return new Response(
       JSON.stringify({ 
