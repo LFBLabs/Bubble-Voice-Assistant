@@ -47,22 +47,26 @@ serve(async (req) => {
       const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
       const supabase = createClient(supabaseUrl, supabaseKey);
 
-      // Fetch relevant knowledge base entries
+      // Fetch only relevant knowledge base entries based on the query
       console.log('Fetching knowledge base entries...');
       const { data: knowledgeBaseEntries, error: fetchError } = await supabase
         .from('knowledge_base')
-        .select('title, content, url, type')
-        .limit(10);
+        .select('title, content')
+        .limit(5); // Reduced limit to prevent large context
 
       if (fetchError) {
         console.error('Error fetching knowledge base:', fetchError);
         throw new Error('Failed to fetch knowledge base data');
       }
 
-      // Format knowledge base entries for context
+      // Format knowledge base entries more efficiently
       const knowledgeBaseContext = knowledgeBaseEntries
-        .map(entry => `${entry.title}${entry.content ? ': ' + entry.content : ''} (${entry.url})`)
-        .join('\n');
+        .slice(0, 5) // Extra safety to limit entries
+        .map(entry => `${entry.title}: ${entry.content || ''}`)
+        .join('\n')
+        .slice(0, 1000); // Limit context length
+
+      console.log('Knowledge base context length:', knowledgeBaseContext.length);
 
       const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'));
       if (!genAI) {
@@ -70,32 +74,23 @@ serve(async (req) => {
       }
 
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      const result = await model.generateContent([
-        { 
-          text: `You are a friendly and helpful voice assistant that explains Bubble.io concepts. Keep responses under 400 characters.
-                Use a conversational, natural tone like you're chatting with a friend. Start responses with phrases like:
-                - "Well, let me explain..."
-                - "You know what? ..."
-                - "Actually, ..."
-                - "That's a great question! ..."
-                Use contractions (I'm, you'll, that's) and casual language, but stay professional.
-                Avoid technical jargon unless necessary.
-                
-                Here is some relevant documentation about Bubble.io to help inform your response:
-                ${knowledgeBaseContext}
-                
-                Please use this knowledge to provide accurate, friendly information about Bubble.io.`
-        },
-        { text }
-      ]);
+      
+      // Simplified prompt structure
+      const prompt = `As a Bubble.io expert, answer this question using the following context:
+      ${knowledgeBaseContext}
+      
+      Question: ${text}
+      
+      Keep your response under 400 characters and use a friendly, conversational tone.`;
 
+      const result = await model.generateContent(prompt);
+      
       if (!result || !result.response) {
         throw new Error('Failed to generate AI response');
       }
 
-      const response = await result.response;
-      responseText = response.text().slice(0, 400);
-      console.log('Technical response generated, length:', responseText.length);
+      responseText = result.response.text().slice(0, 400);
+      console.log('Generated response length:', responseText.length);
     }
 
     console.log('Initializing AWS Polly...');
