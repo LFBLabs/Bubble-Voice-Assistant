@@ -8,15 +8,10 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const greetingPatterns = [
-  /^(hi|hello|hey|good morning|good afternoon|good evening|howdy|sup|what'?s up|yo|hiya|greetings)/i,
-];
+// Simplified greeting pattern
+const greetingPattern = /^(hi|hello|hey)/i;
 
-const greetingResponses = [
-  "Hey! I'm excited to chat about Bubble.io with you. What's on your mind?",
-  "Hi there! I'd love to help you out with Bubble.io today. What can I explain?",
-  "Hey! Always happy to talk about Bubble.io. What would you like to know?",
-];
+const greetingResponse = "Hi! I'm here to help you with Bubble.io. What would you like to know?";
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -24,56 +19,46 @@ serve(async (req) => {
   }
 
   try {
-    const requestData = await req.json();
-    const { text } = requestData;
+    const { text } = await req.json();
     
-    if (!text || typeof text !== 'string' || text.trim().length === 0) {
+    if (!text?.trim()) {
       throw new Error('Invalid or empty text input');
     }
 
     let responseText: string;
-    const isGreeting = greetingPatterns.some(pattern => pattern.test(text.trim()));
 
-    if (isGreeting) {
-      responseText = greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
+    // Simple greeting check
+    if (greetingPattern.test(text.trim())) {
+      responseText = greetingResponse;
     } else {
-      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-      const supabase = createClient(supabaseUrl, supabaseKey);
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL')!,
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      );
 
-      const { data: knowledgeBaseEntries, error: fetchError } = await supabase
+      const { data: entries } = await supabase
         .from('knowledge_base')
-        .select('title, content')
-        .limit(3); // Further reduced limit
+        .select('content')
+        .limit(2);
 
-      if (fetchError) {
-        console.error('Error fetching knowledge base:', fetchError);
-        throw new Error('Failed to fetch knowledge base data');
-      }
+      const context = entries
+        ?.map(entry => entry.content || '')
+        .join(' ')
+        .slice(0, 200) || '';
 
-      const context = knowledgeBaseEntries
-        .map(entry => `${entry.title}: ${entry.content || ''}`.slice(0, 200))
-        .join('\n')
-        .slice(0, 500); // Further reduced context length
-
-      const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY'));
+      const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY')!);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const prompt = `Answer this Bubble.io question concisely:\n${text}\n\nContext:\n${context}`;
+      const prompt = `Question about Bubble.io: ${text}\nContext: ${context}\nProvide a brief, helpful response.`;
       const result = await model.generateContent(prompt);
-      
-      if (!result?.response) {
-        throw new Error('No response from AI model');
-      }
-
-      responseText = result.response.text().slice(0, 300); // Reduced max length
+      responseText = result.response?.text().slice(0, 200) || 'Sorry, I could not generate a response.';
     }
 
     const polly = new Polly({
       region: "us-east-1",
       credentials: {
-        accessKeyId: Deno.env.get('AWS_ACCESS_KEY'),
-        secretAccessKey: Deno.env.get('AWS_SECRET_KEY')
+        accessKeyId: Deno.env.get('AWS_ACCESS_KEY')!,
+        secretAccessKey: Deno.env.get('AWS_SECRET_KEY')!
       }
     });
 
@@ -86,7 +71,7 @@ serve(async (req) => {
     });
 
     if (!speechResponse.AudioStream) {
-      throw new Error('No audio stream returned from AWS Polly');
+      throw new Error('Failed to generate audio');
     }
 
     const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
@@ -94,10 +79,7 @@ serve(async (req) => {
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
 
     return new Response(
-      JSON.stringify({ 
-        response: responseText,
-        audioUrl
-      }),
+      JSON.stringify({ response: responseText, audioUrl }),
       { 
         headers: {
           ...corsHeaders,
@@ -108,9 +90,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in process-audio function:', error);
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'An unknown error occurred'
-      }),
+      JSON.stringify({ error: error.message }),
       { 
         headers: {
           ...corsHeaders,
