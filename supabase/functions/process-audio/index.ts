@@ -8,12 +8,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Simplified greeting pattern
-const greetingPattern = /^(hi|hello|hey)/i;
-
-const greetingResponse = "Hi! I'm here to help you with Bubble.io. What would you like to know?";
-
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -25,43 +21,51 @@ serve(async (req) => {
       throw new Error('Invalid or empty text input');
     }
 
+    // Initialize response text
     let responseText: string;
 
-    // Simple greeting check
-    if (greetingPattern.test(text.trim())) {
-      responseText = greetingResponse;
+    // Simple greeting check with basic pattern
+    if (/^(hi|hello|hey)\b/i.test(text.trim())) {
+      responseText = "Hi! I'm here to help you with Bubble.io. What would you like to know?";
     } else {
+      // Initialize Supabase client
       const supabase = createClient(
-        Deno.env.get('SUPABASE_URL')!,
-        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
       );
 
+      // Fetch relevant knowledge base entries
       const { data: entries } = await supabase
         .from('knowledge_base')
         .select('content')
-        .limit(2);
+        .limit(3);
 
+      // Process context with length limit
       const context = entries
         ?.map(entry => entry.content || '')
         .join(' ')
-        .slice(0, 200) || '';
+        .slice(0, 1000) || '';
 
-      const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY')!);
+      // Initialize Gemini
+      const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY') ?? '');
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      
-      const prompt = `Question about Bubble.io: ${text}\nContext: ${context}\nProvide a brief, helpful response.`;
+
+      // Generate response with context
+      const prompt = `Question about Bubble.io: ${text}\nContext: ${context}\nProvide a clear, helpful response.`;
       const result = await model.generateContent(prompt);
-      responseText = result.response?.text().slice(0, 200) || 'Sorry, I could not generate a response.';
+      responseText = result.response?.text().slice(0, 800) || 'I apologize, but I could not generate a response.';
     }
 
+    // Initialize Polly for text-to-speech
     const polly = new Polly({
       region: "us-east-1",
       credentials: {
-        accessKeyId: Deno.env.get('AWS_ACCESS_KEY')!,
-        secretAccessKey: Deno.env.get('AWS_SECRET_KEY')!
+        accessKeyId: Deno.env.get('AWS_ACCESS_KEY') ?? '',
+        secretAccessKey: Deno.env.get('AWS_SECRET_KEY') ?? ''
       }
     });
 
+    // Generate speech
     const speechResponse = await polly.synthesizeSpeech({
       Text: responseText,
       OutputFormat: "mp3",
@@ -74,10 +78,12 @@ serve(async (req) => {
       throw new Error('Failed to generate audio');
     }
 
+    // Convert audio to base64
     const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
     const audioBase64 = btoa(String.fromCharCode(...audioData));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
 
+    // Return response
     return new Response(
       JSON.stringify({ response: responseText, audioUrl }),
       { 
