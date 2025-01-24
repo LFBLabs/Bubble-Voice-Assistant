@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import AuthUI from "./AuthUI";
 import Header from "./Header";
 import VoiceContainer from "./VoiceContainer";
@@ -10,14 +11,31 @@ import { useAudioResponse } from "@/hooks/useAudioResponse";
 
 const VoiceAssistant = () => {
   const { session, loading } = useSupabaseAuth();
+  const { toast } = useToast();
   const { isProcessing, response, processAudioResponse } = useAudioResponse();
   const { isRecording, transcript, toggleRecording } = useVoiceRecording(processAudioResponse);
 
   useEffect(() => {
-    return () => {
-      // Any cleanup code if needed
-    };
-  }, []);
+    if (!session) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to use the voice assistant.",
+        variant: "destructive",
+      });
+    }
+  }, [session, toast]);
+
+  const handleToggleRecording = () => {
+    if (!session) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to use the voice assistant.",
+        variant: "destructive",
+      });
+      return;
+    }
+    toggleRecording();
+  };
 
   if (loading) {
     return (
@@ -43,7 +61,7 @@ const VoiceAssistant = () => {
           <VoiceContainer
             isRecording={isRecording}
             isProcessing={isProcessing}
-            toggleRecording={toggleRecording}
+            toggleRecording={handleToggleRecording}
             transcript={transcript}
             response={response}
           />
