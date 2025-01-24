@@ -37,6 +37,7 @@ const AuthUI = () => {
       }
       if (event === 'SIGNED_OUT') {
         setErrorMessage('');
+        navigate('/landing', { replace: true });
       }
     });
 
@@ -95,6 +96,8 @@ const AuthUI = () => {
                     colors: {
                       brand: '#6D28D9',
                       brandAccent: '#7C3AED',
+                      inputBackground: 'white',
+                      inputText: 'black',
                     },
                   },
                 },

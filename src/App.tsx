@@ -27,9 +27,10 @@ function App() {
       <Router>
         <PayPalProvider>
           <Routes>
+            <Route path="/landing" element={<Landing />} />
             <Route
               path="/"
-              element={!session ? <Landing /> : (
+              element={!session ? <Navigate to="/landing" replace /> : (
                 <ProtectedRoute>
                   <Index />
                 </ProtectedRoute>
