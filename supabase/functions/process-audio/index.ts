@@ -61,15 +61,23 @@ serve(async (req) => {
       const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY') ?? '');
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-      // Generate response with context
-      const prompt = `Question about Bubble.io: ${text}\nContext: ${context}\nProvide a clear, helpful response.`;
-      const result = await model.generateContent(prompt);
-      
-      if (!result.response) {
+      try {
+        // Generate response with context
+        const prompt = `Question about Bubble.io: ${text}\nContext: ${context}\nProvide a clear, helpful response.`;
+        const result = await model.generateContent(prompt);
+        const response = result.response;
+        
+        if (!response) {
+          throw new Error('Failed to generate AI response');
+        }
+        
+        responseText = response.text();
+        // Ensure we have a valid string and limit its length
+        responseText = typeof responseText === 'string' ? responseText.slice(0, 800) : 'I apologize, but I could not generate a response.';
+      } catch (aiError) {
+        console.error('AI Generation error:', aiError);
         throw new Error('Failed to generate AI response');
       }
-      
-      responseText = result.response.text().slice(0, 800) || 'I apologize, but I could not generate a response.';
     }
 
     // Initialize Polly for text-to-speech
@@ -121,7 +129,7 @@ serve(async (req) => {
           ...corsHeaders,
           'Content-Type': 'application/json',
         },
-        status: 400, // Changed from 500 to 400 for client errors
+        status: 400,
       }
     );
   }
