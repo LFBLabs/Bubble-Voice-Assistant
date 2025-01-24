@@ -15,6 +15,12 @@ serve(async (req) => {
   }
 
   try {
+    // Verify authentication
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      throw new Error('No authorization header');
+    }
+
     const { text } = await req.json();
     
     if (!text?.trim()) {
@@ -35,10 +41,15 @@ serve(async (req) => {
       );
 
       // Fetch relevant knowledge base entries
-      const { data: entries } = await supabase
+      const { data: entries, error: dbError } = await supabase
         .from('knowledge_base')
         .select('content')
         .limit(3);
+
+      if (dbError) {
+        console.error('Database error:', dbError);
+        throw new Error('Failed to fetch knowledge base entries');
+      }
 
       // Process context with length limit
       const context = entries
@@ -53,7 +64,12 @@ serve(async (req) => {
       // Generate response with context
       const prompt = `Question about Bubble.io: ${text}\nContext: ${context}\nProvide a clear, helpful response.`;
       const result = await model.generateContent(prompt);
-      responseText = result.response?.text().slice(0, 800) || 'I apologize, but I could not generate a response.';
+      
+      if (!result.response) {
+        throw new Error('Failed to generate AI response');
+      }
+      
+      responseText = result.response.text().slice(0, 800) || 'I apologize, but I could not generate a response.';
     }
 
     // Initialize Polly for text-to-speech
@@ -96,13 +112,16 @@ serve(async (req) => {
   } catch (error) {
     console.error('Error in process-audio function:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: error instanceof Error ? error.message : 'An unexpected error occurred',
+        details: error instanceof Error ? error.stack : undefined
+      }),
       { 
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/json',
         },
-        status: 500,
+        status: 400, // Changed from 500 to 400 for client errors
       }
     );
   }
