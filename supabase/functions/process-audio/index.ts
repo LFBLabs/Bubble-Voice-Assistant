@@ -39,19 +39,19 @@ serve(async (req) => {
       const { data: entries } = await supabase
         .from('knowledge_base')
         .select('content')
-        .limit(3);  // Increased from 2 to 3 entries
+        .limit(2);
 
       const context = entries
         ?.map(entry => entry.content || '')
         .join(' ')
-        .slice(0, 800) || '';  // Increased from 200 to 800 characters
+        .slice(0, 200) || '';
 
       const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY')!);
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const prompt = `Question about Bubble.io: ${text}\nContext: ${context}\nProvide a helpful and detailed response.`;
+      const prompt = `Question about Bubble.io: ${text}\nContext: ${context}\nProvide a brief, helpful response.`;
       const result = await model.generateContent(prompt);
-      responseText = result.response?.text().slice(0, 500) || 'Sorry, I could not generate a response.';  // Increased from 200 to 500 characters
+      responseText = result.response?.text().slice(0, 200) || 'Sorry, I could not generate a response.';
     }
 
     const polly = new Polly({
