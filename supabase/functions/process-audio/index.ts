@@ -42,11 +42,11 @@ serve(async (req) => {
 
       console.log('Fetching knowledge base entries...');
       
-      // Fetch relevant knowledge base entries
+      // Fetch relevant knowledge base entries with a strict limit
       const { data: entries, error: dbError } = await supabase
         .from('knowledge_base')
         .select('content')
-        .limit(3);
+        .limit(2); // Reduced limit to prevent large context
 
       if (dbError) {
         console.error('Database error:', dbError);
@@ -55,11 +55,11 @@ serve(async (req) => {
 
       console.log('Knowledge base entries fetched:', entries?.length);
 
-      // Process context with length limit
+      // Process context with strict length limits
       const context = entries
-        ?.map(entry => entry.content || '')
+        ?.map(entry => entry.content?.substring(0, 500) || '') // Limit each entry
         .join('\n')
-        .slice(0, 1000) || '';
+        .substring(0, 1000); // Overall context limit
 
       // Initialize Gemini
       const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY') ?? '');
@@ -68,13 +68,11 @@ serve(async (req) => {
       console.log('Generating AI response...');
 
       try {
-        // Generate response with context
-        const prompt = `You are a Bubble.io expert assistant. Using the following context and your knowledge, provide a clear and helpful response to the user's question. Keep your response focused and under 800 characters.
+        // Generate response with a more focused prompt
+        const prompt = `As a Bubble.io expert, provide a clear and concise response (max 200 words) to this question: ${text}
 
-Context from knowledge base:
-${context}
-
-User's question: ${text}`;
+Context (if relevant):
+${context}`;
 
         const result = await model.generateContent(prompt);
         const response = await result.response;
@@ -82,13 +80,14 @@ User's question: ${text}`;
         if (!response) {
           throw new Error('Empty response from AI');
         }
-        
+
         responseText = response.text();
         if (typeof responseText !== 'string' || !responseText) {
           throw new Error('Invalid response format from AI');
         }
-        
-        responseText = responseText.slice(0, 800);
+
+        // Strictly limit response length
+        responseText = responseText.substring(0, 500);
         console.log('Successfully generated response:', responseText);
       } catch (aiError) {
         console.error('AI Generation error:', aiError);
@@ -107,9 +106,9 @@ User's question: ${text}`;
 
     console.log('Generating speech...');
 
-    // Generate speech
+    // Generate speech with strict limits
     const speechResponse = await polly.synthesizeSpeech({
-      Text: responseText,
+      Text: responseText.substring(0, 500), // Ensure text length is limited
       OutputFormat: "mp3",
       VoiceId: "Danielle",
       Engine: "neural",
@@ -120,14 +119,13 @@ User's question: ${text}`;
       throw new Error('Failed to generate audio');
     }
 
-    // Convert audio to base64
+    // Convert audio to base64 efficiently
     const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
     const audioBase64 = btoa(String.fromCharCode(...audioData));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
 
     console.log('Successfully processed request');
 
-    // Return response
     return new Response(
       JSON.stringify({ response: responseText, audioUrl }),
       { 
@@ -141,15 +139,14 @@ User's question: ${text}`;
     console.error('Error in process-audio function:', error);
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'An unexpected error occurred',
-        details: error instanceof Error ? error.stack : undefined
+        error: error instanceof Error ? error.message : 'An unexpected error occurred'
       }),
       { 
         headers: {
           ...corsHeaders,
           'Content-Type': 'application/json',
         },
-        status: 400,
+        status: 500,
       }
     );
   }
