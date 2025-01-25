@@ -15,16 +15,6 @@ const VoiceAssistant = () => {
   const { isProcessing, response, processAudioResponse } = useAudioResponse();
   const { isRecording, transcript, toggleRecording } = useVoiceRecording(processAudioResponse);
 
-  useEffect(() => {
-    if (!session) {
-      toast({
-        title: "Authentication Required",
-        description: "Please sign in to use the voice assistant.",
-        variant: "destructive",
-      });
-    }
-  }, [session, toast]);
-
   const handleToggleRecording = () => {
     if (!session) {
       toast({
