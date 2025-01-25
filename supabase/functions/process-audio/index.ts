@@ -10,12 +10,19 @@ const corsHeaders = {
 
 const greetingPatterns = [
   /^(hi|hello|hey|good morning|good afternoon|good evening|howdy|sup|what'?s up|yo|hiya|greetings)/i,
+  /^(thanks|thank you|thanks a lot|thank you so much|appreciated|great help)/i
 ];
 
 const greetingResponses = [
   "Hey! I'm excited to chat about Bubble.io with you. What's on your mind?",
   "Hi there! I'd love to help you out with Bubble.io today. What can I explain?",
   "Hey! Always happy to talk about Bubble.io. What would you like to know?",
+];
+
+const thankYouResponses = [
+  "You're welcome! Feel free to ask me anything else about Bubble.io.",
+  "Glad I could help! Let me know if you have any other questions about Bubble.io.",
+  "My pleasure! I'm here to help you learn more about Bubble.io whenever you need.",
 ];
 
 serve(async (req) => {
@@ -36,9 +43,13 @@ serve(async (req) => {
     console.log('Processing text input:', text);
     let responseText: string;
 
-    const isGreeting = greetingPatterns.some(pattern => pattern.test(text.trim()));
+    const isGreeting = greetingPatterns[0].test(text.trim());
+    const isThankYou = greetingPatterns[1].test(text.trim());
 
-    if (isGreeting) {
+    if (isThankYou) {
+      responseText = thankYouResponses[Math.floor(Math.random() * thankYouResponses.length)];
+      console.log('Thank you detected, sending quick response');
+    } else if (isGreeting) {
       responseText = greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
       console.log('Greeting detected, sending quick response');
     } else {
@@ -94,7 +105,7 @@ serve(async (req) => {
       }
 
       const response = await result.response;
-      responseText = response.text().slice(0, 400);
+      responseText = response.text().substring(0, 400);
       console.log('Technical response generated, length:', responseText.length);
     }
 
