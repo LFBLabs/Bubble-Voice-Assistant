@@ -71,34 +71,31 @@ export type Database = {
           content: string | null
           created_at: string
           id: string
-          is_system_content: boolean | null
           title: string
           type: string
           updated_at: string
           url: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           content?: string | null
           created_at?: string
           id?: string
-          is_system_content?: boolean | null
           title: string
           type: string
           updated_at?: string
           url?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           content?: string | null
           created_at?: string
           id?: string
-          is_system_content?: boolean | null
           title?: string
           type?: string
           updated_at?: string
           url?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }

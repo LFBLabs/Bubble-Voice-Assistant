@@ -22,32 +22,26 @@ export const useAudioResponse = () => {
         return;
       }
 
-      const { data, error } = await supabase.functions.invoke('process-audio', {
+      const result = await supabase.functions.invoke('process-audio', {
         body: { text }
       });
 
-      if (error) {
-        console.error("Edge function error:", error);
-        throw new Error(error.message || "Failed to process audio response");
+      if (result.error) {
+        throw new Error(result.error.message);
       }
 
-      if (!data || !data.response) {
-        throw new Error("Invalid response from server");
-      }
+      const responseText = result.data.response;
+      setResponse(responseText);
 
-      setResponse(data.response);
-
-      if (data.audioUrl) {
-        const audio = new Audio(data.audioUrl);
-        setIsPlaying(true);
-        audio.play();
-        audio.onended = () => setIsPlaying(false);
-      }
+      const audio = new Audio(result.data.audioUrl);
+      setIsPlaying(true);
+      audio.play();
+      audio.onended = () => setIsPlaying(false);
     } catch (error) {
       console.error("Error processing response:", error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "An error occurred while processing your request.",
+        description: "An error occurred while processing your request.",
         variant: "destructive",
       });
     } finally {

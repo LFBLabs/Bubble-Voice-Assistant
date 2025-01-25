@@ -11,33 +11,18 @@ const AuthUI = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check and refresh session on component mount
-    const checkSession = async () => {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error('Session check error:', error);
-        setErrorMessage(getErrorMessage(error));
-        // Clear any invalid session data
-        await supabase.auth.signOut();
-      } else if (session) {
-        navigate('/', { replace: true });
-      }
-    };
-    
-    checkSession();
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log('Auth event:', event);
-      
       if (event === 'SIGNED_IN' && session) {
         navigate('/', { replace: true });
       }
-      if (event === 'TOKEN_REFRESHED' && session) {
-        console.log('Token refreshed successfully');
+      if (event === 'USER_UPDATED') {
+        const { error } = await supabase.auth.getSession();
+        if (error) {
+          setErrorMessage(getErrorMessage(error));
+        }
       }
       if (event === 'SIGNED_OUT') {
         setErrorMessage('');
-        navigate('/landing', { replace: true });
       }
     });
 
@@ -96,8 +81,6 @@ const AuthUI = () => {
                     colors: {
                       brand: '#6D28D9',
                       brandAccent: '#7C3AED',
-                      inputBackground: 'white',
-                      inputText: 'black',
                     },
                   },
                 },
