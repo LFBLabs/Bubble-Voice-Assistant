@@ -28,7 +28,7 @@ serve(async (req) => {
     }
 
     // Initialize response text
-    let responseText: string;
+    let responseText = '';
 
     // Simple greeting check with basic pattern
     if (/^(hi|hello|hey)\b/i.test(text.trim())) {
@@ -40,6 +40,8 @@ serve(async (req) => {
         Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
       );
 
+      console.log('Fetching knowledge base entries...');
+      
       // Fetch relevant knowledge base entries
       const { data: entries, error: dbError } = await supabase
         .from('knowledge_base')
@@ -51,6 +53,8 @@ serve(async (req) => {
         throw new Error('Failed to fetch knowledge base entries');
       }
 
+      console.log('Knowledge base entries fetched:', entries?.length);
+
       // Process context with length limit
       const context = entries
         ?.map(entry => entry.content || '')
@@ -60,6 +64,8 @@ serve(async (req) => {
       // Initialize Gemini
       const genAI = new GoogleGenerativeAI(Deno.env.get('GEMINI_API_KEY') ?? '');
       const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+      console.log('Generating AI response...');
 
       try {
         // Generate response with context
@@ -74,20 +80,15 @@ User's question: ${text}`;
         const response = await result.response;
         
         if (!response) {
-          throw new Error('Failed to generate AI response');
+          throw new Error('Empty response from AI');
         }
         
-        const text = response.text();
-        if (typeof text !== 'string') {
+        responseText = response.text();
+        if (typeof responseText !== 'string' || !responseText) {
           throw new Error('Invalid response format from AI');
         }
         
-        responseText = text.slice(0, 800);
-        
-        if (!responseText) {
-          responseText = 'I apologize, but I could not generate a response.';
-        }
-        
+        responseText = responseText.slice(0, 800);
         console.log('Successfully generated response:', responseText);
       } catch (aiError) {
         console.error('AI Generation error:', aiError);
@@ -103,6 +104,8 @@ User's question: ${text}`;
         secretAccessKey: Deno.env.get('AWS_SECRET_KEY') ?? ''
       }
     });
+
+    console.log('Generating speech...');
 
     // Generate speech
     const speechResponse = await polly.synthesizeSpeech({
@@ -121,6 +124,8 @@ User's question: ${text}`;
     const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
     const audioBase64 = btoa(String.fromCharCode(...audioData));
     const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
+
+    console.log('Successfully processed request');
 
     // Return response
     return new Response(
