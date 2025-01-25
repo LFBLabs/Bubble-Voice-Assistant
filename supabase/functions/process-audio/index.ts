@@ -54,7 +54,7 @@ serve(async (req) => {
       // Process context with length limit
       const context = entries
         ?.map(entry => entry.content || '')
-        .join(' ')
+        .join('\n')
         .slice(0, 1000) || '';
 
       // Initialize Gemini
@@ -63,17 +63,32 @@ serve(async (req) => {
 
       try {
         // Generate response with context
-        const prompt = `Question about Bubble.io: ${text}\nContext: ${context}\nProvide a clear, helpful response.`;
+        const prompt = `You are a Bubble.io expert assistant. Using the following context and your knowledge, provide a clear and helpful response to the user's question. Keep your response focused and under 800 characters.
+
+Context from knowledge base:
+${context}
+
+User's question: ${text}`;
+
         const result = await model.generateContent(prompt);
-        const response = result.response;
+        const response = await result.response;
         
         if (!response) {
           throw new Error('Failed to generate AI response');
         }
         
-        responseText = response.text();
-        // Ensure we have a valid string and limit its length
-        responseText = typeof responseText === 'string' ? responseText.slice(0, 800) : 'I apologize, but I could not generate a response.';
+        const text = response.text();
+        if (typeof text !== 'string') {
+          throw new Error('Invalid response format from AI');
+        }
+        
+        responseText = text.slice(0, 800);
+        
+        if (!responseText) {
+          responseText = 'I apologize, but I could not generate a response.';
+        }
+        
+        console.log('Successfully generated response:', responseText);
       } catch (aiError) {
         console.error('AI Generation error:', aiError);
         throw new Error('Failed to generate AI response');
