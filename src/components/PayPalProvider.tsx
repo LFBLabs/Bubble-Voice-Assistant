@@ -26,7 +26,6 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         
         if (sessionError) {
           console.error('Session error:', sessionError);
-          // Clear any stale session data
           await supabase.auth.signOut();
           navigate('/login');
           return;
@@ -79,7 +78,6 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
             description: "Unable to initialize PayPal. Please try again later.",
           });
           
-          // If there's an auth error, redirect to login
           if (error.message?.includes('auth')) {
             navigate('/login');
           }
