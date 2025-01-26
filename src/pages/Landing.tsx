@@ -72,13 +72,6 @@ const Landing = () => {
               className="w-full object-cover rounded-xl shadow-lg"
               style={{ height: '600px' }}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#1A1A1A] to-transparent opacity-90" />
-            <div className="absolute bottom-8 left-8 right-8 text-white">
-              <h2 className="text-2xl font-bold mb-2">Powerful Voice Commands</h2>
-              <p className="text-gray-300">
-                Control your Bubble.io development environment with natural voice interactions
-              </p>
-            </div>
           </div>
         </main>
       </div>
