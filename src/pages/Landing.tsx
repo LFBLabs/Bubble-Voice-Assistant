@@ -12,7 +12,7 @@ const Landing = () => {
         <nav className="flex justify-end mb-8">
           <Button
             variant="ghost"
-            className="text-primary hover:text-primary/80"
+            className="text-primary hover:bg-primary/10 hover:text-primary"
             onClick={() => navigate("/login")}
           >
             Already subscribed?
