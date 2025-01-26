@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { supabase } from '@/integrations/supabase/client';
 import { getErrorMessage } from '@/utils/authErrors';
+import { Mic } from 'lucide-react';
 
 const AuthUI = () => {
   const [errorMessage, setErrorMessage] = useState('');
@@ -34,18 +35,7 @@ const AuthUI = () => {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center mb-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="h-10 w-10 text-primary"
-            >
-              <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-            </svg>
+            <Mic className="h-12 w-12 text-primary animate-pulse" strokeWidth={1.5} />
           </div>
           <h1 className="text-2xl font-semibold tracking-tight text-secondary mb-2">
             Welcome to Bubble.io Voice Assistant
