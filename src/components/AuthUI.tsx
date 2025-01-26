@@ -30,64 +30,106 @@ const AuthUI = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen flex">
-      <div className="hidden lg:flex lg:flex-1 lg:flex-col bg-primary p-10 text-white relative justify-between">
-        <div className="relative z-20 flex items-center text-lg font-medium">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="mr-2 h-6 w-6"
-          >
-            <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
-          </svg>
-          Bubble.io Voice Assistant
-        </div>
-        <div className="relative z-20">
-          <blockquote className="space-y-2">
-            <p className="text-lg">
-              "This voice assistant has transformed how I interact with Bubble.io, making development faster and more intuitive."
-            </p>
-            <footer className="text-sm">Sofia Davis</footer>
-          </blockquote>
-        </div>
-      </div>
-      <div className="flex-1 flex flex-col justify-center px-4 py-12 sm:px-6 lg:px-20 xl:px-24">
-        <div className="mx-auto w-full max-w-sm lg:w-96">
-          <div className="flex flex-col space-y-4">
-            <h1 className="text-2xl font-semibold tracking-tight">Welcome back</h1>
-            <p className="text-sm text-muted-foreground">
-              Sign in to your account to continue
-            </p>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F5F6F7] px-4">
+      <div className="w-full max-w-md">
+        <div className="mb-8 text-center">
+          <div className="flex items-center justify-center mb-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-10 w-10 text-primary"
+            >
+              <path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3" />
+            </svg>
           </div>
+          <h1 className="text-2xl font-semibold tracking-tight text-secondary mb-2">
+            Welcome to Bubble.io Voice Assistant
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Sign in to your account to continue
+          </p>
+        </div>
 
+        <div className="bg-white rounded-lg shadow-sm p-6 border border-border">
           {errorMessage && (
-            <Alert variant="destructive" className="mt-4">
+            <Alert variant="destructive" className="mb-6">
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
 
-          <div className="mt-6">
-            <Auth
-              supabaseClient={supabase}
-              appearance={{
-                theme: ThemeSupa,
-                variables: {
-                  default: {
-                    colors: {
-                      brand: '#6D28D9',
-                      brandAccent: '#7C3AED',
-                    },
+          <Auth
+            supabaseClient={supabase}
+            appearance={{
+              theme: ThemeSupa,
+              variables: {
+                default: {
+                  colors: {
+                    brand: '#0F3BF5',
+                    brandAccent: '#0D32CC',
+                    brandButtonText: 'white',
+                    defaultButtonBackground: 'white',
+                    defaultButtonBackgroundHover: '#F5F6F7',
+                    defaultButtonBorder: '#E4E4E7',
+                    defaultButtonText: '#1A1A1A',
+                    dividerBackground: '#E4E4E7',
+                    inputBackground: 'white',
+                    inputBorder: '#E4E4E7',
+                    inputBorderHover: '#0F3BF5',
+                    inputBorderFocus: '#0F3BF5',
+                    inputText: '#1A1A1A',
+                    inputLabelText: '#71717A',
+                    inputPlaceholder: '#A1A1AA',
+                  },
+                  space: {
+                    spaceSmall: '4px',
+                    spaceMedium: '8px',
+                    spaceLarge: '16px',
+                    labelBottomMargin: '8px',
+                    anchorBottomMargin: '4px',
+                    emailInputSpacing: '4px',
+                    socialAuthSpacing: '4px',
+                    buttonPadding: '10px',
+                    inputPadding: '10px',
+                  },
+                  fonts: {
+                    bodyFontFamily: `ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`,
+                    buttonFontFamily: `ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`,
+                    inputFontFamily: `ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`,
+                    labelFontFamily: `ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"`,
+                  },
+                  borderWidths: {
+                    buttonBorderWidth: '1px',
+                    inputBorderWidth: '1px',
+                  },
+                  radii: {
+                    borderRadiusButton: '6px',
+                    buttonBorderRadius: '6px',
+                    inputBorderRadius: '6px',
                   },
                 },
-              }}
-              providers={[]}
-            />
-          </div>
+              },
+              className: {
+                container: 'w-full',
+                button: 'w-full px-4 py-2 rounded-md font-medium transition-colors',
+                label: 'text-sm font-medium text-secondary mb-1.5',
+                input: 'w-full px-3 py-2 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary/20 transition-colors',
+                loader: 'w-4 h-4 border-2 border-primary/30 border-t-primary animate-spin rounded-full',
+              },
+            }}
+            providers={[]}
+          />
+        </div>
+
+        <div className="mt-6 text-center">
+          <blockquote className="text-sm text-muted-foreground">
+            "This voice assistant has transformed how I interact with Bubble.io, making development faster and more intuitive."
+            <footer className="mt-2 font-medium text-secondary">Sofia Davis</footer>
+          </blockquote>
         </div>
       </div>
     </div>
