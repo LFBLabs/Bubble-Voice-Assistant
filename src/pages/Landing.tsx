@@ -2,7 +2,6 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mic, Brain, Zap, Clock } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -36,7 +35,7 @@ const Landing = () => {
               get explanations, and streamline your workflow.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-4 justify-center mb-12">
+            <div className="flex flex-col sm:flex-row items-center gap-4 justify-center mb-16">
               <Button
                 size="lg"
                 className="text-lg gap-2 bg-[#9B87F5] hover:bg-[#8B75E3] transition-colors duration-300"
@@ -48,23 +47,6 @@ const Landing = () => {
               <p className="text-sm text-gray-400">
                 Includes a 1-day free trial, then $24/month
               </p>
-            </div>
-
-            <div className="max-w-md mx-auto space-y-4 mb-16">
-              <div>
-                <div className="flex justify-between text-sm text-gray-400 mb-2">
-                  <span>Fun to use</span>
-                  <span>98%</span>
-                </div>
-                <Progress value={98} className="h-2 bg-gray-700" />
-              </div>
-              <div>
-                <div className="flex justify-between text-sm text-gray-400 mb-2">
-                  <span>Sentient Agents</span>
-                  <span>92%</span>
-                </div>
-                <Progress value={92} className="h-2 bg-gray-700" />
-              </div>
             </div>
           </div>
 
