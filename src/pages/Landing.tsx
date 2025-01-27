@@ -2,9 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Mic, Brain, Zap, Clock } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const Landing = () => {
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
 
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
@@ -62,14 +64,16 @@ const Landing = () => {
             ))}
           </div>
 
-          <div className="relative rounded-xl overflow-hidden">
-            <img
-              src="/lovable-uploads/274d4461-71f9-4e12-abb3-812c2215fb65.png"
-              alt="Bubble.io AI Voice Assistant Interface"
-              className="w-full object-cover rounded-xl shadow-lg"
-              style={{ height: '600px' }}
-            />
-          </div>
+          {!isMobile && (
+            <div className="relative rounded-xl overflow-hidden hidden sm:block">
+              <img
+                src="/lovable-uploads/274d4461-71f9-4e12-abb3-812c2215fb65.png"
+                alt="Bubble.io AI Voice Assistant Interface"
+                className="w-full object-cover rounded-xl shadow-lg"
+                style={{ height: '600px' }}
+              />
+            </div>
+          )}
         </main>
       </div>
     </div>
