@@ -12,7 +12,7 @@ const Landing = () => {
         <nav className="flex justify-between items-center mb-16">
           <div className="flex items-center gap-2">
             <Mic className="h-8 w-8 text-[#0F3BF5]" />
-            <span className="text-xl font-bold text-[#1A1A1A]">Voice Assistant</span>
+            <span className="text-xl font-bold text-[#1A1A1A]">Bubble.io Assistant</span>
           </div>
           <Button
             variant="ghost"
@@ -31,8 +31,8 @@ const Landing = () => {
             </h1>
             
             <p className="text-xl text-[#4A4A4A] mb-8 max-w-2xl mx-auto leading-relaxed">
-              Get instant, voice-powered help with your Bubble.io development. Ask questions,
-              get explanations, and streamline your workflow.
+              Get instant, voice-powered answers to your Bubble.io questions. Learn faster,
+              build better, and master no-code development with AI assistance.
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center mb-16">
@@ -45,7 +45,7 @@ const Landing = () => {
                 <ArrowRight className="w-5 h-5" />
               </Button>
               <p className="text-sm text-[#4A4A4A]">
-                Includes a 1-day free trial, then $24/month
+                Start with a 1-day free trial, then $24/month
               </p>
             </div>
           </div>
@@ -68,7 +68,7 @@ const Landing = () => {
           <div className="relative rounded-xl overflow-hidden">
             <img
               src="/lovable-uploads/274d4461-71f9-4e12-abb3-812c2215fb65.png"
-              alt="No-code development environment"
+              alt="Bubble.io AI Voice Assistant Interface"
               className="w-full object-cover rounded-xl shadow-lg"
               style={{ height: '600px' }}
             />
@@ -82,23 +82,23 @@ const Landing = () => {
 const features = [
   {
     icon: Mic,
-    title: "Voice Control",
-    description: "Natural language voice commands for seamless development",
+    title: "Voice Interaction",
+    description: "Ask questions naturally and get instant answers about Bubble.io",
   },
   {
     icon: Brain,
-    title: "AI Powered",
-    description: "Advanced AI understanding of Bubble.io concepts and workflows",
+    title: "AI Knowledge Base",
+    description: "Access comprehensive Bubble.io documentation and best practices",
   },
   {
     icon: Zap,
-    title: "Instant Help",
-    description: "Get immediate assistance with your development questions",
+    title: "Quick Learning",
+    description: "Get immediate answers to your Bubble.io questions",
   },
   {
     icon: Clock,
     title: "24/7 Available",
-    description: "Round-the-clock access to your AI development partner",
+    description: "Learn and get help with Bubble.io anytime you need",
   },
 ];
 
