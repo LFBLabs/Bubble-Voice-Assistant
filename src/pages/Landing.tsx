@@ -10,10 +10,7 @@ const Landing = () => {
     <div className="min-h-screen bg-[#F8FAFC]">
       <div className="container mx-auto px-4 py-8">
         <nav className="flex justify-between items-center mb-16">
-          <div className="flex items-center gap-2">
-            <Mic className="h-8 w-8 text-[#0F3BF5]" />
-            <span className="text-xl font-bold text-[#1A1A1A]">Bubble.io Assistant</span>
-          </div>
+          <div></div>
           <Button
             variant="ghost"
             className="text-[#0F3BF5] hover:bg-[#0F3BF5]/10"
