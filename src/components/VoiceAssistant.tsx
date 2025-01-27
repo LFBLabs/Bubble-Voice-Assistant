@@ -36,7 +36,7 @@ const VoiceAssistant = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col min-h-screen">
         <Header 
           title="Bubble.io Voice Assistant"
-          description="Ask questions about Bubble.io and get instant answers"
+          description="Ask questions about Bubble.io and get instant voice responses"
         />
 
         <div className="flex-1 flex flex-col gap-6">
@@ -52,7 +52,7 @@ const VoiceAssistant = () => {
         </div>
 
         <div className="text-center text-sm text-gray-500 dark:text-gray-400 mt-4 mb-2">
-          <p className="px-4">Tip: Click the microphone button and ask any question about Bubble.io</p>
+          <p className="px-4">Tip: Click the microphone button to start asking your question about Bubble.io</p>
         </div>
       </div>
     </div>
