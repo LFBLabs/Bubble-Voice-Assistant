@@ -9,7 +9,6 @@ interface VoiceRecorderProps {
   toggleRecording: () => void;
   transcript: string;
   response: string;
-  audioUrl?: string;
 }
 
 const VoiceRecorder = ({
@@ -18,7 +17,6 @@ const VoiceRecorder = ({
   toggleRecording,
   transcript,
   response,
-  audioUrl,
 }: VoiceRecorderProps) => {
   return (
     <div className="flex flex-col items-center justify-center space-y-6">
@@ -46,7 +44,7 @@ const VoiceRecorder = ({
         )}
       </div>
 
-      {(isRecording || audioUrl) && <Waveform audioUrl={audioUrl} />}
+      {isRecording && <Waveform />}
 
       {transcript && (
         <div className="w-full bg-gray-50 dark:bg-gray-800 rounded-lg p-4 mt-4">
