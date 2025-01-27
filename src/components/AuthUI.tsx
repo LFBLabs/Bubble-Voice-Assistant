@@ -114,13 +114,6 @@ const AuthUI = () => {
             providers={[]}
           />
         </div>
-
-        <div className="mt-6 text-center">
-          <blockquote className="text-sm text-muted-foreground">
-            "This voice assistant has transformed how I interact with Bubble.io, making development faster and more intuitive."
-            <footer className="mt-2 font-medium text-secondary">Sofia Davis</footer>
-          </blockquote>
-        </div>
       </div>
     </div>
   );
