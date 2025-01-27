@@ -24,7 +24,7 @@ const Landing = () => {
           <div className="text-center mb-16 animate-fade-in">
             <h1 className="text-4xl sm:text-6xl font-bold text-[#1A1A1A] mb-6 leading-tight">
               Your AI Voice Assistant for{" "}
-              <span className="text-[#0F3BF5] inline-block">Bubble.io</span>
+              <span className="text-[#0F3BF5] inline-block animate-pulse">Bubble.io</span>
             </h1>
             
             <p className="text-xl text-[#4A4A4A] mb-8 max-w-2xl mx-auto leading-relaxed">
