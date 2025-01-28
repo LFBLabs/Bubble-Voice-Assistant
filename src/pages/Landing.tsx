@@ -27,7 +27,7 @@ const Landing = () => {
             <h1 className="text-4xl sm:text-6xl font-bold text-[#1a1a1a] mb-6 leading-tight">
               Your AI Voice Assistant for{" "}
               <span className="relative inline-block">
-                <span className="relative z-10 text-[#0037ff]">Bubble.io</span>
+                <span className="relative z-10 text-[#0037ff] animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite]">Bubble.io</span>
                 <span className="absolute -bottom-2 left-0 right-0 h-3 bg-[#0037ff]/10 transform -skew-x-12"></span>
               </span>
             </h1>
