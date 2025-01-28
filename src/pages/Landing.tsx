@@ -9,13 +9,13 @@ const Landing = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F8FAFC] to-[#E5DEFF]">
+    <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-8">
         <nav className="flex justify-between items-center mb-16">
-          <div className="text-2xl font-bold text-[#9b87f5]">BubbleVoice</div>
+          <div className="text-2xl font-bold text-[#1a1a1a]">BubbleVoice</div>
           <Button
             variant="ghost"
-            className="text-[#7E69AB] hover:bg-[#9b87f5]/10 transition-all duration-300"
+            className="text-[#1a1a1a] hover:bg-gray-100 transition-all duration-300"
             onClick={() => navigate("/login")}
           >
             Already subscribed?
@@ -24,11 +24,11 @@ const Landing = () => {
 
         <main className="max-w-5xl mx-auto">
           <div className="text-center mb-20 space-y-8">
-            <h1 className="text-4xl sm:text-6xl font-bold text-[#1A1F2C] mb-6 leading-tight">
+            <h1 className="text-4xl sm:text-6xl font-bold text-[#1a1a1a] mb-6 leading-tight">
               Your AI Voice Assistant for{" "}
               <span className="relative inline-block">
-                <span className="relative z-10 text-[#9b87f5] animate-pulse">Bubble.io</span>
-                <span className="absolute -bottom-2 left-0 right-0 h-3 bg-[#D6BCFA]/30 transform -skew-x-12"></span>
+                <span className="relative z-10 text-[#0037ff]">Bubble.io</span>
+                <span className="absolute -bottom-2 left-0 right-0 h-3 bg-[#0037ff]/10 transform -skew-x-12"></span>
               </span>
             </h1>
             
@@ -40,13 +40,13 @@ const Landing = () => {
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
               <Button
                 size="lg"
-                className="text-lg gap-2 bg-[#9b87f5] hover:bg-[#7E69AB] transition-all duration-300 transform hover:scale-105"
+                className="text-lg gap-2 bg-[#0037ff] hover:bg-[#0028bd] transition-all duration-300 transform hover:scale-105"
                 onClick={() => navigate("/login")}
               >
                 Get Started Free
                 <ArrowRight className="w-5 h-5" />
               </Button>
-              <p className="text-sm text-[#4A4A4A] bg-white/50 px-4 py-2 rounded-full">
+              <p className="text-sm text-[#4A4A4A] bg-gray-50 px-4 py-2 rounded-full">
                 Start with a 1-day free trial, then $24/month
               </p>
             </div>
@@ -56,12 +56,12 @@ const Landing = () => {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="bg-white/80 backdrop-blur-sm p-8 rounded-xl border border-[#D6BCFA] hover:border-[#9b87f5] transition-all duration-300 hover:shadow-lg group hover:transform hover:-translate-y-1"
+                className="bg-white shadow-sm p-8 rounded-xl border border-gray-100 hover:border-[#0037ff] hover:shadow-lg transition-all duration-300 group hover:transform hover:-translate-y-1"
               >
-                <div className="mb-4 bg-[#F2FCE2] p-3 rounded-lg inline-block">
-                  <feature.icon className="h-8 w-8 text-[#9b87f5] group-hover:scale-110 transition-transform duration-300" />
+                <div className="mb-4 bg-[#f5f5f5] p-3 rounded-lg inline-block">
+                  <feature.icon className="h-8 w-8 text-[#0037ff] group-hover:scale-110 transition-transform duration-300" />
                 </div>
-                <h3 className="text-lg font-semibold text-[#1A1F2C] mb-2">{feature.title}</h3>
+                <h3 className="text-lg font-semibold text-[#1a1a1a] mb-2">{feature.title}</h3>
                 <p className="text-[#4A4A4A] text-sm leading-relaxed">{feature.description}</p>
               </div>
             ))}
@@ -69,7 +69,7 @@ const Landing = () => {
 
           {!isMobile && (
             <div className="relative rounded-xl overflow-hidden hidden sm:block transform hover:scale-[1.02] transition-transform duration-300">
-              <div className="absolute inset-0 bg-gradient-to-r from-[#9b87f5]/10 to-transparent pointer-events-none"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-[#0037ff]/10 to-transparent pointer-events-none"></div>
               <img
                 src="/lovable-uploads/274d4461-71f9-4e12-abb3-812c2215fb65.png"
                 alt="Bubble.io AI Voice Assistant Interface"
