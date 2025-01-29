@@ -1,8 +1,9 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Mic, Brain, Zap, Clock } from "lucide-react";
+import { ArrowRight, Mic, Brain, Zap, Clock, Check } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -36,20 +37,6 @@ const Landing = () => {
               Get instant, voice-powered answers to your Bubble.io questions. Learn faster,
               build better, and master no-code development with AI assistance.
             </p>
-
-            <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
-              <Button
-                size="lg"
-                className="text-lg gap-2 bg-[#0037ff] hover:bg-[#0028bd] transition-all duration-300 transform hover:scale-105"
-                onClick={() => navigate("/login")}
-              >
-                Get Started Free
-                <ArrowRight className="w-5 h-5" />
-              </Button>
-              <p className="text-sm text-[#4A4A4A] bg-gray-50 px-4 py-2 rounded-full">
-                Start with a 1-day free trial, then $24/month
-              </p>
-            </div>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
@@ -68,7 +55,7 @@ const Landing = () => {
           </div>
 
           {!isMobile && (
-            <div className="relative rounded-xl overflow-hidden hidden sm:block transform hover:scale-[1.02] transition-transform duration-300">
+            <div className="relative rounded-xl overflow-hidden hidden sm:block transform hover:scale-[1.02] transition-transform duration-300 mb-20">
               <div className="absolute inset-0 bg-gradient-to-r from-[#0037ff]/10 to-transparent pointer-events-none"></div>
               <img
                 src="/lovable-uploads/274d4461-71f9-4e12-abb3-812c2215fb65.png"
@@ -78,6 +65,49 @@ const Landing = () => {
               />
             </div>
           )}
+
+          {/* Pricing Section */}
+          <div className="py-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#1a1a1a] mb-12">
+              Choose Your Plan
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              {pricingPlans.map((plan, index) => (
+                <Card key={index} className="relative overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  {plan.popular && (
+                    <div className="absolute top-0 right-0 bg-[#0037ff] text-white px-4 py-1 text-sm">
+                      Most Popular
+                    </div>
+                  )}
+                  <CardHeader>
+                    <CardTitle className="text-xl font-bold text-center">{plan.name}</CardTitle>
+                    <div className="text-center mt-4">
+                      <span className="text-4xl font-bold">${plan.price}</span>
+                      <span className="text-gray-500">/month</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ul className="space-y-3">
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center gap-2">
+                          <Check className="h-5 w-5 text-[#0037ff]" />
+                          <span className="text-[#4A4A4A]">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full bg-[#0037ff] hover:bg-[#0028bd] transition-all duration-300"
+                      onClick={() => navigate("/login")}
+                    >
+                      {plan.trial ? `Start ${plan.trial} Free Trial` : "Get Started"}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          </div>
         </main>
       </div>
     </div>
@@ -104,6 +134,45 @@ const features = [
     icon: Clock,
     title: "24/7 Available",
     description: "Learn and get help with Bubble.io anytime you need",
+  },
+];
+
+const pricingPlans = [
+  {
+    name: "Basic",
+    price: 19,
+    trial: "1-day",
+    features: [
+      "Voice-powered Q&A",
+      "Basic documentation access",
+      "5 queries per day",
+      "Community support",
+    ],
+  },
+  {
+    name: "Pro",
+    price: 49,
+    trial: "3-day",
+    popular: true,
+    features: [
+      "Everything in Basic",
+      "Unlimited queries",
+      "Advanced documentation",
+      "Priority support",
+      "Custom knowledge base",
+    ],
+  },
+  {
+    name: "Enterprise",
+    price: 99,
+    features: [
+      "Everything in Pro",
+      "Team collaboration",
+      "API access",
+      "Custom integration",
+      "Dedicated support",
+      "Training sessions",
+    ],
   },
 ];
 
