@@ -83,7 +83,7 @@ const Landing = () => {
                     <CardTitle className="text-xl font-bold text-center">{plan.name}</CardTitle>
                     <div className="text-center mt-4">
                       <span className="text-4xl font-bold">${plan.price}</span>
-                      <span className="text-gray-500">/month</span>
+                      {plan.name !== "Annual" && <span className="text-gray-500">/month</span>}
                     </div>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -158,7 +158,7 @@ const pricingPlans = [
     ],
   },
   {
-    name: "Enterprise",
+    name: "Annual",
     price: 275,
     features: [
       "Everything in Pro",
