@@ -140,7 +140,7 @@ const features = [
 const pricingPlans = [
   {
     name: "Basic",
-    price: 9,
+    price: 19,
     trial: "1-day",
     features: [
       "Voice-powered Q&A",
