@@ -149,15 +149,12 @@ const pricingPlans = [
   },
   {
     name: "Pro",
-    price: 49,
+    price: 29,
     trial: "3-day",
     popular: true,
     features: [
-      "Everything in Basic",
       "Unlimited queries",
-      "Advanced documentation",
       "Priority support",
-      "Custom knowledge base",
     ],
   },
   {
