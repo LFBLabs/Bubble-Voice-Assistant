@@ -66,48 +66,49 @@ const Landing = () => {
             </div>
           )}
 
-        {/* Pricing Section */}
-        <div className="py-16">
-          <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#1a1a1a] mb-12">
-            Choose Your Plan
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            {pricingPlans.map((plan, index) => (
-              <Card key={index} className="relative overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-[#0037ff] text-white px-4 py-1 text-sm">
-                    Most Popular
-                  </div>
-                )}
-                <CardHeader>
-                  <CardTitle className="text-xl font-bold text-center">{plan.name}</CardTitle>
-                  <div className="text-center mt-4">
-                    <span className="text-4xl font-bold">${plan.price}</span>
-                    <span className="text-gray-500">/month</span>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <ul className="space-y-3">
-                    {plan.features.map((feature, idx) => (
-                      <li key={idx} className="flex items-center gap-2">
-                        <Check className="h-5 w-5 text-[#0037ff]" />
-                        <span className="text-[#4A4A4A]">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-                <CardFooter>
-                  <Button
-                    className="w-full bg-[#0037ff] hover:bg-[#0028bd] transition-all duration-300"
-                    onClick={() => navigate("/login")}
-                  >
-                    {plan.trial ? `Start ${plan.trial} Free Trial` : "Get Started"}
-                  </Button>
-                </CardFooter>
-              </Card>
-            ))}
+          {/* Pricing Section */}
+          <div className="py-16">
+            <h2 className="text-3xl sm:text-4xl font-bold text-center text-[#1a1a1a] mb-12">
+              Choose Your Plan
+            </h2>
+            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+              {pricingPlans.map((plan, index) => (
+                <Card key={index} className="relative overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                  {plan.popular && (
+                    <div className="absolute top-0 right-0 bg-[#0037ff] text-white px-4 py-1 text-sm">
+                      Most Popular
+                    </div>
+                  )}
+                  <CardHeader>
+                    <CardTitle className="text-xl font-bold text-center">{plan.name}</CardTitle>
+                    <div className="text-center mt-4">
+                      <span className="text-4xl font-bold">${plan.price}</span>
+                      <span className="text-gray-500">/month</span>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <ul className="space-y-3">
+                      {plan.features.map((feature, idx) => (
+                        <li key={idx} className="flex items-center gap-2">
+                          <Check className="h-5 w-5 text-[#0037ff]" />
+                          <span className="text-[#4A4A4A]">{feature}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                  <CardFooter>
+                    <Button
+                      className="w-full bg-[#0037ff] hover:bg-[#0028bd] transition-all duration-300"
+                      onClick={() => navigate("/login")}
+                    >
+                      {plan.trial ? `Start ${plan.trial} Free Trial` : "Get Started"}
+                    </Button>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
           </div>
-        </div>
+        </main>
       </div>
     </div>
   );
