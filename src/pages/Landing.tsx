@@ -159,14 +159,10 @@ const pricingPlans = [
   },
   {
     name: "Enterprise",
-    price: 99,
+    price: 275,
     features: [
       "Everything in Pro",
-      "Team collaboration",
-      "API access",
-      "Custom integration",
       "Dedicated support",
-      "Training sessions",
     ],
   },
 ];
