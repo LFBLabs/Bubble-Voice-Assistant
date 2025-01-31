@@ -68,6 +68,7 @@ const Payment = () => {
           features={starterFeatures}
           isSelected={selectedPlan === "starter"}
           onSelect={() => handlePlanSelect("starter")}
+          showCheckbox={true}
         />
         <PricingCard
           title="Pro"
@@ -77,6 +78,7 @@ const Payment = () => {
           isPopular
           isSelected={selectedPlan === "pro"}
           onSelect={() => handlePlanSelect("pro")}
+          showCheckbox={true}
         />
         <PricingCard
           title="Annual"
@@ -84,10 +86,10 @@ const Payment = () => {
           features={annualFeatures}
           isSelected={selectedPlan === "annual"}
           onSelect={() => handlePlanSelect("annual")}
+          showCheckbox={true}
         />
       </div>
 
-      {/* PayPal button will be added here later */}
       {selectedPlan && (
         <div className="text-center mt-8">
           <p className="text-sm text-muted-foreground">
