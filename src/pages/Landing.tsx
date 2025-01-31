@@ -95,14 +95,6 @@ const Landing = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
-              <Button
-                size="lg"
-                className="text-lg gap-2 bg-[#0037ff] hover:bg-[#0028bd] transition-all duration-300 transform hover:scale-105"
-                onClick={() => navigate("/login")}
-              >
-                Get Started Free
-                <ArrowRight className="w-5 h-5" />
-              </Button>
               <p className="text-sm text-[#4A4A4A] bg-gray-50 px-4 py-2 rounded-full">
                 Start with a 1-day free trial, then $24/month
               </p>
