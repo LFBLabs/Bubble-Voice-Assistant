@@ -5,24 +5,24 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
-type PlanType = "monthly" | "annual";
+type PlanType = "starter" | "pro" | "annual";
 
 interface PricingFeature {
   text: string;
 }
 
-const monthlyFeatures: PricingFeature[] = [
-  { text: "Access to all features" },
-  { text: "Unlimited voice interactions" },
+const starterFeatures: PricingFeature[] = [
+  { text: "5 queries per day" },
+  { text: "Limited support" },
+];
+
+const proFeatures: PricingFeature[] = [
+  { text: "Unlimited queries" },
   { text: "Priority support" },
-  { text: "Regular updates" },
 ];
 
 const annualFeatures: PricingFeature[] = [
-  { text: "All monthly features" },
-  { text: "15% discount" },
-  { text: "Premium support" },
-  { text: "Early access to new features" },
+  { text: "Everything in pro" },
 ];
 
 const Payment = () => {
@@ -60,21 +60,28 @@ const Payment = () => {
         description="Select a plan to access all features of Bubble.io Voice Assistant"
       />
       
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <PricingCard
-          title="Monthly"
+          title="Starter"
+          price="$15"
+          priceDetail="/month"
+          features={starterFeatures}
+          isSelected={selectedPlan === "starter"}
+          onSelect={() => handlePlanSelect("starter")}
+        />
+        <PricingCard
+          title="Pro"
           price="$24"
-          description="Billed monthly"
-          features={monthlyFeatures}
-          isSelected={selectedPlan === "monthly"}
-          onSelect={() => handlePlanSelect("monthly")}
+          priceDetail="/month"
+          features={proFeatures}
+          isPopular
+          isSelected={selectedPlan === "pro"}
+          onSelect={() => handlePlanSelect("pro")}
         />
         <PricingCard
           title="Annual"
-          price="$245"
-          description="Billed annually (Save 15%)"
+          price="$230"
           features={annualFeatures}
-          isPopular
           isSelected={selectedPlan === "annual"}
           onSelect={() => handlePlanSelect("annual")}
         />
