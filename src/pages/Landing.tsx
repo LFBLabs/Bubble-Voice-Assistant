@@ -95,9 +95,6 @@ const Landing = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
-              <p className="text-sm text-[#4A4A4A] bg-gray-50 px-4 py-2 rounded-full">
-                Start with a 1-day free trial, then $24/month
-              </p>
             </div>
           </div>
 
