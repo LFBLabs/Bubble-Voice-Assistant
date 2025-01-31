@@ -1,7 +1,6 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
-import { Checkbox } from "@/components/ui/checkbox";
 
 interface PricingFeature {
   text: string;
@@ -36,14 +35,7 @@ export const PricingCard = ({
         </div>
       )}
       <CardHeader className="text-center pt-8">
-        <div className="flex items-center justify-between mb-4">
-          <CardTitle className="text-xl font-semibold">{title}</CardTitle>
-          <Checkbox
-            checked={isSelected}
-            onCheckedChange={onSelect}
-            className="h-5 w-5"
-          />
-        </div>
+        <CardTitle className="text-xl font-semibold mb-4">{title}</CardTitle>
         <div className="flex items-baseline justify-center gap-1">
           <span className="text-4xl font-bold">{price}</span>
           {priceDetail && (
