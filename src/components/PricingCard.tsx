@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface PricingFeature {
   text: string;
@@ -12,6 +13,8 @@ interface PricingCardProps {
   description?: string;
   features: PricingFeature[];
   isPopular?: boolean;
+  isSelected?: boolean;
+  onSelect?: () => void;
 }
 
 export const PricingCard = ({
@@ -20,6 +23,8 @@ export const PricingCard = ({
   description,
   features,
   isPopular = false,
+  isSelected = false,
+  onSelect,
 }: PricingCardProps) => {
   return (
     <Card className={`relative w-full max-w-sm ${isPopular ? 'border-primary shadow-lg' : ''}`}>
@@ -31,7 +36,14 @@ export const PricingCard = ({
         </div>
       )}
       <CardHeader className="text-center">
-        <CardTitle className="text-xl">{title}</CardTitle>
+        <div className="flex items-center justify-between mb-2">
+          <CardTitle className="text-xl">{title}</CardTitle>
+          <Checkbox
+            checked={isSelected}
+            onCheckedChange={onSelect}
+            className="h-5 w-5"
+          />
+        </div>
         {description && (
           <CardDescription>{description}</CardDescription>
         )}
