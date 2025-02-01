@@ -41,9 +41,9 @@ const plans: Plan[] = [
 ];
 
 const PaymentSection = () => {
-  const [selectedPlan, setSelectedPlan] = useState<PlanType>("monthly");
+  const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null);
 
-  const currentPlan = plans.find((plan) => plan.type === selectedPlan)!;
+  const currentPlan = selectedPlan ? plans.find((plan) => plan.type === selectedPlan)! : null;
 
   return (
     <Card className="p-6">
@@ -51,7 +51,7 @@ const PaymentSection = () => {
         <div>
           <h2 className="text-2xl font-semibold mb-4">Choose Your Plan</h2>
           <RadioGroup
-            value={selectedPlan}
+            value={selectedPlan || ""}
             onValueChange={(value) => setSelectedPlan(value as PlanType)}
             className="grid gap-4"
           >
@@ -76,9 +76,11 @@ const PaymentSection = () => {
             ))}
           </RadioGroup>
         </div>
-        <div className="w-full max-w-md mx-auto">
-          <PayPalButton amount={currentPlan.price} planType={currentPlan.type} />
-        </div>
+        {selectedPlan && currentPlan && (
+          <div className="w-full max-w-md mx-auto">
+            <PayPalButton amount={currentPlan.price} planType={currentPlan.type} />
+          </div>
+        )}
       </div>
     </Card>
   );
