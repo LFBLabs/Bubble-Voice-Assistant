@@ -31,8 +31,8 @@ const AuthUI = () => {
   }, [navigate]);
 
   return (
-    <div className="min-h-screen grid place-items-center bg-[#F5F6F7] px-4">
-      <div className="w-full max-w-md">
+    <div className="flex min-h-screen items-center justify-center bg-[#F5F6F7] px-4">
+      <div className="w-full max-w-md mx-auto">
         <div className="mb-8 text-center">
           <div className="flex items-center justify-center mb-8">
             <Mic className="h-12 w-12 text-primary animate-pulse mt-4" strokeWidth={1.5} />
