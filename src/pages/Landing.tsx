@@ -21,7 +21,7 @@ const pricingPlans = [
     price: "$24",
     priceDetail: "/month",
     features: [
-      { text: "Unlimited voice interactions" },
+      { text: "Voice interactions" },
       { text: "Priority support" },
       { text: "Unlimited updates" },
     ],
