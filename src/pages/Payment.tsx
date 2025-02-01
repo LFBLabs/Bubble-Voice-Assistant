@@ -12,13 +12,15 @@ interface PricingFeature {
 }
 
 const starterFeatures: PricingFeature[] = [
-  { text: "5 queries per day" },
+  { text: "10 voice interactions per day" },
   { text: "Limited support" },
+  { text: "Limited updates" },
 ];
 
 const proFeatures: PricingFeature[] = [
-  { text: "Unlimited queries" },
+  { text: "Unlimited voice interactions" },
   { text: "Priority support" },
+  { text: "Unlimited updates" },
 ];
 
 const annualFeatures: PricingFeature[] = [
