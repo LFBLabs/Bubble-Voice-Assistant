@@ -24,19 +24,14 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         // Skip initialization if no session
         if (!session) {
           console.log('No active session, skipping PayPal initialization');
-          setIsLoading(false);
+          if (isSubscribed) {
+            setIsLoading(false);
+            setClientId("");
+          }
           return;
         }
 
-        // Set up auth state change listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
-          console.log("Auth state changed:", event);
-          
-          if (event === 'SIGNED_OUT') {
-            setClientId("");
-            navigate('/login');
-          }
-        });
+        console.log("Initializing PayPal with session:", session.user.id);
 
         // Fetch PayPal client ID
         const { data, error } = await supabase.functions.invoke('get-secret', {
@@ -55,10 +50,11 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         if (isSubscribed) {
           console.log("Successfully fetched PayPal client ID");
           setClientId(data.PAYPAL_CLIENT_ID);
+          setIsLoading(false);
         }
       } catch (error: any) {
         console.error('PayPal initialization error:', error);
-        if (isSubscribed && session) {  // Only show error toast if user is logged in
+        if (isSubscribed && session) {
           toast({
             variant: "destructive",
             title: "PayPal Configuration Error",
@@ -69,29 +65,44 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
             navigate('/login');
           }
         }
-      } finally {
         if (isSubscribed) {
           setIsLoading(false);
         }
       }
     };
 
+    // Initialize PayPal when session changes
     initializePayPal();
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
+      console.log("Auth state changed:", event);
+      
+      if (event === 'SIGNED_OUT') {
+        if (isSubscribed) {
+          setClientId("");
+          setIsLoading(false);
+        }
+        navigate('/login');
+      }
+    });
 
     return () => {
       isSubscribed = false;
+      subscription.unsubscribe();
     };
   }, [session, toast, navigate]);
-
-  if (isLoading && session) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="text-lg">Loading PayPal configuration...</div>
-    </div>;
-  }
 
   // If no session, just render children without PayPal provider
   if (!session) {
     return <>{children}</>;
+  }
+
+  // Show loading state only when logged in and still loading
+  if (isLoading && session) {
+    return <div className="flex items-center justify-center min-h-screen">
+      <div className="text-lg">Loading PayPal configuration...</div>
+    </div>;
   }
 
   // Only show error if we're logged in and failed to get client ID
