@@ -62,7 +62,7 @@ export const PricingCard = ({
           {features.map((feature, index) => (
             <li key={index} className="flex items-center gap-3">
               <Check className="h-5 w-5 text-primary flex-shrink-0" />
-              <span className="text-gray-600 dark:text-gray-300">{feature.text}</span>
+              <span className="text-gray-600 dark:text-gray-300 text-sm whitespace-nowrap overflow-hidden text-ellipsis">{feature.text}</span>
             </li>
           ))}
         </ul>
