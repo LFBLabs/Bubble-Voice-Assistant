@@ -5,7 +5,7 @@ export interface Plan {
   name: string;
   price: string;
   description: string;
-  features: string[];
+  features: { text: string }[];
 }
 
 export const plans: Plan[] = [
@@ -15,10 +15,10 @@ export const plans: Plan[] = [
     price: "15.00",
     description: "Billed monthly",
     features: [
-      "3 day free trial",
-      "10 voice interactions per day",
-      "Limited support",
-      "Limited updates",
+      { text: "3 day free trial" },
+      { text: "10 voice interactions per day" },
+      { text: "Limited support" },
+      { text: "Limited updates" },
     ],
   },
   {
@@ -27,10 +27,10 @@ export const plans: Plan[] = [
     price: "24.00",
     description: "Billed monthly",
     features: [
-      "5 days trial included",
-      "Unlimited voice interactions",
-      "Priority support",
-      "Unlimited updates",
+      { text: "5 days trial included" },
+      { text: "Unlimited voice interactions" },
+      { text: "Priority support" },
+      { text: "Unlimited updates" },
     ],
   },
   {
@@ -39,9 +39,9 @@ export const plans: Plan[] = [
     price: "24.00",
     description: "Billed monthly",
     features: [
-      "Unlimited voice interactions",
-      "Priority support",
-      "Unlimited updates",
+      { text: "Unlimited voice interactions" },
+      { text: "Priority support" },
+      { text: "Unlimited updates" },
     ],
   },
   {
@@ -50,9 +50,9 @@ export const plans: Plan[] = [
     price: "245.00",
     description: "Billed annually (Save 15%)",
     features: [
-      "Everything in pro",
-      "Two months free",
-      "Annual exclusive features",
+      { text: "Everything in pro" },
+      { text: "Two months free" },
+      { text: "Annual exclusive features" },
     ],
   },
 ];
