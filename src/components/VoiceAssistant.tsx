@@ -7,17 +7,32 @@ import NotesSection from "./NotesSection";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 import { useAudioResponse } from "@/hooks/useAudioResponse";
+import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 const VoiceAssistant = () => {
   const { session, loading } = useSupabaseAuth();
   const { isProcessing, response, processAudioResponse } = useAudioResponse();
   const { isRecording, transcript, toggleRecording } = useVoiceRecording(processAudioResponse);
+  const { toast } = useToast();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    return () => {
-      // Any cleanup code if needed
-    };
-  }, []);
+    if (session?.user?.user_metadata?.should_change_password) {
+      toast({
+        title: "Security Notice",
+        description: "Please change your password for security purposes.",
+        action: (
+          <button
+            onClick={() => navigate("/settings")}
+            className="bg-primary text-white px-3 py-1 rounded-md text-sm"
+          >
+            Change Password
+          </button>
+        ),
+      });
+    }
+  }, [session, navigate, toast]);
 
   if (loading) {
     return (
