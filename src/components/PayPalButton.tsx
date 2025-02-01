@@ -76,7 +76,11 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         description: `Your ${planType} subscription is now active`,
       });
       
-      navigate('/');
+      // Force a small delay to ensure the database transaction is complete
+      setTimeout(() => {
+        console.log("Navigating to index page...");
+        navigate('/', { replace: true });
+      }, 1000);
       
     } catch (error: any) {
       console.error("Error saving subscription:", error);
@@ -115,7 +119,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
             application_context: {
               shipping_preference: "NO_SHIPPING",
               user_action: "SUBSCRIBE_NOW",
-              return_url: `${window.location.origin}/payment`,
+              return_url: `${window.location.origin}/`,
               cancel_url: `${window.location.origin}/payment`
             }
           }).catch(err => {
