@@ -58,7 +58,7 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
         }
       } catch (error: any) {
         console.error('PayPal initialization error:', error);
-        if (isSubscribed) {
+        if (isSubscribed && session) {  // Only show error toast if user is logged in
           toast({
             variant: "destructive",
             title: "PayPal Configuration Error",
@@ -89,11 +89,13 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
     </div>;
   }
 
+  // If no session, just render children without PayPal provider
   if (!session) {
     return <>{children}</>;
   }
 
-  if (!clientId && !isLoading) {
+  // Only show error if we're logged in and failed to get client ID
+  if (!clientId && !isLoading && session) {
     return <div className="flex items-center justify-center min-h-screen">
       <div className="text-lg text-red-500">PayPal configuration error. Please try again later.</div>
     </div>;
