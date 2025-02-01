@@ -19,6 +19,7 @@ const starterFeatures: PricingFeature[] = [
 ];
 
 const proFeatures: PricingFeature[] = [
+  { text: "5 day free trial" },
   { text: "Unlimited voice interactions" },
   { text: "Priority support" },
   { text: "Unlimited updates" },
