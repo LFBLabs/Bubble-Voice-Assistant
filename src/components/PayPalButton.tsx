@@ -6,10 +6,11 @@ import { useNavigate } from "react-router-dom";
 
 interface PayPalButtonProps {
   amount: string;
-  planType: "monthly" | "annual";
+  planType: "starter" | "monthly" | "annual";
 }
 
 const PLAN_IDS = {
+  starter: "P-0ED97087CN9355402M6OZN4Y",
   monthly: "P-85M1675421680423TM6FMVGA",
   annual: "P-1PE850798P928170PM6FMXLA",
 };
@@ -39,6 +40,9 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
 
       const validUntil = new Date();
       switch (planType) {
+        case "starter":
+          validUntil.setMonth(validUntil.getMonth() + 1);
+          break;
         case "monthly":
           validUntil.setMonth(validUntil.getMonth() + 1);
           break;
@@ -50,7 +54,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
       const { error: insertError } = await supabase.from("payments").insert({
         payment_id: details.orderID,
         status: "active",
-        amount: planType === "monthly" ? 24.00 : 245.00,
+        amount: planType === "starter" ? 15.00 : planType === "monthly" ? 24.00 : 245.00,
         user_id: session.user.id,
         subscription_id: details.subscriptionID,
         subscription_status: "active",
