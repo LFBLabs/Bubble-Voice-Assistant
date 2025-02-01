@@ -13,7 +13,7 @@ const PLAN_IDS = {
   starter: "P-0ED97087CN9355402M6OZN4Y",
   pro: "P-5KF35011AK525611SM6OZQNY",
   monthly: "P-85M1675421680423TM6FMVGA",
-  annual: "P-1PE850798P928170PM6FMXLA",
+  annual: "P-7TP45305AJ1806514M6OZSSI",
 };
 
 const PayPalButton = ({ planType }: PayPalButtonProps) => {
@@ -100,7 +100,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
       )}
       <PayPalButtons
         style={{
-          shape: planType === "pro" ? "pill" : "rect",
+          shape: planType === "pro" || planType === "annual" ? "pill" : "rect",
           color: planType === "pro" ? "gold" : "blue",
           layout: "vertical",
           label: "subscribe"
