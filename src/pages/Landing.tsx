@@ -20,8 +20,9 @@ const pricingPlans = [
     price: "$24",
     isPopular: true,
     features: [
-      { text: "Unlimited queries" },
+      { text: "Unlimited voice interactions" },
       { text: "Priority support" },
+      { text: "Unlimited updates" },
     ],
   },
   {
