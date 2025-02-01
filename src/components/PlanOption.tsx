@@ -20,7 +20,7 @@ export const PlanOption = ({ plan }: PlanOptionProps) => {
             <ul className="mt-2 space-y-1">
               {plan.features.map((feature, index) => (
                 <li key={index} className="text-sm text-gray-600 dark:text-gray-300">
-                  • {feature}
+                  • {feature.text}
                 </li>
               ))}
             </ul>
