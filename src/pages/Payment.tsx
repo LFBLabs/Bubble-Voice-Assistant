@@ -4,30 +4,7 @@ import Header from "@/components/Header";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
 import PayPalButton from "@/components/PayPalButton";
-
-type PlanType = "starter" | "pro" | "monthly" | "annual";
-
-interface PricingFeature {
-  text: string;
-}
-
-const starterFeatures: PricingFeature[] = [
-  { text: "3 day free trial" },
-  { text: "10 voice interactions per day" },
-  { text: "Limited support" },
-  { text: "Limited updates" },
-];
-
-const proFeatures: PricingFeature[] = [
-  { text: "5 day free trial" },
-  { text: "Unlimited voice interactions" },
-  { text: "Priority support" },
-  { text: "Unlimited updates" },
-];
-
-const annualFeatures: PricingFeature[] = [
-  { text: "Everything in pro" },
-];
+import { plans, PlanType } from "@/utils/plan-config";
 
 const Payment = () => {
   const { session, loading } = useSupabaseAuth();
@@ -64,33 +41,19 @@ const Payment = () => {
       />
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        <PricingCard
-          title="Starter"
-          price="$15"
-          priceDetail="/month"
-          features={starterFeatures}
-          isSelected={selectedPlan === "starter"}
-          onSelect={() => handlePlanSelect("starter")}
-          showCheckbox={true}
-        />
-        <PricingCard
-          title="Pro"
-          price="$24"
-          priceDetail="/month"
-          features={proFeatures}
-          isPopular
-          isSelected={selectedPlan === "pro"}
-          onSelect={() => handlePlanSelect("pro")}
-          showCheckbox={true}
-        />
-        <PricingCard
-          title="Annual"
-          price="$230"
-          features={annualFeatures}
-          isSelected={selectedPlan === "annual"}
-          onSelect={() => handlePlanSelect("annual")}
-          showCheckbox={true}
-        />
+        {plans.map((plan) => (
+          <PricingCard
+            key={plan.type}
+            title={plan.name}
+            price={plan.price}
+            priceDetail={plan.description}
+            features={plan.features}
+            isSelected={selectedPlan === plan.type}
+            onSelect={() => handlePlanSelect(plan.type)}
+            showCheckbox={true}
+            isPopular={plan.type === "pro"}
+          />
+        ))}
       </div>
 
       {selectedPlan && (
