@@ -33,7 +33,7 @@ const plans: Plan[] = [
     price: "24.00",
     description: "Billed monthly",
     features: [
-      "5 day free trial",
+      "5 days trial included",
       "Unlimited voice interactions",
       "Priority support",
       "Unlimited updates",
