@@ -12,6 +12,7 @@ interface PricingFeature {
 }
 
 const starterFeatures: PricingFeature[] = [
+  { text: "3 day free trial" },
   { text: "10 voice interactions per day" },
   { text: "Limited support" },
   { text: "Limited updates" },
