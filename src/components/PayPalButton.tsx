@@ -6,11 +6,12 @@ import { useNavigate } from "react-router-dom";
 
 interface PayPalButtonProps {
   amount: string;
-  planType: "starter" | "monthly" | "annual";
+  planType: "starter" | "monthly" | "annual" | "pro";
 }
 
 const PLAN_IDS = {
   starter: "P-0ED97087CN9355402M6OZN4Y",
+  pro: "P-5KF35011AK525611SM6OZQNY",
   monthly: "P-85M1675421680423TM6FMVGA",
   annual: "P-1PE850798P928170PM6FMXLA",
 };
@@ -43,6 +44,9 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         case "starter":
           validUntil.setMonth(validUntil.getMonth() + 1);
           break;
+        case "pro":
+          validUntil.setMonth(validUntil.getMonth() + 1);
+          break;
         case "monthly":
           validUntil.setMonth(validUntil.getMonth() + 1);
           break;
@@ -54,7 +58,7 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
       const { error: insertError } = await supabase.from("payments").insert({
         payment_id: details.orderID,
         status: "active",
-        amount: planType === "starter" ? 15.00 : planType === "monthly" ? 24.00 : 245.00,
+        amount: planType === "starter" ? 15.00 : planType === "pro" ? 24.00 : planType === "monthly" ? 24.00 : 245.00,
         user_id: session.user.id,
         subscription_id: details.subscriptionID,
         subscription_status: "active",
@@ -96,8 +100,8 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
       )}
       <PayPalButtons
         style={{
-          shape: "rect",
-          color: "blue",
+          shape: planType === "pro" ? "pill" : "rect",
+          color: planType === "pro" ? "gold" : "blue",
           layout: "vertical",
           label: "subscribe"
         }}
