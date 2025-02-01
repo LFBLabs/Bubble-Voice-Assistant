@@ -95,10 +95,7 @@ const Payment = () => {
 
       {selectedPlan && (
         <div className="max-w-md mx-auto mt-8">
-          <PayPalButton 
-            amount={selectedPlan === "starter" ? "15.00" : selectedPlan === "pro" ? "24.00" : "230.00"} 
-            planType={selectedPlan} 
-          />
+          <PayPalButton planType={selectedPlan} />
         </div>
       )}
     </div>

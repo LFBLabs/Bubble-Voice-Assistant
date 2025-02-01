@@ -108,7 +108,7 @@ const PaymentSection = () => {
         </div>
         {selectedPlan && currentPlan && (
           <div className="w-full max-w-md mx-auto">
-            <PayPalButton amount={currentPlan.price} planType={currentPlan.type} />
+            <PayPalButton planType={currentPlan.type} />
           </div>
         )}
       </div>
