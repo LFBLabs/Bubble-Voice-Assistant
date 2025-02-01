@@ -11,6 +11,7 @@ interface Plan {
   name: string;
   price: string;
   description: string;
+  features: string[];
 }
 
 const plans: Plan[] = [
@@ -19,24 +20,46 @@ const plans: Plan[] = [
     name: "Starter Plan",
     price: "15.00",
     description: "Billed monthly",
+    features: [
+      "3 day free trial",
+      "10 voice interactions per day",
+      "Limited support",
+      "Limited updates",
+    ],
   },
   {
     type: "pro",
     name: "Pro Plan",
     price: "24.00",
     description: "Billed monthly",
+    features: [
+      "5 day free trial",
+      "Unlimited voice interactions",
+      "Priority support",
+      "Unlimited updates",
+    ],
   },
   {
     type: "monthly",
     name: "Monthly Plan",
     price: "24.00",
     description: "Billed monthly",
+    features: [
+      "Unlimited voice interactions",
+      "Priority support",
+      "Unlimited updates",
+    ],
   },
   {
     type: "annual",
     name: "Annual Plan",
     price: "245.00",
     description: "Billed annually (Save 15%)",
+    features: [
+      "Everything in pro",
+      "Two months free",
+      "Annual exclusive features",
+    ],
   },
 ];
 
@@ -68,6 +91,13 @@ const PaymentSection = () => {
                       <div className="text-sm text-gray-500 dark:text-gray-400">
                         {plan.description}
                       </div>
+                      <ul className="mt-2 space-y-1">
+                        {plan.features.map((feature, index) => (
+                          <li key={index} className="text-sm text-gray-600 dark:text-gray-300">
+                            • {feature}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                     <div className="text-lg font-semibold">${plan.price}</div>
                   </div>

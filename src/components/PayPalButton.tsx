@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 
 interface PayPalButtonProps {
   amount: string;
-  planType: "starter" | "monthly" | "annual" | "pro";
+  planType: "starter" | "pro" | "monthly" | "annual";
 }
 
 const PLAN_IDS = {
@@ -66,7 +66,10 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         valid_until: validUntil.toISOString(),
       });
 
-      if (insertError) throw insertError;
+      if (insertError) {
+        console.error("Insert error:", insertError);
+        throw insertError;
+      }
 
       toast({
         title: "Subscription Successful",
