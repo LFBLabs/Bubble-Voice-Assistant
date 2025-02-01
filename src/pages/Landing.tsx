@@ -10,8 +10,9 @@ const pricingPlans = [
     title: "Starter",
     price: "$15",
     features: [
-      { text: "5 queries per day" },
+      { text: "10 voice interactions per day" },
       { text: "Limited support" },
+      { text: "Limited updates" },
     ],
   },
   {
