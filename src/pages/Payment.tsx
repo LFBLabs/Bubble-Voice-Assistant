@@ -3,9 +3,9 @@ import { PricingCard } from "@/components/PricingCard";
 import Header from "@/components/Header";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useNavigate } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
+import PayPalButton from "@/components/PayPalButton";
 
-type PlanType = "starter" | "pro" | "annual";
+type PlanType = "starter" | "pro" | "monthly" | "annual";
 
 interface PricingFeature {
   text: string;
@@ -30,7 +30,6 @@ const annualFeatures: PricingFeature[] = [
 const Payment = () => {
   const { session, loading } = useSupabaseAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
   const [selectedPlan, setSelectedPlan] = useState<PlanType | null>(null);
 
   React.useEffect(() => {
@@ -93,10 +92,11 @@ const Payment = () => {
       </div>
 
       {selectedPlan && (
-        <div className="text-center mt-8">
-          <p className="text-sm text-muted-foreground">
-            PayPal integration coming soon...
-          </p>
+        <div className="max-w-md mx-auto mt-8">
+          <PayPalButton 
+            amount={selectedPlan === "starter" ? "15.00" : selectedPlan === "pro" ? "24.00" : "230.00"} 
+            planType={selectedPlan} 
+          />
         </div>
       )}
     </div>
