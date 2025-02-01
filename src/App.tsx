@@ -11,6 +11,7 @@ import { Toaster } from "@/components/ui/toaster";
 import PayPalProvider from "@/components/PayPalProvider";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AuthenticatedRoute } from "@/components/AuthenticatedRoute";
+import { SidebarProvider } from "@/components/ui/sidebar";
 import "./App.css";
 
 const queryClient = new QueryClient();
@@ -25,49 +26,51 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <PayPalProvider>
-          <Routes>
-            <Route
-              path="/"
-              element={!session ? <Landing /> : (
-                <ProtectedRoute>
-                  <Index />
-                </ProtectedRoute>
-              )}
-            />
-            <Route
-              path="/login"
-              element={!session ? <AuthUI /> : <Navigate to="/" replace />}
-            />
-            <Route
-              path="/payment"
-              element={
-                <AuthenticatedRoute>
-                  <Payment />
-                </AuthenticatedRoute>
-              }
-            />
-            <Route
-              path="/settings"
-              element={
-                <AuthenticatedRoute>
+        <SidebarProvider>
+          <PayPalProvider>
+            <Routes>
+              <Route
+                path="/"
+                element={!session ? <Landing /> : (
                   <ProtectedRoute>
-                    <Settings />
+                    <Index />
                   </ProtectedRoute>
-                </AuthenticatedRoute>
-              }
-            />
-            <Route
-              path="/feedback"
-              element={
-                <AuthenticatedRoute>
-                  <Feedback />
-                </AuthenticatedRoute>
-              }
-            />
-          </Routes>
-          <Toaster />
-        </PayPalProvider>
+                )}
+              />
+              <Route
+                path="/login"
+                element={!session ? <AuthUI /> : <Navigate to="/" replace />}
+              />
+              <Route
+                path="/payment"
+                element={
+                  <AuthenticatedRoute>
+                    <Payment />
+                  </AuthenticatedRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <AuthenticatedRoute>
+                    <ProtectedRoute>
+                      <Settings />
+                    </ProtectedRoute>
+                  </AuthenticatedRoute>
+                }
+              />
+              <Route
+                path="/feedback"
+                element={
+                  <AuthenticatedRoute>
+                    <Feedback />
+                  </AuthenticatedRoute>
+                }
+              />
+            </Routes>
+            <Toaster />
+          </PayPalProvider>
+        </SidebarProvider>
       </Router>
     </QueryClientProvider>
   );
