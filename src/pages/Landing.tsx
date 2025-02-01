@@ -9,6 +9,7 @@ const pricingPlans = [
   {
     title: "Starter",
     price: "$15",
+    priceDetail: "/month",
     features: [
       { text: "10 voice interactions per day" },
       { text: "Limited support" },
@@ -18,12 +19,13 @@ const pricingPlans = [
   {
     title: "Pro",
     price: "$24",
-    isPopular: true,
+    priceDetail: "/month",
     features: [
       { text: "Unlimited voice interactions" },
       { text: "Priority support" },
       { text: "Unlimited updates" },
     ],
+    isPopular: true,
   },
   {
     title: "Annual",
@@ -47,6 +49,7 @@ const Landing = () => {
             key={index}
             title={plan.title}
             price={plan.price}
+            priceDetail={plan.priceDetail}
             features={plan.features}
             isPopular={plan.isPopular}
           />
