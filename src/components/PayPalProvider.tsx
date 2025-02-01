@@ -1,97 +1,16 @@
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
-import { ReactNode, useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { ReactNode } from "react";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { usePayPalClient } from "@/hooks/usePayPalClient";
+import { PAYPAL_OPTIONS } from "@/utils/paypal-config";
 
 interface PayPalProviderProps {
   children: ReactNode;
 }
 
 const PayPalProvider = ({ children }: PayPalProviderProps) => {
-  const [clientId, setClientId] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-  const navigate = useNavigate();
   const { session } = useSupabaseAuth();
-
-  useEffect(() => {
-    let isSubscribed = true;
-
-    const initializePayPal = async () => {
-      try {
-        // Skip initialization if no session
-        if (!session) {
-          console.log('No active session, skipping PayPal initialization');
-          if (isSubscribed) {
-            setIsLoading(false);
-            setClientId("");
-          }
-          return;
-        }
-
-        console.log("Initializing PayPal with session:", session.user.id);
-
-        // Fetch PayPal client ID
-        const { data, error } = await supabase.functions.invoke('get-secret', {
-          body: { secretName: 'PAYPAL_CLIENT_ID' }
-        });
-        
-        if (error) {
-          console.error('Error fetching PayPal client ID:', error);
-          throw error;
-        }
-        
-        if (!data?.PAYPAL_CLIENT_ID) {
-          throw new Error('PayPal Client ID not found in response');
-        }
-
-        if (isSubscribed) {
-          console.log("Successfully fetched PayPal client ID");
-          setClientId(data.PAYPAL_CLIENT_ID);
-          setIsLoading(false);
-        }
-      } catch (error: any) {
-        console.error('PayPal initialization error:', error);
-        if (isSubscribed && session) {
-          toast({
-            variant: "destructive",
-            title: "PayPal Configuration Error",
-            description: "Unable to initialize PayPal. Please try again later.",
-          });
-          
-          if (error.message?.includes('auth')) {
-            navigate('/login');
-          }
-        }
-        if (isSubscribed) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    // Initialize PayPal when session changes
-    initializePayPal();
-
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event) => {
-      console.log("Auth state changed:", event);
-      
-      if (event === 'SIGNED_OUT') {
-        if (isSubscribed) {
-          setClientId("");
-          setIsLoading(false);
-        }
-        navigate('/login');
-      }
-    });
-
-    return () => {
-      isSubscribed = false;
-      subscription.unsubscribe();
-    };
-  }, [session, toast, navigate]);
+  const { clientId, isLoading } = usePayPalClient(session);
 
   // If no session, just render children without PayPal provider
   if (!session) {
@@ -115,14 +34,8 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
   return (
     <PayPalScriptProvider
       options={{
-        clientId: clientId,
-        currency: "USD",
-        intent: "subscription",
-        vault: true,
-        components: "buttons",
-        "enable-funding": "card",
-        "disable-funding": "paylater,venmo",
-        environment: "sandbox"
+        clientId,
+        ...PAYPAL_OPTIONS
       }}
     >
       {children}
