@@ -71,16 +71,20 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         throw insertError;
       }
 
+      // Refresh the session to ensure it's up to date
+      await supabase.auth.refreshSession();
+
       toast({
         title: "Subscription Successful",
         description: `Your ${planType} subscription is now active`,
       });
       
       // Force a small delay to ensure the database transaction is complete
+      // and the session is refreshed before redirecting
       setTimeout(() => {
         console.log("Navigating to index page...");
-        navigate('/', { replace: true });
-      }, 1000);
+        window.location.href = '/';
+      }, 1500);
       
     } catch (error: any) {
       console.error("Error saving subscription:", error);
