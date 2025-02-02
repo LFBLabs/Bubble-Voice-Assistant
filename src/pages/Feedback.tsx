@@ -61,22 +61,23 @@ const Feedback = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+    <div className="container mx-auto p-4">
+      <div className="space-y-8">
         <Header
           title="Provide Feedback"
           description="Help us improve by sharing your thoughts"
         />
 
-        <div className="mt-8 max-w-2xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-              <div className="space-y-4">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+          <h2 className="text-2xl font-semibold text-center mb-8">Submit Feedback</h2>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <div className="space-y-4">
+              <div>
                 <Label className="text-lg font-medium">Type of Feedback</Label>
                 <RadioGroup
                   defaultValue="general"
                   {...register("type")}
-                  className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-2"
                 >
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="general" id="general" />
@@ -93,28 +94,34 @@ const Feedback = () => {
                 </RadioGroup>
               </div>
 
-              <div className="space-y-2">
+              <div>
                 <Label htmlFor="content" className="text-lg font-medium">Your Feedback</Label>
                 <Textarea
                   id="content"
                   {...register("content")}
                   placeholder="Please share your thoughts..."
-                  className="min-h-[150px]"
+                  className="min-h-[150px] mt-2"
                 />
               </div>
+            </div>
 
-              <div className="flex justify-end space-x-4">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => navigate("/")}
-                >
-                  Cancel
-                </Button>
-                <Button type="submit">Submit Feedback</Button>
-              </div>
-            </form>
-          </div>
+            <div className="flex justify-center space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate("/")}
+                className="min-w-[120px]"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit"
+                className="min-w-[120px]"
+              >
+                Submit Feedback
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
