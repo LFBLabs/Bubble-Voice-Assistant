@@ -24,11 +24,10 @@ const PayPalProvider = ({ children }: PayPalProviderProps) => {
     </div>;
   }
 
-  // Only show error if we're logged in and failed to get client ID
+  // If no clientId, just render children without PayPal provider
+  // This allows the app to function without PayPal integration
   if (!clientId && !isLoading && session) {
-    return <div className="flex items-center justify-center min-h-screen">
-      <div className="text-lg text-red-500">PayPal configuration error. Please try again later.</div>
-    </div>;
+    return <>{children}</>;
   }
 
   return (
