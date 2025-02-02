@@ -61,68 +61,64 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800 flex items-center justify-center">
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-2xl mx-auto">
-          <Header
-            title="Settings"
-            description="Manage your account settings and preferences"
-          />
-          
-          <div className="mt-8">
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-              <h2 className="text-2xl font-semibold text-center mb-8">Change Password</h2>
-              <form onSubmit={handlePasswordChange} className="space-y-6 max-w-md mx-auto">
-                <div className="space-y-4">
-                  <div>
-                    <label htmlFor="password" className="block text-sm font-medium mb-2">
-                      New Password
-                    </label>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      placeholder="Enter new password"
-                      className="w-full"
-                    />
-                  </div>
-                  
-                  <div>
-                    <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
-                      Confirm New Password
-                    </label>
-                    <Input
-                      id="confirmPassword"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="Confirm new password"
-                      className="w-full"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex justify-center space-x-4 pt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => navigate('/')}
-                    className="min-w-[120px]"
-                  >
-                    Cancel
-                  </Button>
-                  <Button 
-                    type="submit" 
-                    disabled={loading}
-                    className="min-w-[120px]"
-                  >
-                    {loading ? 'Updating...' : 'Update Password'}
-                  </Button>
-                </div>
-              </form>
+    <div className="container mx-auto p-4">
+      <div className="space-y-8">
+        <Header
+          title="Settings"
+          description="Manage your account settings and preferences"
+        />
+        
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 max-w-2xl mx-auto">
+          <h2 className="text-2xl font-semibold text-center mb-8">Change Password</h2>
+          <form onSubmit={handlePasswordChange} className="space-y-6">
+            <div className="space-y-4">
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium mb-2">
+                  New Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="w-full"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+                  Confirm New Password
+                </label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full"
+                />
+              </div>
             </div>
-          </div>
+
+            <div className="flex justify-center space-x-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => navigate('/')}
+                className="min-w-[120px]"
+              >
+                Cancel
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="min-w-[120px]"
+              >
+                {loading ? 'Updating...' : 'Update Password'}
+              </Button>
+            </div>
+          </form>
         </div>
       </div>
     </div>
