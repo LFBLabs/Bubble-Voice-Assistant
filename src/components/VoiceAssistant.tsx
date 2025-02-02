@@ -7,13 +7,15 @@ import NotesSection from "./NotesSection";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 import { useAudioResponse } from "@/hooks/useAudioResponse";
+import { useVoiceInteraction } from "@/hooks/useVoiceInteraction";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
 const VoiceAssistant = () => {
   const { session, loading } = useSupabaseAuth();
   const { isProcessing, response, processAudioResponse } = useAudioResponse();
-  const { isRecording, transcript, toggleRecording } = useVoiceRecording(processAudioResponse);
+  const { checkInteractionLimit, recordInteraction } = useVoiceInteraction();
+  const { isRecording, transcript, toggleRecording: originalToggleRecording } = useVoiceRecording(processAudioResponse);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -33,6 +35,16 @@ const VoiceAssistant = () => {
       });
     }
   }, [session, navigate, toast]);
+
+  const toggleRecording = async () => {
+    if (!isRecording) {
+      const canProceed = await checkInteractionLimit();
+      if (!canProceed) return;
+      
+      await recordInteraction();
+    }
+    originalToggleRecording();
+  };
 
   if (loading) {
     return (

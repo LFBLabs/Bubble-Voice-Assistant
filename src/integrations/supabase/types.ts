@@ -174,12 +174,35 @@ export type Database = {
         }
         Relationships: []
       }
+      voice_interactions: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_daily_interaction_count: {
+        Args: {
+          user_id: string
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
