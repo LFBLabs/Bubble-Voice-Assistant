@@ -12,7 +12,7 @@ export const plans: Plan[] = [
   {
     type: "starter",
     name: "Starter Plan",
-    price: "15.00",
+    price: "$15.00",
     description: "Billed monthly",
     features: [
       { text: "3 day free trial" },
@@ -24,7 +24,7 @@ export const plans: Plan[] = [
   {
     type: "pro",
     name: "Pro Plan",
-    price: "24.00",
+    price: "$24.00",
     description: "Billed monthly",
     features: [
       { text: "5 day free trial" },
@@ -36,7 +36,7 @@ export const plans: Plan[] = [
   {
     type: "annual",
     name: "Annual Plan",
-    price: "230.00",
+    price: "$230.00",
     description: "Billed annually",
     features: [
       { text: "Everything in pro" },
