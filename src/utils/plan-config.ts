@@ -1,4 +1,4 @@
-export type PlanType = "starter" | "pro" | "monthly" | "annual";
+export type PlanType = "starter" | "pro" | "annual";
 
 export interface Plan {
   type: PlanType;
@@ -34,25 +34,12 @@ export const plans: Plan[] = [
     ],
   },
   {
-    type: "monthly",
-    name: "Monthly Plan",
-    price: "24.00",
-    description: "Billed monthly",
-    features: [
-      { text: "Unlimited voice interactions" },
-      { text: "Priority support" },
-      { text: "Unlimited updates" },
-    ],
-  },
-  {
     type: "annual",
     name: "Annual Plan",
-    price: "245.00",
-    description: "Billed annually (Save 15%)",
+    price: "230.00",
+    description: "Billed annually",
     features: [
       { text: "Everything in pro" },
-      { text: "Two months free" },
-      { text: "Annual exclusive features" },
     ],
   },
 ];
