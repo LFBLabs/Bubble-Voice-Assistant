@@ -27,7 +27,7 @@ export const plans: Plan[] = [
     price: "24.00",
     description: "Billed monthly",
     features: [
-      { text: "5 days trial included" },
+      { text: "5 day free trial" },
       { text: "Unlimited voice interactions" },
       { text: "Priority support" },
       { text: "Unlimited updates" },
