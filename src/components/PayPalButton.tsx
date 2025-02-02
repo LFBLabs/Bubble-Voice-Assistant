@@ -30,6 +30,9 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
     return <div className="text-red-500">Configuration error: Invalid plan ID</div>;
   }
 
+  // Get the base URL without any trailing slashes
+  const baseUrl = window.location.origin.replace(/\/$/, '');
+
   return (
     <div className="relative">
       {isProcessing && (
@@ -46,14 +49,16 @@ const PayPalButton = ({ planType }: PayPalButtonProps) => {
         }}
         createSubscription={(data, actions) => {
           console.log("Creating subscription with plan ID:", planId);
+          console.log("Return URL:", `${baseUrl}/`);
+          console.log("Cancel URL:", `${baseUrl}/payment`);
           setIsProcessing(true);
           return actions.subscription.create({
             plan_id: planId,
             application_context: {
               shipping_preference: "NO_SHIPPING",
               user_action: "SUBSCRIBE_NOW",
-              return_url: `${window.location.origin}/`,
-              cancel_url: `${window.location.origin}/payment`
+              return_url: `${baseUrl}/`,
+              cancel_url: `${baseUrl}/payment`
             }
           }).catch(err => {
             console.error("Subscription creation error:", err);
