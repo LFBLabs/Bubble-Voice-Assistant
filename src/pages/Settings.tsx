@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
+import Header from "@/components/Header";
 
 const Settings = () => {
   const [password, setPassword] = useState('');
@@ -46,7 +47,6 @@ const Settings = () => {
         description: "Password updated successfully",
       });
       
-      // Clear the form
       setPassword('');
       setConfirmPassword('');
     } catch (error: any) {
@@ -61,50 +61,59 @@ const Settings = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-md mx-auto">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl font-bold">Settings</h1>
-          <Button variant="outline" onClick={() => navigate('/')}>
-            Back to Home
-          </Button>
-        </div>
+    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+        <Header
+          title="Settings"
+          description="Manage your account settings and preferences"
+        />
         
-        <div className="bg-card rounded-lg shadow-lg p-6">
-          <h2 className="text-xl font-semibold mb-4">Change Password</h2>
-          <form onSubmit={handlePasswordChange} className="space-y-4">
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium mb-1">
-                New Password
-              </label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter new password"
-                className="w-full"
-              />
-            </div>
-            
-            <div>
-              <label htmlFor="confirmPassword" className="block text-sm font-medium mb-1">
-                Confirm New Password
-              </label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="Confirm new password"
-                className="w-full"
-              />
-            </div>
+        <div className="mt-8 max-w-md mx-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <h2 className="text-xl font-semibold mb-6">Change Password</h2>
+            <form onSubmit={handlePasswordChange} className="space-y-6">
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium mb-2">
+                  New Password
+                </label>
+                <Input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="w-full"
+                />
+              </div>
+              
+              <div>
+                <label htmlFor="confirmPassword" className="block text-sm font-medium mb-2">
+                  Confirm New Password
+                </label>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full"
+                />
+              </div>
 
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? 'Updating...' : 'Update Password'}
-            </Button>
-          </form>
+              <div className="flex justify-end space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate('/')}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit" disabled={loading}>
+                  {loading ? 'Updating...' : 'Update Password'}
+                </Button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>

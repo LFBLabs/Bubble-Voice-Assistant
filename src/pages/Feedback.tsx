@@ -68,50 +68,54 @@ const Feedback = () => {
           description="Help us improve by sharing your thoughts"
         />
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-          <div className="space-y-4">
-            <Label>Type of Feedback</Label>
-            <RadioGroup
-              defaultValue="general"
-              {...register("type")}
-              className="grid grid-cols-1 sm:grid-cols-3 gap-4"
-            >
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="general" id="general" />
-                <Label htmlFor="general">General Feedback</Label>
+        <div className="mt-8 max-w-2xl mx-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+              <div className="space-y-4">
+                <Label className="text-lg font-medium">Type of Feedback</Label>
+                <RadioGroup
+                  defaultValue="general"
+                  {...register("type")}
+                  className="grid grid-cols-1 sm:grid-cols-3 gap-4"
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="general" id="general" />
+                    <Label htmlFor="general">General Feedback</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="bug" id="bug" />
+                    <Label htmlFor="bug">Bug Report</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="feature" id="feature" />
+                    <Label htmlFor="feature">Feature Request</Label>
+                  </div>
+                </RadioGroup>
               </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="bug" id="bug" />
-                <Label htmlFor="bug">Bug Report</Label>
-              </div>
-              <div className="flex items-center space-x-2">
-                <RadioGroupItem value="feature" id="feature" />
-                <Label htmlFor="feature">Feature Request</Label>
-              </div>
-            </RadioGroup>
-          </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="content">Your Feedback</Label>
-            <Textarea
-              id="content"
-              {...register("content")}
-              placeholder="Please share your thoughts..."
-              className="min-h-[150px]"
-            />
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="content" className="text-lg font-medium">Your Feedback</Label>
+                <Textarea
+                  id="content"
+                  {...register("content")}
+                  placeholder="Please share your thoughts..."
+                  className="min-h-[150px]"
+                />
+              </div>
 
-          <div className="flex justify-end space-x-4">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => navigate("/")}
-            >
-              Cancel
-            </Button>
-            <Button type="submit">Submit Feedback</Button>
+              <div className="flex justify-end space-x-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => navigate("/")}
+                >
+                  Cancel
+                </Button>
+                <Button type="submit">Submit Feedback</Button>
+              </div>
+            </form>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
