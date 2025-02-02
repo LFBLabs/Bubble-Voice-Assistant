@@ -41,9 +41,9 @@ const Landing = () => {
   const isMobile = useIsMobile();
 
   const PricingSection = () => (
-    <div className="space-y-8">
+    <div className="w-full max-w-7xl mx-auto px-4 space-y-8">
       <h2 className="text-3xl font-bold text-center text-[#1a1a1a] mb-8">Pricing</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto px-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {pricingPlans.map((plan, index) => (
           <PricingCard
             key={index}
@@ -70,7 +70,7 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="container mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <nav className="flex justify-between items-center mb-16">
           <div className="text-2xl font-bold text-[#1a1a1a]">BubbleVoice</div>
           <Button
@@ -82,7 +82,7 @@ const Landing = () => {
           </Button>
         </nav>
 
-        <main className="max-w-5xl mx-auto">
+        <main className="w-full max-w-7xl mx-auto">
           <div className="text-center mb-20 space-y-8">
             <h1 className="text-4xl sm:text-6xl font-bold text-[#1a1a1a] mb-6 leading-tight">
               Your AI Voice Assistant for{" "}
@@ -108,7 +108,7 @@ const Landing = () => {
             <PricingSection />
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-16 max-w-6xl mx-auto">
             {features.map((feature, index) => (
               <div
                 key={index}
@@ -128,7 +128,7 @@ const Landing = () => {
           </div>
 
           {!isMobile && (
-            <div className="relative rounded-xl overflow-hidden hidden sm:block transform hover:scale-[1.02] transition-transform duration-300 mb-20">
+            <div className="relative rounded-xl overflow-hidden hidden sm:block transform hover:scale-[1.02] transition-transform duration-300 mb-20 max-w-6xl mx-auto">
               <div className="absolute inset-0 bg-gradient-to-r from-[#0037ff]/10 to-transparent pointer-events-none"></div>
               <img
                 src="/lovable-uploads/274d4461-71f9-4e12-abb3-812c2215fb65.png"
