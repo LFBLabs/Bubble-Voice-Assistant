@@ -26,16 +26,19 @@ export const useVoiceInteraction = () => {
         return true;
       }
 
-      const { data: count, error } = await supabase.rpc(
-        'get_daily_interaction_count',
-        { user_id: session.user.id }
-      );
+      const { data, error } = await supabase.rpc('get_daily_interaction_count', {
+        user_id: session.user.id
+      });
 
       if (error) {
+        console.error("Error checking interaction limit:", error);
         throw error;
       }
 
-      if (count >= 10) {
+      // Add more detailed logging
+      console.log("Daily interaction count:", data);
+
+      if (data >= 10) {
         setIsLimitReached(true);
         toast({
           title: "Daily Limit Reached",
@@ -58,7 +61,7 @@ export const useVoiceInteraction = () => {
       console.error("Error checking interaction limit:", error);
       toast({
         title: "Error",
-        description: "Failed to check interaction limit.",
+        description: "Failed to check interaction limit. Please try again.",
         variant: "destructive",
       });
       return false;
@@ -75,7 +78,10 @@ export const useVoiceInteraction = () => {
         .from('voice_interactions')
         .insert([{ user_id: session.user.id }]);
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error recording interaction:", error);
+        throw error;
+      }
     } catch (error) {
       console.error("Error recording interaction:", error);
     }
