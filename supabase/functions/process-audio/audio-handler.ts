@@ -30,9 +30,19 @@ export async function synthesizeAudio(text: string) {
 
   console.log('Successfully generated audio stream');
 
-  const audioData = new Uint8Array(await speechResponse.AudioStream.transformToByteArray());
-  const audioBase64 = btoa(String.fromCharCode(...audioData));
-  const audioUrl = `data:audio/mpeg;base64,${audioBase64}`;
+  // Convert AudioStream to Uint8Array directly
+  const audioData = await speechResponse.AudioStream.transformToByteArray();
+  
+  // Convert to base64 in chunks to prevent stack overflow
+  const chunkSize = 32768;
+  let base64String = '';
+  
+  for (let i = 0; i < audioData.length; i += chunkSize) {
+    const chunk = audioData.slice(i, i + chunkSize);
+    base64String += btoa(String.fromCharCode.apply(null, chunk));
+  }
+
+  const audioUrl = `data:audio/mpeg;base64,${base64String}`;
 
   console.log('Successfully converted audio to base64');
   
