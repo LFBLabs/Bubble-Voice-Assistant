@@ -22,26 +22,51 @@ export const useAudioResponse = () => {
         return;
       }
 
+      console.log('Calling process-audio function with text:', text);
       const result = await supabase.functions.invoke('process-audio', {
         body: { text }
       });
 
+      console.log('Received response:', result);
+
       if (result.error) {
-        throw new Error(result.error.message);
+        console.error('Function error:', result.error);
+        throw new Error(result.error.message || 'Error processing audio response');
       }
 
-      const responseText = result.data.response;
+      if (!result.data) {
+        throw new Error('No data received from function');
+      }
+
+      const { response: responseText, audioUrl } = result.data;
+
+      if (!responseText || !audioUrl) {
+        throw new Error('Invalid response format from function');
+      }
+
       setResponse(responseText);
 
-      const audio = new Audio(result.data.audioUrl);
+      const audio = new Audio(audioUrl);
       setIsPlaying(true);
+      
+      audio.onerror = (e) => {
+        console.error('Audio playback error:', e);
+        toast({
+          title: "Error",
+          description: "Failed to play audio response.",
+          variant: "destructive",
+        });
+        setIsPlaying(false);
+      };
+
       audio.play();
       audio.onended = () => setIsPlaying(false);
+
     } catch (error) {
       console.error("Error processing response:", error);
       toast({
         title: "Error",
-        description: "An error occurred while processing your request.",
+        description: error instanceof Error ? error.message : "An error occurred while processing your request.",
         variant: "destructive",
       });
     } finally {

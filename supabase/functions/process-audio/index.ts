@@ -8,23 +8,41 @@ const corsHeaders = {
 };
 
 serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const requestData = await req.json();
-    const { text } = requestData;
+    console.log('Processing audio request...');
+    const { text } = await req.json();
     
-    console.log('Received request with text:', text);
+    if (!text || typeof text !== 'string') {
+      console.error('Invalid or missing text in request');
+      throw new Error('Invalid or missing text in request');
+    }
 
+    console.log('Generating AI response...');
     const responseText = await handleTextResponse(text);
-    const audioUrl = await synthesizeAudio(responseText);
+    
+    if (!responseText) {
+      console.error('No response text generated');
+      throw new Error('Failed to generate response text');
+    }
 
+    console.log('Synthesizing audio...');
+    const audioUrl = await synthesizeAudio(responseText);
+    
+    if (!audioUrl) {
+      console.error('No audio URL generated');
+      throw new Error('Failed to generate audio');
+    }
+
+    console.log('Successfully processed request');
     return new Response(
       JSON.stringify({ 
         response: responseText,
-        audioUrl
+        audioUrl 
       }),
       { 
         headers: {
@@ -33,11 +51,15 @@ serve(async (req) => {
         },
       }
     );
+
   } catch (error) {
     console.error('Error in process-audio function:', error);
+    
+    // Return a more detailed error response
     return new Response(
       JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'An unknown error occurred'
+        error: error instanceof Error ? error.message : 'An unknown error occurred',
+        details: error instanceof Error ? error.stack : undefined
       }),
       { 
         headers: {
