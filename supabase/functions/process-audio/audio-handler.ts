@@ -15,7 +15,8 @@ export async function synthesizeAudio(text: string): Promise<string> {
     const response = await polly.synthesizeSpeech({
       Text: text,
       OutputFormat: "mp3",
-      VoiceId: "Joanna"
+      VoiceId: "Danielle",
+      Engine: "neural"
     });
 
     if (!response.AudioStream) {
