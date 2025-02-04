@@ -46,11 +46,25 @@ export const useAudioResponse = () => {
 
       setResponse(responseText);
 
-      const audio = new Audio(audioUrl);
+      // Create a Blob from the base64 audio data
+      const base64Data = audioUrl.split(',')[1];
+      const binaryData = atob(base64Data);
+      const arrayBuffer = new ArrayBuffer(binaryData.length);
+      const uint8Array = new Uint8Array(arrayBuffer);
+      
+      for (let i = 0; i < binaryData.length; i++) {
+        uint8Array[i] = binaryData.charCodeAt(i);
+      }
+      
+      const audioBlob = new Blob([uint8Array], { type: 'audio/mpeg' });
+      const objectUrl = URL.createObjectURL(audioBlob);
+      
+      const audio = new Audio(objectUrl);
       setIsPlaying(true);
       
       audio.onerror = (e) => {
         console.error('Audio playback error:', e);
+        URL.revokeObjectURL(objectUrl);
         toast({
           title: "Error",
           description: "Failed to play audio response.",
@@ -59,8 +73,23 @@ export const useAudioResponse = () => {
         setIsPlaying(false);
       };
 
-      audio.play();
-      audio.onended = () => setIsPlaying(false);
+      audio.onended = () => {
+        URL.revokeObjectURL(objectUrl);
+        setIsPlaying(false);
+      };
+
+      try {
+        await audio.play();
+      } catch (playError) {
+        console.error('Audio play error:', playError);
+        URL.revokeObjectURL(objectUrl);
+        toast({
+          title: "Error",
+          description: "Failed to start audio playback. Please ensure audio is enabled in your browser.",
+          variant: "destructive",
+        });
+        setIsPlaying(false);
+      }
 
     } catch (error) {
       console.error("Error processing response:", error);
