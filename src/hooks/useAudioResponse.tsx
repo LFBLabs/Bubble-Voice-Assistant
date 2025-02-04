@@ -46,6 +46,11 @@ export const useAudioResponse = () => {
 
       setResponse(responseText);
 
+      // Validate the audio URL format
+      if (!audioUrl.startsWith('data:audio/mpeg;base64,')) {
+        throw new Error('Invalid audio data format');
+      }
+
       // Create a Blob from the base64 audio data
       const base64Data = audioUrl.split(',')[1];
       const binaryData = atob(base64Data);
@@ -59,9 +64,10 @@ export const useAudioResponse = () => {
       const audioBlob = new Blob([uint8Array], { type: 'audio/mpeg' });
       const objectUrl = URL.createObjectURL(audioBlob);
       
-      const audio = new Audio(objectUrl);
-      setIsPlaying(true);
+      const audio = new Audio();
+      audio.src = objectUrl;
       
+      // Set up event handlers before playing
       audio.onerror = (e) => {
         console.error('Audio playback error:', e);
         URL.revokeObjectURL(objectUrl);
@@ -78,6 +84,10 @@ export const useAudioResponse = () => {
         setIsPlaying(false);
       };
 
+      // Load the audio before playing
+      await audio.load();
+      setIsPlaying(true);
+      
       try {
         await audio.play();
       } catch (playError) {
