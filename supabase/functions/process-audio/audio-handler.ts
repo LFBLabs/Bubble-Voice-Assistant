@@ -23,11 +23,11 @@ export async function synthesizeAudio(text: string): Promise<string> {
       throw new Error('No audio stream returned from Polly');
     }
 
-    // Convert AudioStream to Uint8Array
+    // Convert AudioStream to Uint8Array using the built-in transformToByteArray method
     const audioData = await response.AudioStream.transformToByteArray();
     
-    // Convert to base64
-    const base64Audio = btoa(String.fromCharCode(...audioData));
+    // Convert to base64 string safely
+    const base64Audio = btoa(String.fromCharCode.apply(null, audioData));
     
     // Return as a proper data URL
     return `data:audio/mpeg;base64,${base64Audio}`;
