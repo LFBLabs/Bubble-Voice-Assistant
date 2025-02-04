@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAudioPlayback } from "./useAudioPlayback";
 
 export const useAudioResponse = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState("");
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { isPlaying, playAudio } = useAudioPlayback();
   const { toast } = useToast();
 
   const processAudioResponse = async (text: string) => {
@@ -45,61 +46,7 @@ export const useAudioResponse = () => {
       }
 
       setResponse(responseText);
-
-      // Validate the audio URL format
-      if (!audioUrl.startsWith('data:audio/mpeg;base64,')) {
-        throw new Error('Invalid audio data format');
-      }
-
-      // Create a Blob from the base64 audio data
-      const base64Data = audioUrl.split(',')[1];
-      const binaryData = atob(base64Data);
-      const arrayBuffer = new ArrayBuffer(binaryData.length);
-      const uint8Array = new Uint8Array(arrayBuffer);
-      
-      for (let i = 0; i < binaryData.length; i++) {
-        uint8Array[i] = binaryData.charCodeAt(i);
-      }
-      
-      const audioBlob = new Blob([uint8Array], { type: 'audio/mpeg' });
-      const objectUrl = URL.createObjectURL(audioBlob);
-      
-      const audio = new Audio();
-      audio.src = objectUrl;
-      
-      // Set up event handlers before playing
-      audio.onerror = (e) => {
-        console.error('Audio playback error:', e);
-        URL.revokeObjectURL(objectUrl);
-        toast({
-          title: "Error",
-          description: "Failed to play audio response.",
-          variant: "destructive",
-        });
-        setIsPlaying(false);
-      };
-
-      audio.onended = () => {
-        URL.revokeObjectURL(objectUrl);
-        setIsPlaying(false);
-      };
-
-      // Load the audio before playing
-      await audio.load();
-      setIsPlaying(true);
-      
-      try {
-        await audio.play();
-      } catch (playError) {
-        console.error('Audio play error:', playError);
-        URL.revokeObjectURL(objectUrl);
-        toast({
-          title: "Error",
-          description: "Failed to start audio playback. Please ensure audio is enabled in your browser.",
-          variant: "destructive",
-        });
-        setIsPlaying(false);
-      }
+      await playAudio(audioUrl);
 
     } catch (error) {
       console.error("Error processing response:", error);
