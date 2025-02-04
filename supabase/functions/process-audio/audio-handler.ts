@@ -16,7 +16,7 @@ export async function synthesizeAudio(text: string): Promise<string> {
       Text: text,
       OutputFormat: "mp3",
       VoiceId: "Danielle",
-      Engine: "neural"
+      Engine: "standard" // Changed from "neural" to "standard" for generative voice
     });
 
     if (!response.AudioStream) {
