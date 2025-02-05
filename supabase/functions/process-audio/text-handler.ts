@@ -2,6 +2,29 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { greetingPatterns, greetingResponses, thankYouResponses, getGeminiPrompt } from "./ai-config.ts";
 
+// Function to clean up text for natural speech
+function formatTextForSpeech(text: string): string {
+  return text
+    // Replace numbered lists (e.g., "1. ", "2. ") with natural transitions
+    .replace(/(\d+)\.\s+/g, (_, num) => {
+      if (num === "1") return "First, ";
+      if (num === "2") return "Second, ";
+      if (num === "3") return "Third, ";
+      if (num === "4") return "Fourth, ";
+      if (num === "5") return "Fifth, ";
+      return "Next, ";
+    })
+    // Replace multiple dots with a pause
+    .replace(/\.{3,}/g, '. ')
+    // Clean up any remaining special characters
+    .replace(/[*_]/g, '')
+    // Add natural pauses after sentences
+    .replace(/\. /g, '. <break time="0.5s"/> ')
+    // Clean up any double spaces
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export async function handleTextResponse(text: string) {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
     throw new Error('Invalid or empty text input');
@@ -59,8 +82,12 @@ export async function handleTextResponse(text: string) {
   }
 
   const response = await result.response;
-  const responseText = response.text().substring(0, 1000);
-  console.log('Technical response generated, length:', responseText.length);
+  const rawText = response.text().substring(0, 1000);
+  console.log('Technical response generated, length:', rawText.length);
   
-  return responseText;
+  // Format the text for more natural speech
+  const formattedText = formatTextForSpeech(rawText);
+  console.log('Formatted response for speech:', formattedText);
+  
+  return formattedText;
 }
