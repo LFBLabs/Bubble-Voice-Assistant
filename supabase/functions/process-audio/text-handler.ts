@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
-import { greetingPatterns, greetingResponses, thankYouResponses, getGeminiPrompt } from "./ai-config.ts";
+import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
 
 export async function handleTextResponse(text: string) {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -49,9 +49,24 @@ export async function handleTextResponse(text: string) {
   }
 
   const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+  // Updated system prompt to generate more conversational, speech-friendly responses
+  const systemPrompt = `You are a helpful voice assistant specializing in Bubble.io. Format your responses in a natural, conversational way that's suitable for text-to-speech:
+
+- Speak naturally as if having a conversation
+- Instead of numbered lists, use transitions like "First," "Next," "Then," "Finally"
+- Avoid special characters, symbols, or formatting that wouldn't be spoken
+- Use complete sentences and natural pauses
+- Keep responses concise and clear
+- When explaining steps, connect them with natural transitions
+- Use contractions and informal language where appropriate
+
+Context from our knowledge base:
+${knowledgeBaseContext}`;
+
   const result = await model.generateContent([
-    { text: getGeminiPrompt(knowledgeBaseContext) },
-    { text }
+    { text: systemPrompt },
+    { text: `Please answer this question about Bubble.io in a natural, conversational way: ${text}` }
   ]);
 
   if (!result || !result.response) {
@@ -59,8 +74,23 @@ export async function handleTextResponse(text: string) {
   }
 
   const response = await result.response;
-  const responseText = response.text().substring(0, 1000);
-  console.log('Technical response generated, length:', responseText.length);
+  const responseText = response.text()
+    .substring(0, 1000)
+    // Clean up any remaining numbers or special characters
+    .replace(/(\d+\.\s)/g, match => {
+      const num = parseInt(match);
+      const words = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+      return num <= words.length ? `${words[num-1]}, ` : 'Next, ';
+    })
+    // Add natural pauses
+    .replace(/\.\s+/g, '. ')
+    // Clean up any remaining special characters
+    .replace(/[*_#]/g, '')
+    // Ensure clean spacing
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  console.log('Conversational response generated, length:', responseText.length);
   
   return responseText;
 }
