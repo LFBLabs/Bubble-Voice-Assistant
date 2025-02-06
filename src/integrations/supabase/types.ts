@@ -178,7 +178,10 @@ export type Database = {
         Row: {
           audio_url: string
           created_at: string
+          expires_at: string | null
           id: string
+          last_accessed: string | null
+          performance_metrics: Json | null
           question: string
           question_hash: string
           response: string
@@ -188,7 +191,10 @@ export type Database = {
         Insert: {
           audio_url: string
           created_at?: string
+          expires_at?: string | null
           id?: string
+          last_accessed?: string | null
+          performance_metrics?: Json | null
           question: string
           question_hash: string
           response: string
@@ -198,7 +204,10 @@ export type Database = {
         Update: {
           audio_url?: string
           created_at?: string
+          expires_at?: string | null
           id?: string
+          last_accessed?: string | null
+          performance_metrics?: Json | null
           question?: string
           question_hash?: string
           response?: string
@@ -230,6 +239,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      clean_expired_cache: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
+      }
       get_daily_interaction_count: {
         Args: {
           user_id: string

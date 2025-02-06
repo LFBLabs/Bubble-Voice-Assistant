@@ -3,9 +3,18 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useAudioPlayback } from "./useAudioPlayback";
 
+interface ProcessingMetrics {
+  totalTime: number;
+  cacheCheckTime?: number;
+  responseGenerationTime?: number;
+  audioSynthesisTime?: number;
+  error?: boolean;
+}
+
 export const useAudioResponse = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [response, setResponse] = useState("");
+  const [metrics, setMetrics] = useState<ProcessingMetrics | null>(null);
   const { isPlaying, playAudio } = useAudioPlayback();
   const { toast } = useToast();
 
@@ -39,13 +48,29 @@ export const useAudioResponse = () => {
         throw new Error('No data received from function');
       }
 
-      const { response: responseText, audioUrl } = result.data;
+      const { response: responseText, audioUrl, metrics: processingMetrics } = result.data;
 
       if (!responseText || !audioUrl) {
         throw new Error('Invalid response format from function');
       }
 
       setResponse(responseText);
+      setMetrics(processingMetrics);
+
+      // Log performance metrics
+      if (processingMetrics) {
+        console.log('Processing metrics:', {
+          totalTime: `${processingMetrics.totalTime.toFixed(2)}ms`,
+          cached: processingMetrics.cacheCheckTime ? 'Yes' : 'No',
+          ...(processingMetrics.responseGenerationTime && {
+            responseGeneration: `${processingMetrics.responseGenerationTime.toFixed(2)}ms`
+          }),
+          ...(processingMetrics.audioSynthesisTime && {
+            audioSynthesis: `${processingMetrics.audioSynthesisTime.toFixed(2)}ms`
+          })
+        });
+      }
+
       await playAudio(audioUrl);
 
     } catch (error) {
@@ -64,6 +89,7 @@ export const useAudioResponse = () => {
     isProcessing,
     isPlaying,
     response,
+    metrics,
     processAudioResponse
   };
 };
