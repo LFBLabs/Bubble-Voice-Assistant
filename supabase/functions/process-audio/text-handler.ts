@@ -1,6 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
+import { createHash } from "https://deno.land/std@0.177.0/hash/mod.ts";
 
 export async function handleTextResponse(text: string) {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -27,8 +28,38 @@ export async function handleTextResponse(text: string) {
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const supabase = createClient(supabaseUrl, supabaseKey);
 
+  // Generate a hash of the question for cache lookup
+  const questionHash = createHash("sha256")
+    .update(text.toLowerCase().trim())
+    .toString();
+
+  console.log('Checking cache for question hash:', questionHash);
+
+  // Check cache first
+  const { data: cachedResponse, error: cacheError } = await supabase
+    .from('response_cache')
+    .select('response, audio_url, usage_count')
+    .eq('question_hash', questionHash)
+    .single();
+
+  if (cacheError && cacheError.code !== 'PGRST116') {
+    console.error('Error checking cache:', cacheError);
+  }
+
+  if (cachedResponse) {
+    console.log('Cache hit! Returning cached response');
+    // Update usage count
+    await supabase
+      .from('response_cache')
+      .update({ usage_count: (cachedResponse.usage_count || 0) + 1 })
+      .eq('question_hash', questionHash);
+
+    return cachedResponse.response;
+  }
+
+  console.log('Cache miss. Generating new response...');
+
   // Fetch relevant knowledge base entries
-  console.log('Fetching knowledge base entries...');
   const { data: knowledgeBaseEntries, error: fetchError } = await supabase
     .from('knowledge_base')
     .select('title, content, url, type')
@@ -48,10 +79,8 @@ export async function handleTextResponse(text: string) {
     throw new Error('Failed to initialize Gemini AI');
   }
 
-  // Updated to use Gemini-2.0-flash model
   const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
-  // Updated system prompt to generate more conversational, speech-friendly responses
   const systemPrompt = `You are a helpful voice assistant specializing in Bubble.io. Format your responses in a natural, conversational way that's suitable for text-to-speech:
 
 - Speak naturally as if having a conversation
@@ -78,17 +107,13 @@ ${knowledgeBaseContext}`;
   const response = await result.response;
   const responseText = response.text()
     .substring(0, 1000)
-    // Clean up any remaining numbers or special characters
     .replace(/(\d+\.\s)/g, match => {
       const num = parseInt(match);
       const words = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
       return num <= words.length ? `${words[num-1]}, ` : 'Next, ';
     })
-    // Add natural pauses
     .replace(/\.\s+/g, '. ')
-    // Clean up any remaining special characters
     .replace(/[*_#]/g, '')
-    // Ensure clean spacing
     .replace(/\s+/g, ' ')
     .trim();
 

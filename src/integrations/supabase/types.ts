@@ -174,6 +174,39 @@ export type Database = {
         }
         Relationships: []
       }
+      response_cache: {
+        Row: {
+          audio_url: string
+          created_at: string
+          id: string
+          question: string
+          question_hash: string
+          response: string
+          updated_at: string
+          usage_count: number | null
+        }
+        Insert: {
+          audio_url: string
+          created_at?: string
+          id?: string
+          question: string
+          question_hash: string
+          response: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Update: {
+          audio_url?: string
+          created_at?: string
+          id?: string
+          question?: string
+          question_hash?: string
+          response?: string
+          updated_at?: string
+          usage_count?: number | null
+        }
+        Relationships: []
+      }
       voice_interactions: {
         Row: {
           created_at: string
