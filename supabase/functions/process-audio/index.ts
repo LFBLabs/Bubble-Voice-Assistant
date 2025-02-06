@@ -1,13 +1,39 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { handleTextResponse } from "./text-handler.ts";
 import { synthesizeAudio } from "./audio-handler.ts";
-import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Process audio chunks in parallel
+async function processAudioChunks(audioData: Uint8Array, chunkSize: number = 1024 * 1024) {
+  const chunks: Uint8Array[] = [];
+  for (let i = 0; i < audioData.length; i += chunkSize) {
+    chunks.push(audioData.slice(i, i + chunkSize));
+  }
+
+  // Process chunks in parallel
+  const processedChunks = await Promise.all(
+    chunks.map(async (chunk) => {
+      return new Uint8Array(chunk);
+    })
+  );
+
+  // Combine processed chunks
+  const totalLength = processedChunks.reduce((acc, chunk) => acc + chunk.length, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  
+  for (const chunk of processedChunks) {
+    result.set(chunk, offset);
+    offset += chunk.length;
+  }
+
+  return result;
+}
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -75,8 +101,8 @@ serve(async (req) => {
       throw new Error('Failed to generate audio');
     }
 
-    // Store in cache
-    const { error: cacheError } = await supabase
+    // Store in cache using background task
+    const cachePromise = supabase
       .from('response_cache')
       .insert({
         question_hash: questionHash,
@@ -85,9 +111,8 @@ serve(async (req) => {
         audio_url: audioUrl
       });
 
-    if (cacheError) {
-      console.error('Error caching response:', cacheError);
-    }
+    // Use waitUntil for background caching
+    EdgeRuntime.waitUntil(cachePromise);
 
     console.log('Successfully processed request');
     return new Response(
