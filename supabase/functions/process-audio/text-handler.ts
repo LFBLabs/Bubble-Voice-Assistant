@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
-import { createHash } from "https://deno.land/std@0.204.0/hash/mod.ts";
+import { createHash } from "https://deno.land/std@0.168.0/hash/mod.ts";
 
 export async function handleTextResponse(text: string) {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -121,3 +121,4 @@ ${knowledgeBaseContext}`;
   
   return responseText;
 }
+
