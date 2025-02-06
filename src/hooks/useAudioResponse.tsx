@@ -19,17 +19,15 @@ export const useAudioResponse = () => {
   const { toast } = useToast();
 
   const processAudioResponse = async (text: string) => {
+    const startTime = performance.now();
+    console.log('Starting audio response processing');
+    
     try {
       setIsProcessing(true);
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        toast({
-          title: "Error",
-          description: "Please sign in to continue.",
-          variant: "destructive",
-        });
-        return;
+        throw new Error('Please sign in to continue.');
       }
 
       console.log('Calling process-audio function with text:', text);
@@ -57,7 +55,7 @@ export const useAudioResponse = () => {
       setResponse(responseText);
       setMetrics(processingMetrics);
 
-      // Log performance metrics
+      // Enhanced metrics logging
       if (processingMetrics) {
         console.log('Processing metrics:', {
           totalTime: `${processingMetrics.totalTime.toFixed(2)}ms`,
@@ -75,13 +73,22 @@ export const useAudioResponse = () => {
 
     } catch (error) {
       console.error("Error processing response:", error);
+      const errorMessage = error instanceof Error ? error.message : "An error occurred while processing your request.";
+      
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "An error occurred while processing your request.",
+        description: errorMessage,
         variant: "destructive",
       });
+      
+      setMetrics({
+        totalTime: performance.now() - startTime,
+        error: true
+      });
+      
     } finally {
       setIsProcessing(false);
+      console.log('Audio response processing completed');
     }
   };
 

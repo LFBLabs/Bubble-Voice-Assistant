@@ -9,20 +9,18 @@ export const useVoiceInteraction = () => {
   const { data: subscription } = useSubscriptionStatus();
 
   const checkInteractionLimit = async () => {
+    console.log('Checking interaction limit');
+    
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
-        toast({
-          title: "Error",
-          description: "Please sign in to continue.",
-          variant: "destructive",
-        });
-        return false;
+        throw new Error('Please sign in to continue.');
       }
 
-      // If user has an active pro or annual subscription, allow unlimited interactions
+      // Check subscription status for unlimited interactions
       if (subscription && ['pro', 'annual'].includes(subscription.plan_type)) {
+        console.log('User has unlimited interactions');
         return true;
       }
 
@@ -35,7 +33,6 @@ export const useVoiceInteraction = () => {
         throw error;
       }
 
-      // Add more detailed logging
       console.log("Daily interaction count:", data);
 
       if (data >= 10) {
@@ -61,7 +58,7 @@ export const useVoiceInteraction = () => {
       console.error("Error checking interaction limit:", error);
       toast({
         title: "Error",
-        description: "Failed to check interaction limit. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to check interaction limit. Please try again.",
         variant: "destructive",
       });
       return false;
@@ -69,10 +66,15 @@ export const useVoiceInteraction = () => {
   };
 
   const recordInteraction = async () => {
+    console.log('Recording interaction');
+    
     try {
       const { data: { session } } = await supabase.auth.getSession();
       
-      if (!session) return;
+      if (!session) {
+        console.log('No active session found');
+        return;
+      }
 
       const { error } = await supabase
         .from('voice_interactions')
@@ -82,6 +84,9 @@ export const useVoiceInteraction = () => {
         console.error("Error recording interaction:", error);
         throw error;
       }
+      
+      console.log('Interaction recorded successfully');
+      
     } catch (error) {
       console.error("Error recording interaction:", error);
     }
