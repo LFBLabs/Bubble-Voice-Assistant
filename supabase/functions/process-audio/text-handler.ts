@@ -48,7 +48,8 @@ export async function handleTextResponse(text: string) {
     throw new Error('Failed to initialize Gemini AI');
   }
 
-  const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  // Updated to use Gemini-2.0-flash model
+  const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
   // Updated system prompt to generate more conversational, speech-friendly responses
   const systemPrompt = `You are a helpful voice assistant specializing in Bubble.io. Format your responses in a natural, conversational way that's suitable for text-to-speech:
@@ -64,6 +65,7 @@ export async function handleTextResponse(text: string) {
 Context from our knowledge base:
 ${knowledgeBaseContext}`;
 
+  console.log('Generating response with Gemini 2.0 Flash...');
   const result = await model.generateContent([
     { text: systemPrompt },
     { text: `Please answer this question about Bubble.io in a natural, conversational way: ${text}` }
@@ -90,7 +92,7 @@ ${knowledgeBaseContext}`;
     .replace(/\s+/g, ' ')
     .trim();
 
-  console.log('Conversational response generated, length:', responseText.length);
+  console.log('Response generated with Gemini 2.0 Flash, length:', responseText.length);
   
   return responseText;
 }
