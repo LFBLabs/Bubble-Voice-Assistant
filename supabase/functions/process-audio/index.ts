@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { handleTextResponse } from "./text-handler.ts";
 import { synthesizeAudio } from "./audio-handler.ts";
-import { createHash } from "https://deno.land/std@0.168.0/hash/mod.ts";
+import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 
 const corsHeaders = {
@@ -30,9 +30,11 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     // Generate question hash
-    const questionHash = createHash("sha256")
-      .update(text.toLowerCase().trim())
-      .toString();
+    const encoder = new TextEncoder();
+    const data = encoder.encode(text.toLowerCase().trim());
+    const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const questionHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     // Check cache first
     const { data: cachedResponse } = await supabase
