@@ -36,13 +36,17 @@ async function processAudioChunks(audioData: Uint8Array, chunkSize: number = 102
 }
 
 serve(async (req) => {
+  // Performance monitoring
+  const startTime = performance.now();
+  console.log('Processing request started');
+
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    console.log('Processing audio request...');
+    console.log('Parsing request body');
     const { text } = await req.json();
     
     if (!text || typeof text !== 'string') {
@@ -55,7 +59,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    // Generate question hash
+    // Generate question hash for caching
     const encoder = new TextEncoder();
     const data = encoder.encode(text.toLowerCase().trim());
     const hashBuffer = await crypto.subtle.digest('SHA-256', data);
@@ -63,6 +67,7 @@ serve(async (req) => {
     const questionHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
     // Check cache first
+    console.log('Checking cache for:', questionHash);
     const { data: cachedResponse } = await supabase
       .from('response_cache')
       .select('response, audio_url')
@@ -70,11 +75,15 @@ serve(async (req) => {
       .single();
 
     if (cachedResponse) {
-      console.log('Cache hit! Returning cached response and audio');
+      console.log('Cache hit! Returning cached response');
+      const endTime = performance.now();
+      console.log(`Request processed in ${endTime - startTime}ms (cached)`);
+      
       return new Response(
         JSON.stringify({ 
           response: cachedResponse.response,
-          audioUrl: cachedResponse.audio_url
+          audioUrl: cachedResponse.audio_url,
+          cached: true
         }),
         { 
           headers: {
@@ -109,16 +118,26 @@ serve(async (req) => {
         question: text,
         response: responseText,
         audio_url: audioUrl
+      })
+      .then(() => {
+        console.log('Cache updated successfully');
+      })
+      .catch((error) => {
+        console.error('Error updating cache:', error);
       });
 
     // Use waitUntil for background caching
     EdgeRuntime.waitUntil(cachePromise);
 
-    console.log('Successfully processed request');
+    const endTime = performance.now();
+    console.log(`Request processed in ${endTime - startTime}ms`);
+
     return new Response(
       JSON.stringify({ 
         response: responseText,
-        audioUrl 
+        audioUrl,
+        cached: false,
+        processingTime: endTime - startTime
       }),
       { 
         headers: {
@@ -130,11 +149,13 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('Error in process-audio function:', error);
+    const endTime = performance.now();
     
     return new Response(
       JSON.stringify({ 
         error: error instanceof Error ? error.message : 'An unknown error occurred',
-        details: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.stack : undefined,
+        processingTime: endTime - startTime
       }),
       { 
         headers: {

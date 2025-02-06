@@ -1,5 +1,44 @@
 import { Polly } from "npm:@aws-sdk/client-polly";
 
+// Split text into manageable chunks for parallel processing
+function splitTextIntoChunks(text: string, maxChunkLength = 1000): string[] {
+  const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
+  const chunks: string[] = [];
+  let currentChunk: string[] = [];
+  let currentLength = 0;
+
+  for (const sentence of sentences) {
+    if (currentLength + sentence.length > maxChunkLength) {
+      chunks.push(currentChunk.join(' '));
+      currentChunk = [sentence];
+      currentLength = sentence.length;
+    } else {
+      currentChunk.push(sentence);
+      currentLength += sentence.length;
+    }
+  }
+
+  if (currentChunk.length > 0) {
+    chunks.push(currentChunk.join(' '));
+  }
+
+  return chunks;
+}
+
+// Combine audio streams efficiently
+async function combineAudioStreams(audioBuffers: Uint8Array[]): Promise<ArrayBuffer> {
+  const totalLength = audioBuffers.reduce((acc, buffer) => acc + buffer.length, 0);
+  const combinedBuffer = new Uint8Array(totalLength);
+  let offset = 0;
+
+  for (const buffer of audioBuffers) {
+    combinedBuffer.set(buffer, offset);
+    offset += buffer.length;
+  }
+
+  return combinedBuffer.buffer;
+}
+
 // Implement streaming for audio synthesis
 export async function synthesizeAudio(text: string): Promise<string> {
   try {
@@ -12,8 +51,9 @@ export async function synthesizeAudio(text: string): Promise<string> {
       }
     });
 
-    // Split long text into chunks for parallel processing
+    // Split text into chunks for parallel processing
     const chunks = splitTextIntoChunks(text);
+    console.log(`Split text into ${chunks.length} chunks`);
     
     // Process chunks in parallel
     const audioPromises = chunks.map(chunk => 
@@ -25,10 +65,21 @@ export async function synthesizeAudio(text: string): Promise<string> {
       })
     );
 
+    console.log('Processing audio chunks in parallel');
     const audioResponses = await Promise.all(audioPromises);
     
-    // Combine audio streams
-    const combinedAudio = await combineAudioStreams(audioResponses);
+    // Convert responses to audio buffers
+    const audioBuffers = await Promise.all(
+      audioResponses.map(async (response) => {
+        if (!response.AudioStream) {
+          throw new Error('No audio stream returned from Polly');
+        }
+        return new Uint8Array(await response.AudioStream.transformToByteArray());
+      })
+    );
+
+    console.log('Combining audio streams');
+    const combinedAudio = await combineAudioStreams(audioBuffers);
     
     // Convert to base64
     const base64Audio = btoa(
@@ -37,57 +88,11 @@ export async function synthesizeAudio(text: string): Promise<string> {
         .join('')
     );
     
+    console.log('Audio synthesis completed successfully');
     return `data:audio/mpeg;base64,${base64Audio}`;
 
   } catch (error) {
     console.error('Error in synthesizeAudio:', error);
     throw error;
   }
-}
-
-// Helper function to split text into manageable chunks
-function splitTextIntoChunks(text: string, maxChunkLength = 1000): string[] {
-  const words = text.split(' ');
-  const chunks: string[] = [];
-  let currentChunk: string[] = [];
-  
-  for (const word of words) {
-    if (currentChunk.join(' ').length + word.length > maxChunkLength) {
-      chunks.push(currentChunk.join(' '));
-      currentChunk = [word];
-    } else {
-      currentChunk.push(word);
-    }
-  }
-  
-  if (currentChunk.length > 0) {
-    chunks.push(currentChunk.join(' '));
-  }
-  
-  return chunks;
-}
-
-// Helper function to combine audio streams
-async function combineAudioStreams(responses: any[]): Promise<ArrayBuffer> {
-  const audioBuffers = await Promise.all(
-    responses.map(async (response) => {
-      if (!response.AudioStream) {
-        throw new Error('No audio stream returned from Polly');
-      }
-      return await response.AudioStream.transformToByteArray();
-    })
-  );
-  
-  // Calculate total length
-  const totalLength = audioBuffers.reduce((acc, buffer) => acc + buffer.length, 0);
-  const combinedBuffer = new Uint8Array(totalLength);
-  
-  // Combine buffers
-  let offset = 0;
-  for (const buffer of audioBuffers) {
-    combinedBuffer.set(buffer, offset);
-    offset += buffer.length;
-  }
-  
-  return combinedBuffer.buffer;
 }
