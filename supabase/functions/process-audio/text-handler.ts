@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
 import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
+import { calculateTextComplexity } from "./text-complexity.ts";
 
 export async function handleTextResponse(text: string) {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -49,7 +50,6 @@ export async function handleTextResponse(text: string) {
   }
 
   try {
-    // Get Gemini API key using maybeSingle() instead of single()
     const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('api_keys')
       .select('gemini_key')
@@ -65,13 +65,28 @@ export async function handleTextResponse(text: string) {
       throw new Error('Gemini API key not configured');
     }
 
+    // Calculate text complexity
+    const complexity = calculateTextComplexity(text);
+    console.log('Text complexity score:', complexity);
+
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(apiKeyData.gemini_key);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    
+    // Select model based on complexity
+    const modelName = complexity >= 3 
+      ? "gemini-pro"  // Use full model for complex queries
+      : "gemini-2.0-flash-lite-preview-02-05";  // Use lite model for simple queries
+    
+    console.log('Selected model:', modelName);
+    
+    const model = genAI.getGenerativeModel({ model: modelName });
+
+    // Set max words based on complexity
+    const maxWords = complexity >= 3 ? 150 : 50;
 
     const prompt = `You are a helpful assistant specializing in Bubble dot io. 
     Provide clear, concise answers about Bubble dot io's features, capabilities, and best practices.
-    Keep responses focused and under 100 words when possible.
+    Keep responses focused and under ${maxWords} words.
     
     Question: ${text}`;
 
