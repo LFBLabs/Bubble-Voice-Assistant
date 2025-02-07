@@ -74,7 +74,7 @@ export async function handleTextResponse(text: string) {
     
     // Select model based on complexity
     const modelName = complexity >= 3 
-      ? "gemini-pro"  // Use full model for complex queries
+      ? "gemini-2.0-flash"  // Use flash model for complex queries
       : "gemini-2.0-flash-lite-preview-02-05";  // Use lite model for simple queries
     
     console.log('Selected model:', modelName);
