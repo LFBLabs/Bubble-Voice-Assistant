@@ -1,3 +1,4 @@
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
@@ -47,23 +48,27 @@ export async function handleTextResponse(text: string) {
     return randomResponse;
   }
 
-  // Get Gemini API key
-  const { data: apiKeyData, error: apiKeyError } = await supabase
-    .from('api_keys')
-    .select('gemini_key')
-    .limit(1)
-    .single();
-
-  if (apiKeyError || !apiKeyData?.gemini_key) {
-    console.error('Error fetching Gemini API key:', apiKeyError);
-    throw new Error('Failed to fetch Gemini API key');
-  }
-
-  // Initialize Gemini
-  const genAI = new GoogleGenerativeAI(apiKeyData.gemini_key);
-  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
-
   try {
+    // Get Gemini API key using maybeSingle() instead of single()
+    const { data: apiKeyData, error: apiKeyError } = await supabase
+      .from('api_keys')
+      .select('gemini_key')
+      .maybeSingle();
+
+    if (apiKeyError) {
+      console.error('Error fetching Gemini API key:', apiKeyError);
+      throw new Error('Failed to fetch Gemini API key');
+    }
+
+    if (!apiKeyData?.gemini_key) {
+      console.error('No Gemini API key found in database');
+      throw new Error('Gemini API key not configured');
+    }
+
+    // Initialize Gemini
+    const genAI = new GoogleGenerativeAI(apiKeyData.gemini_key);
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
     const prompt = `You are a helpful assistant specializing in Bubble.io. 
     Provide clear, concise answers about Bubble.io's features, capabilities, and best practices.
     Keep responses focused and under 100 words when possible.
@@ -82,8 +87,6 @@ export async function handleTextResponse(text: string) {
 
   } catch (error) {
     console.error('Error generating response with Gemini:', error);
-    throw new Error('Failed to generate response with AI model');
+    throw error;
   }
-
-  return responseText;
 }
