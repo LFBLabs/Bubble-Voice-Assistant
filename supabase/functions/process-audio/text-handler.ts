@@ -30,7 +30,7 @@ export async function handleTextResponse(text: string) {
 
   if (cachedResponse) {
     console.log('Cache hit in text handler');
-    return cachedResponse.response;
+    return preprocessResponseForSpeech(cachedResponse.response);
   }
 
   // Process greetings
@@ -38,14 +38,14 @@ export async function handleTextResponse(text: string) {
   for (const pattern of greetingPatterns) {
     if (pattern.test(lowerText)) {
       const randomResponse = greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
-      return randomResponse;
+      return preprocessResponseForSpeech(randomResponse);
     }
   }
 
   // Process thank you messages
   if (lowerText.includes('thank you') || lowerText.includes('thanks')) {
     const randomResponse = thankYouResponses[Math.floor(Math.random() * thankYouResponses.length)];
-    return randomResponse;
+    return preprocessResponseForSpeech(randomResponse);
   }
 
   try {
@@ -69,8 +69,8 @@ export async function handleTextResponse(text: string) {
     const genAI = new GoogleGenerativeAI(apiKeyData.gemini_key);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    const prompt = `You are a helpful assistant specializing in Bubble.io. 
-    Provide clear, concise answers about Bubble.io's features, capabilities, and best practices.
+    const prompt = `You are a helpful assistant specializing in Bubble dot io. 
+    Provide clear, concise answers about Bubble dot io's features, capabilities, and best practices.
     Keep responses focused and under 100 words when possible.
     
     Question: ${text}`;
@@ -83,10 +83,15 @@ export async function handleTextResponse(text: string) {
       throw new Error('Empty response from Gemini');
     }
 
-    return responseText;
+    return preprocessResponseForSpeech(responseText);
 
   } catch (error) {
     console.error('Error generating response with Gemini:', error);
     throw error;
   }
+}
+
+function preprocessResponseForSpeech(text: string): string {
+  // Replace "Bubble.io" with "Bubble dot io" for better speech synthesis
+  return text.replace(/Bubble\.io/gi, 'Bubble dot io');
 }
