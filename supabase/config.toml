@@ -1,8 +1,9 @@
 
 project_id = "jfjcwxuzbgylgxbwlxmf"
 
+[functions]
 [functions.process-audio]
-regions = ["us-east-1", "eu-west-1", "ap-southeast-1"]
+verify_jwt = false
 
 [functions.synthesize-speech]
-regions = ["us-east-1", "eu-west-1", "ap-southeast-1"]
+verify_jwt = false
