@@ -50,27 +50,41 @@ export async function handleTextResponse(text: string) {
   }
 
   try {
-    const { data: apiKeyData, error: apiKeyError } = await supabase
-      .from('api_keys')
-      .select('gemini_key')
-      .single();
+    // First try to get the API key from environment variables
+    let geminiKey = Deno.env.get('GEMINI_API_KEY');
+    
+    if (!geminiKey) {
+      console.log('Gemini API key not found in environment variables, checking database...');
+      // If not in env, try to get from database
+      const { data: apiKeyData, error: apiKeyError } = await supabase
+        .from('api_keys')
+        .select('gemini_key')
+        .single();
 
-    if (apiKeyError) {
-      console.error('Error fetching Gemini API key:', apiKeyError);
-      throw new Error('Failed to fetch Gemini API key');
+      if (apiKeyError) {
+        console.error('Error fetching Gemini API key from database:', apiKeyError);
+        throw new Error('Failed to fetch Gemini API key');
+      }
+
+      if (!apiKeyData?.gemini_key) {
+        console.error('No Gemini API key found in database');
+        throw new Error('Gemini API key not configured');
+      }
+
+      geminiKey = apiKeyData.gemini_key;
     }
 
-    if (!apiKeyData?.gemini_key) {
-      console.error('No Gemini API key found in database');
-      throw new Error('Gemini API key not configured');
+    if (!geminiKey) {
+      throw new Error('No Gemini API key available');
     }
 
     // Calculate text complexity
     const complexity = calculateTextComplexity(text);
     console.log('Text complexity score:', complexity);
 
-    // Initialize Gemini
-    const genAI = new GoogleGenerativeAI(apiKeyData.gemini_key);
+    // Initialize Gemini with the API key
+    console.log('Initializing Gemini AI...');
+    const genAI = new GoogleGenerativeAI(geminiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     console.log('Selected model: gemini-pro');
@@ -84,6 +98,7 @@ export async function handleTextResponse(text: string) {
     
     Question: ${text}`;
 
+    console.log('Sending prompt to Gemini...');
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const responseText = response.text();
@@ -92,6 +107,7 @@ export async function handleTextResponse(text: string) {
       throw new Error('Empty response from Gemini');
     }
 
+    console.log('Successfully generated response from Gemini');
     return preprocessResponseForSpeech(responseText);
 
   } catch (error) {
@@ -104,4 +120,3 @@ function preprocessResponseForSpeech(text: string): string {
   // Replace "Bubble.io" with "Bubble dot io" for better speech synthesis
   return text.replace(/Bubble\.io/gi, 'Bubble dot io');
 }
-
