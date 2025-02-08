@@ -68,6 +68,7 @@ export type Database = {
       }
       knowledge_base: {
         Row: {
+          active: boolean | null
           content: string | null
           created_at: string
           id: string
@@ -79,6 +80,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          active?: boolean | null
           content?: string | null
           created_at?: string
           id?: string
@@ -90,6 +92,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          active?: boolean | null
           content?: string | null
           created_at?: string
           id?: string

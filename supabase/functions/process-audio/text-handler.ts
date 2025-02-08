@@ -31,7 +31,7 @@ export async function handleTextResponse(text: string) {
 
   if (cachedResponse) {
     console.log('Cache hit in text handler');
-    return preprocessResponseForSpeech(cachedResponse.response);
+    return cachedResponse.response;
   }
 
   // Process greetings
@@ -39,14 +39,14 @@ export async function handleTextResponse(text: string) {
   for (const pattern of greetingPatterns) {
     if (pattern.test(lowerText)) {
       const randomResponse = greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
-      return preprocessResponseForSpeech(randomResponse);
+      return randomResponse;
     }
   }
 
   // Process thank you messages
   if (lowerText.includes('thank you') || lowerText.includes('thanks')) {
     const randomResponse = thankYouResponses[Math.floor(Math.random() * thankYouResponses.length)];
-    return preprocessResponseForSpeech(randomResponse);
+    return randomResponse;
   }
 
   try {
@@ -59,23 +59,21 @@ export async function handleTextResponse(text: string) {
       const { data: apiKeyData, error: apiKeyError } = await supabase
         .from('api_keys')
         .select('gemini_key')
-        .single();
+        .limit(1);
 
       if (apiKeyError) {
         console.error('Error fetching Gemini API key from database:', apiKeyError);
         throw new Error('Failed to fetch Gemini API key');
       }
 
-      if (!apiKeyData?.gemini_key) {
-        console.error('No Gemini API key found in database');
-        throw new Error('Gemini API key not configured');
+      if (apiKeyData && apiKeyData.length > 0 && apiKeyData[0].gemini_key) {
+        geminiKey = apiKeyData[0].gemini_key;
       }
-
-      geminiKey = apiKeyData.gemini_key;
     }
 
     if (!geminiKey) {
-      throw new Error('No Gemini API key available');
+      console.error('No Gemini API key available in environment or database');
+      throw new Error('Gemini API key not configured');
     }
 
     // Get knowledge base content
@@ -89,7 +87,7 @@ export async function handleTextResponse(text: string) {
       throw new Error('Failed to fetch knowledge base');
     }
 
-    const knowledgeBaseContent = knowledgeBase?.map(k => k.content).join('\n') || '';
+    const knowledgeBaseContent = knowledgeBase?.map(k => k.content).join('\n\n') || '';
 
     // Calculate text complexity
     const complexity = calculateTextComplexity(text);
@@ -103,30 +101,25 @@ export async function handleTextResponse(text: string) {
     console.log('Selected model: gemini-pro');
     
     // Set max words based on complexity
-    const maxWords = complexity >= 3 ? 250 : 100;
+    const maxWords = complexity >= 3 ? 300 : 150;
 
-    const prompt = `You are a Bubble.io expert focused on providing detailed, accurate information about the Bubble.io platform. Your role is to help users understand and work with Bubble.io effectively.
+    const prompt = `You are an expert AI assistant focused exclusively on providing detailed, accurate information about Bubble.io. Your responses should be thorough, technical when appropriate, and always focused on helping users understand and work with Bubble.io effectively.
 
-Primary Knowledge Base (Use this first):
+Primary Knowledge Base (USE THIS AS YOUR PRIMARY SOURCE):
 ${knowledgeBaseContent}
 
-Guidelines:
-1. ALWAYS prioritize information from the knowledge base above.
-2. Only use your general knowledge if the specific information cannot be found in the knowledge base.
-3. Focus EXCLUSIVELY on Bubble.io-related topics.
-4. If a question is not about Bubble.io, politely redirect the conversation back to Bubble.io.
-5. Provide detailed, thorough explanations with examples when possible.
-6. Keep responses under ${maxWords} words while maintaining clarity and depth.
-7. Include technical details when relevant, explaining them in an accessible way.
+Guidelines for your responses:
+1. ALWAYS prioritize information from the knowledge base above. Only use your general knowledge if specific information isn't found in the knowledge base.
+2. Focus EXCLUSIVELY on Bubble.io-related topics.
+3. If a question isn't about Bubble.io, politely redirect the conversation back to Bubble.io topics.
+4. Provide detailed, step-by-step explanations when applicable.
+5. Include technical details when relevant, but explain them in an accessible way.
+6. Keep responses under ${maxWords} words while maintaining depth and clarity.
+7. Always explain the "why" behind your answers to help users truly understand concepts.
 8. If you're unsure about something, acknowledge it and stick to what you know for certain.
+9. Use "Bubble.io" consistently in your responses (not "Bubble" or other variations).
 
-Question: ${text}
-
-Remember to:
-- Always explain the "why" behind your answers
-- Use clear, professional language
-- Stay focused on Bubble.io
-- Provide step-by-step explanations when applicable`;
+User Question: ${text}`;
 
     console.log('Sending prompt to Gemini...');
     const result = await model.generateContent(prompt);
@@ -138,16 +131,10 @@ Remember to:
     }
 
     console.log('Successfully generated response from Gemini');
-    return preprocessResponseForSpeech(responseText);
+    return responseText;
 
   } catch (error) {
     console.error('Error generating response with Gemini:', error);
     throw error;
   }
-}
-
-function preprocessResponseForSpeech(text: string): string {
-  // Only convert Bubble.io to "Bubble dot io" for speech synthesis
-  // This ensures text displays correctly while speaking naturally
-  return text.replace(/Bubble\.io/gi, 'Bubble dot io');
 }
