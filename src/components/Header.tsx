@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
@@ -108,7 +109,7 @@ const Header = ({ title, description }: HeaderProps) => {
         </div>
       </div>
       <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-4">{title}</h1>
-      <p className="text-gray-600 dark:text-gray-300">{description}</p>
+      <p className="text-gray-600 dark:text-gray-300">Ask questions about Bubble.io and get voice responses in seconds</p>
     </header>
   );
 };
