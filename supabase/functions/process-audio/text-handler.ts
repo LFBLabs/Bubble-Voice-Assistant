@@ -12,12 +12,8 @@ function formatResponseForSpeech(text: string): string {
       const num = parseInt(number);
       return num <= words.length ? `${words[num-1]}, ` : `${number}`;
     })
-    // Add natural pauses after sentences
-    .replace(/\./g, '... ')
-    // Make commas create slight pauses
-    .replace(/,/g, '... ')
-    // Remove other punctuation marks that might be read out
-    .replace(/[;:]/g, '... ')
+    // Add natural pauses for complex sentences, but not for greetings
+    .replace(/[;:]|(?<=[.!?])\s+(?=[A-Z])/g, '... ')
     // Replace Bubble.io with just Bubble
     .replace(/Bubble\.io/g, 'Bubble')
     // Clean up multiple spaces
