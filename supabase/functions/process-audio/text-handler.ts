@@ -78,6 +78,19 @@ export async function handleTextResponse(text: string) {
       throw new Error('No Gemini API key available');
     }
 
+    // Get knowledge base content
+    const { data: knowledgeBase, error: knowledgeError } = await supabase
+      .from('knowledge_base')
+      .select('content')
+      .eq('active', true);
+
+    if (knowledgeError) {
+      console.error('Error fetching knowledge base:', knowledgeError);
+      throw new Error('Failed to fetch knowledge base');
+    }
+
+    const knowledgeBaseContent = knowledgeBase?.map(k => k.content).join('\n') || '';
+
     // Calculate text complexity
     const complexity = calculateTextComplexity(text);
     console.log('Text complexity score:', complexity);
@@ -90,13 +103,30 @@ export async function handleTextResponse(text: string) {
     console.log('Selected model: gemini-pro');
     
     // Set max words based on complexity
-    const maxWords = complexity >= 3 ? 150 : 50;
+    const maxWords = complexity >= 3 ? 250 : 100;
 
-    const prompt = `You are a helpful assistant specializing in Bubble dot io. 
-    Provide clear, concise answers about Bubble dot io's features, capabilities, and best practices.
-    Keep responses focused and under ${maxWords} words.
-    
-    Question: ${text}`;
+    const prompt = `You are a Bubble.io expert focused on providing detailed, accurate information about the Bubble.io platform. Your role is to help users understand and work with Bubble.io effectively.
+
+Primary Knowledge Base (Use this first):
+${knowledgeBaseContent}
+
+Guidelines:
+1. ALWAYS prioritize information from the knowledge base above.
+2. Only use your general knowledge if the specific information cannot be found in the knowledge base.
+3. Focus EXCLUSIVELY on Bubble.io-related topics.
+4. If a question is not about Bubble.io, politely redirect the conversation back to Bubble.io.
+5. Provide detailed, thorough explanations with examples when possible.
+6. Keep responses under ${maxWords} words while maintaining clarity and depth.
+7. Include technical details when relevant, explaining them in an accessible way.
+8. If you're unsure about something, acknowledge it and stick to what you know for certain.
+
+Question: ${text}
+
+Remember to:
+- Always explain the "why" behind your answers
+- Use clear, professional language
+- Stay focused on Bubble.io
+- Provide step-by-step explanations when applicable`;
 
     console.log('Sending prompt to Gemini...');
     const result = await model.generateContent(prompt);
@@ -117,6 +147,7 @@ export async function handleTextResponse(text: string) {
 }
 
 function preprocessResponseForSpeech(text: string): string {
-  // Replace "Bubble.io" with "Bubble dot io" for better speech synthesis
+  // Only convert Bubble.io to "Bubble dot io" for speech synthesis
+  // This ensures text displays correctly while speaking naturally
   return text.replace(/Bubble\.io/gi, 'Bubble dot io');
 }
