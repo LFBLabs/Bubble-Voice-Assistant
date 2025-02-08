@@ -20,22 +20,42 @@ async function generateCacheKey(text: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Enhanced response formatting with smart punctuation handling
+// Enhanced response formatting for natural speech
 function formatResponseForSpeech(text: string): string {
-  const numberWords = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+  const abbreviationMap: Record<string, string> = {
+    'e.g.': 'for example',
+    'i.e.': 'that is',
+    'etc.': 'etcetera',
+    'viz.': 'namely',
+    'vs.': 'versus',
+    'w.r.t.': 'with respect to',
+    'approx.': 'approximately'
+  };
   
   let formattedText = text
+    // Remove markdown formatting characters
+    .replace(/[*_~`]/g, '')
+    // Replace bracketed abbreviations with their spoken form
+    .replace(/\[(.*?)\]/g, (match, content) => {
+      // Check if the content is an abbreviation we want to replace
+      const lowerContent = content.toLowerCase();
+      return abbreviationMap[lowerContent] || content;
+    })
     // Convert numbered lists
     .replace(/(\d+\.\s)/g, (match, number) => {
+      const numberWords = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
       const num = parseInt(number);
       return num <= numberWords.length ? `${numberWords[num-1]}, ` : `${number}`;
+    })
+    // Replace standard abbreviations outside brackets
+    .replace(/\b(e\.g\.|i\.e\.|etc\.|viz\.|vs\.|w\.r\.t\.|approx\.)\b/g, (match) => {
+      const key = match.toLowerCase();
+      return abbreviationMap[key] || match;
     })
     // Improve natural pauses
     .replace(/[;:]|(?<=[.!?])\s+(?=[A-Z])/g, '... ')
     // Product name consistency
     .replace(/Bubble\.io/g, 'Bubble')
-    // Smart quote handling
-    .replace(/"([^"]+)"/g, '$1')
     // Remove multiple spaces
     .replace(/\s+/g, ' ')
     // Improve sentence breaks for speech
