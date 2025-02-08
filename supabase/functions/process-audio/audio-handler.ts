@@ -56,13 +56,13 @@ export async function synthesizeAudio(text: string): Promise<string> {
     const chunks = splitTextIntoChunks(text);
     console.log(`Split text into ${chunks.length} chunks`);
     
-    // Process chunks in parallel with neural engine
+    // Process chunks in parallel with generative engine
     const audioPromises = chunks.map(chunk => 
       polly.synthesizeSpeech({
         Text: chunk,
         OutputFormat: "mp3",
         VoiceId: "Danielle",
-        Engine: "neural"  // Changed to neural engine which is required for Danielle
+        Engine: "generative"  // Changed to generative engine
       })
     );
 

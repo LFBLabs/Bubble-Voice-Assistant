@@ -50,7 +50,7 @@ serve(async (req) => {
       Text: text,
       OutputFormat: "mp3",
       VoiceId: "Danielle",
-      Engine: "neural"  // Changed to neural engine which is required for Danielle
+      Engine: "generative"  // Changed to generative engine
     });
 
     const audioStream = response.AudioStream;
