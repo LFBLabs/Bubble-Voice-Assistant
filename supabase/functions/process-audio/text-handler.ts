@@ -53,7 +53,7 @@ export async function handleTextResponse(text: string) {
     const { data: apiKeyData, error: apiKeyError } = await supabase
       .from('api_keys')
       .select('gemini_key')
-      .maybeSingle();
+      .single();
 
     if (apiKeyError) {
       console.error('Error fetching Gemini API key:', apiKeyError);
@@ -71,16 +71,10 @@ export async function handleTextResponse(text: string) {
 
     // Initialize Gemini
     const genAI = new GoogleGenerativeAI(apiKeyData.gemini_key);
-    
-    // Select model based on complexity
-    const modelName = complexity >= 3 
-      ? "gemini-2.0-flash"  // Use flash model for complex queries
-      : "gemini-2.0-flash-lite-preview-02-05";  // Use lite model for simple queries
-    
-    console.log('Selected model:', modelName);
-    
-    const model = genAI.getGenerativeModel({ model: modelName });
+    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
+    console.log('Selected model: gemini-pro');
+    
     // Set max words based on complexity
     const maxWords = complexity >= 3 ? 150 : 50;
 
@@ -110,3 +104,4 @@ function preprocessResponseForSpeech(text: string): string {
   // Replace "Bubble.io" with "Bubble dot io" for better speech synthesis
   return text.replace(/Bubble\.io/gi, 'Bubble dot io');
 }
+
