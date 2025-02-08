@@ -18,8 +18,8 @@ function formatResponseForSpeech(text: string): string {
     .replace(/,/g, '... ')
     // Remove other punctuation marks that might be read out
     .replace(/[;:]/g, '... ')
-    // Replace Bubble.io with speech-friendly version while maintaining text display
-    .replace(/Bubble\.io/g, 'Bubble dot io')
+    // Replace Bubble.io with just Bubble
+    .replace(/Bubble\.io/g, 'Bubble')
     // Clean up multiple spaces
     .replace(/\s+/g, ' ')
     .trim();
@@ -117,7 +117,7 @@ export async function handleTextResponse(text: string) {
     
     const maxWords = complexity >= 3 ? 300 : 150;
 
-    const prompt = `You are a friendly, conversational AI assistant focused on providing detailed information about Bubble.io. Speak naturally as if you're having a casual conversation, while maintaining professionalism.
+    const prompt = `You are a friendly, conversational AI assistant focused on providing detailed information about Bubble. Speak naturally as if you're having a casual conversation, while maintaining professionalism.
 
 Primary Knowledge Base (USE THIS AS YOUR PRIMARY SOURCE):
 ${knowledgeBaseContent}
@@ -126,14 +126,14 @@ Guidelines for your responses:
 1. Use conversational language and avoid sounding scripted
 2. Instead of numbered lists, use words like "First," "Next," "Then," "Finally"
 3. Write numbers as words (e.g., "three" instead of "3")
-4. Focus exclusively on Bubble.io topics
+4. Focus exclusively on Bubble topics
 5. Explain concepts clearly without being too technical
 6. Keep responses under ${maxWords} words while being thorough
 7. Use natural transitions between ideas
 8. If unsure about something, be honest and stick to what you know
-9. Always refer to the platform as "Bubble.io"
+9. Always refer to the platform simply as "Bubble"
 
-Format your response in a conversational way, as if you're speaking to a friend who's learning about Bubble.io.
+Format your response in a conversational way, as if you're speaking to a friend who's learning about Bubble.
 
 User Question: ${text}`;
 
