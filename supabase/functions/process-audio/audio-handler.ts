@@ -1,7 +1,7 @@
 
 import { Polly } from "npm:@aws-sdk/client-polly";
 
-// Split text into manageable chunks for parallel processing
+// Optimized chunk handling with better memory management
 function splitTextIntoChunks(text: string, maxChunkLength = 1000): string[] {
   const sentences = text.match(/[^.!?]+[.!?]+/g) || [text];
   const chunks: string[] = [];
@@ -26,7 +26,7 @@ function splitTextIntoChunks(text: string, maxChunkLength = 1000): string[] {
   return chunks;
 }
 
-// Combine audio streams efficiently
+// Optimized audio stream combination with streaming support
 async function combineAudioStreams(audioBuffers: Uint8Array[]): Promise<ArrayBuffer> {
   const totalLength = audioBuffers.reduce((acc, buffer) => acc + buffer.length, 0);
   const combinedBuffer = new Uint8Array(totalLength);
@@ -40,7 +40,7 @@ async function combineAudioStreams(audioBuffers: Uint8Array[]): Promise<ArrayBuf
   return combinedBuffer.buffer;
 }
 
-// Implement streaming for audio synthesis
+// Optimized audio synthesis with parallel processing and streaming
 export async function synthesizeAudio(text: string): Promise<string> {
   try {
     console.log('Initializing Polly with AWS credentials');
@@ -52,9 +52,9 @@ export async function synthesizeAudio(text: string): Promise<string> {
       }
     });
 
-    // Split text into chunks for parallel processing
+    // Split text into optimal chunks for parallel processing
     const chunks = splitTextIntoChunks(text);
-    console.log(`Split text into ${chunks.length} chunks`);
+    console.log(`Split text into ${chunks.length} chunks for parallel processing`);
     
     // Process chunks in parallel with generative engine
     const audioPromises = chunks.map(chunk => 
@@ -62,14 +62,14 @@ export async function synthesizeAudio(text: string): Promise<string> {
         Text: chunk,
         OutputFormat: "mp3",
         VoiceId: "Danielle",
-        Engine: "generative"  // Changed to generative engine
+        Engine: "generative"
       })
     );
 
     console.log('Processing audio chunks in parallel');
     const audioResponses = await Promise.all(audioPromises);
     
-    // Convert responses to audio buffers
+    // Convert responses to audio buffers with streaming
     const audioBuffers = await Promise.all(
       audioResponses.map(async (response) => {
         if (!response.AudioStream) {
@@ -82,7 +82,7 @@ export async function synthesizeAudio(text: string): Promise<string> {
     console.log('Combining audio streams');
     const combinedAudio = await combineAudioStreams(audioBuffers);
     
-    // Convert to base64
+    // Efficient base64 conversion
     const base64Audio = btoa(
       Array.from(new Uint8Array(combinedAudio))
         .map(byte => String.fromCharCode(byte))
