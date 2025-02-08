@@ -1,4 +1,3 @@
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
@@ -19,8 +18,8 @@ function formatResponseForSpeech(text: string): string {
     .replace(/,/g, '... ')
     // Remove other punctuation marks that might be read out
     .replace(/[;:]/g, '... ')
-    // Replace Bubble.io with natural speech version
-    .replace(/Bubble\.io/g, 'Bubble io')
+    // Replace Bubble.io with speech-friendly version while maintaining text display
+    .replace(/Bubble\.io/g, 'Bubble dot io')
     // Clean up multiple spaces
     .replace(/\s+/g, ' ')
     .trim();
