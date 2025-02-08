@@ -1,3 +1,4 @@
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
@@ -59,8 +60,12 @@ export async function handleTextResponse(text: string) {
     }
   }
 
-  // Process thank you messages
-  if (lowerText.includes('thank you') || lowerText.includes('thanks')) {
+  // Process thank you messages - now checking for more variations
+  if (lowerText.includes('thank') || 
+      lowerText.includes('thanks') || 
+      lowerText.includes('appreciate') || 
+      lowerText.includes('helpful') ||
+      lowerText.includes('great job')) {
     const randomResponse = thankYouResponses[Math.floor(Math.random() * thankYouResponses.length)];
     return formatResponseForSpeech(randomResponse);
   }
@@ -128,6 +133,11 @@ Guidelines for your responses:
 7. Use natural transitions between ideas
 8. If unsure about something, be honest and stick to what you know
 9. Always refer to the platform simply as "Bubble"
+10. ALWAYS start your response with one of these phrases:
+    - "Well, let me explain..."
+    - "You know what? ..."
+    - "Actually, ..."
+    - "That's a great question! ..."
 
 Format your response in a conversational way, as if you're speaking to a friend who's learning about Bubble.
 
