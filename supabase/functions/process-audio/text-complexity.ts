@@ -1,28 +1,37 @@
 
 export function calculateTextComplexity(text: string): number {
-  // Consider multiple factors for complexity
-  const wordCount = text.split(/\s+/).length;
+  // Enhanced complexity factors
+  const sentenceCount = (text.match(/[.!?]+/g) || []).length;
+  const words = text.split(/\s+/);
+  const wordCount = words.length;
   const avgWordLength = text.length / wordCount;
-  const questionMarks = (text.match(/\?/g) || []).length;
-  const technicalTerms = (text.match(/\b(workflow|database|component|function|api|integration|plugin|element|variable)\b/gi) || []).length;
+  const uniqueWords = new Set(words.map(w => w.toLowerCase())).size;
+  const lexicalDiversity = uniqueWords / wordCount;
   
-  // Calculate complexity score (1-5 scale)
+  // Technical terms with expanded vocabulary
+  const technicalTerms = (text.match(/\b(workflow|database|component|function|api|integration|plugin|element|variable|interface|endpoint|middleware|webhook|authentication|configuration|deployment|parameter|dependency|framework|lifecycle)\b/gi) || []).length;
+  
+  // Calculate weighted complexity score (1-5 scale)
   let score = 1;
   
-  // Length factor
-  if (wordCount > 15) score += 1;
-  if (wordCount > 30) score += 1;
+  // Length and structure complexity
+  if (wordCount > 15) score += 0.5;
+  if (wordCount > 30) score += 0.5;
+  if (sentenceCount > 2) score += 0.5;
   
-  // Word complexity factor
+  // Vocabulary complexity
   if (avgWordLength > 5) score += 0.5;
   if (avgWordLength > 7) score += 0.5;
+  if (lexicalDiversity > 0.8) score += 0.5;
   
-  // Question complexity
-  if (questionMarks > 1) score += 0.5;
-  
-  // Technical terms factor
+  // Technical complexity
   if (technicalTerms > 0) score += 0.5;
   if (technicalTerms > 2) score += 0.5;
+  if (technicalTerms > 4) score += 0.5;
+  
+  // Query complexity
+  const isCompoundQuestion = text.includes(" and ") || text.includes(" or ");
+  if (isCompoundQuestion) score += 0.5;
   
   // Normalize score between 1-5
   return Math.max(1, Math.min(5, score));

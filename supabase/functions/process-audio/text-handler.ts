@@ -1,15 +1,17 @@
-
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
 import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 import { calculateTextComplexity } from "./text-complexity.ts";
 
-// Improved cache key generation for better hit rates
+// Enhanced cache key generation with better normalization
 async function generateCacheKey(text: string): Promise<string> {
-  const normalizedText = text.toLowerCase().trim()
+  const normalizedText = text.toLowerCase()
+    .trim()
     .replace(/\s+/g, ' ')  // Normalize whitespace
-    .replace(/[.,!?;:]$/g, ''); // Remove trailing punctuation
+    .replace(/[.,!?;:]$/g, '') // Remove trailing punctuation
+    .replace(/(?:the|a|an) /g, '')  // Remove articles
+    .replace(/\b(?:is|are|was|were)\b/g, '');  // Remove common verbs
   
   const encoder = new TextEncoder();
   const data = encoder.encode(normalizedText);
@@ -18,27 +20,36 @@ async function generateCacheKey(text: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Improved response formatting with better performance
+// Enhanced response formatting with smart punctuation handling
 function formatResponseForSpeech(text: string): string {
-  const words = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+  const numberWords = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+  
   let formattedText = text
+    // Convert numbered lists
     .replace(/(\d+\.\s)/g, (match, number) => {
       const num = parseInt(number);
-      return num <= words.length ? `${words[num-1]}, ` : `${number}`;
+      return num <= numberWords.length ? `${numberWords[num-1]}, ` : `${number}`;
     })
+    // Improve natural pauses
     .replace(/[;:]|(?<=[.!?])\s+(?=[A-Z])/g, '... ')
+    // Product name consistency
     .replace(/Bubble\.io/g, 'Bubble')
+    // Smart quote handling
+    .replace(/"([^"]+)"/g, '$1')
+    // Remove multiple spaces
     .replace(/\s+/g, ' ')
+    // Improve sentence breaks for speech
+    .replace(/(?<=[.!?])\s+/g, '... ')
     .trim();
 
   return formattedText;
 }
 
-// Optimized quick responses for common patterns
+// Optimized quick response system with context awareness
 function getQuickResponse(text: string): string | null {
   const lowerText = text.toLowerCase();
   
-  // Fast path for greetings
+  // Enhanced greeting detection
   for (const pattern of greetingPatterns) {
     if (pattern.test(lowerText)) {
       return formatResponseForSpeech(
@@ -47,12 +58,9 @@ function getQuickResponse(text: string): string | null {
     }
   }
   
-  // Fast path for thank you messages
-  if (lowerText.includes('thank') || 
-      lowerText.includes('thanks') || 
-      lowerText.includes('appreciate') || 
-      lowerText.includes('helpful') ||
-      lowerText.includes('great job')) {
+  // Enhanced gratitude detection with context awareness
+  const gratitudeKeywords = ['thank', 'thanks', 'appreciate', 'grateful', 'helpful', 'great job', 'good job'];
+  if (gratitudeKeywords.some(keyword => lowerText.includes(keyword))) {
     return formatResponseForSpeech(
       thankYouResponses[Math.floor(Math.random() * thankYouResponses.length)]
     );
