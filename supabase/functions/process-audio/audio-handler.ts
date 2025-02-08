@@ -1,4 +1,3 @@
-
 import { Polly } from "npm:@aws-sdk/client-polly";
 
 // Split text into manageable chunks for parallel processing
@@ -45,7 +44,7 @@ export async function synthesizeAudio(text: string): Promise<string> {
   try {
     console.log('Initializing Polly with AWS credentials');
     const polly = new Polly({
-      region: "us-east-1",  // Changed back to us-east-1 which supports the generative engine
+      region: "af-south-1",  // Changed to af-south-1 with neural engine
       credentials: {
         accessKeyId: Deno.env.get('AWS_ACCESS_KEY')!,
         secretAccessKey: Deno.env.get('AWS_SECRET_KEY')!
@@ -56,13 +55,13 @@ export async function synthesizeAudio(text: string): Promise<string> {
     const chunks = splitTextIntoChunks(text);
     console.log(`Split text into ${chunks.length} chunks`);
     
-    // Process chunks in parallel
+    // Process chunks in parallel with neural engine
     const audioPromises = chunks.map(chunk => 
       polly.synthesizeSpeech({
         Text: chunk,
         OutputFormat: "mp3",
-        VoiceId: "Danielle",
-        Engine: "generative"
+        VoiceId: "Ruth",  // Changed to Ruth which supports neural engine
+        Engine: "neural"  // Changed to neural engine
       })
     );
 
