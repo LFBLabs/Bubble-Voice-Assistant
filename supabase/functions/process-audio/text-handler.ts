@@ -5,6 +5,27 @@ import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-con
 import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 import { calculateTextComplexity } from "./text-complexity.ts";
 
+function formatResponseForSpeech(text: string): string {
+  return text
+    // Replace numbered lists with natural language
+    .replace(/(\d+\.\s)/g, (match, number) => {
+      const words = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+      const num = parseInt(number);
+      return num <= words.length ? `${words[num-1]}, ` : `${number}`;
+    })
+    // Add natural pauses after sentences
+    .replace(/\./g, '... ')
+    // Make commas create slight pauses
+    .replace(/,/g, '... ')
+    // Remove other punctuation marks that might be read out
+    .replace(/[;:]/g, '... ')
+    // Replace Bubble.io with natural speech version
+    .replace(/Bubble\.io/g, 'Bubble io')
+    // Clean up multiple spaces
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 export async function handleTextResponse(text: string) {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
     throw new Error('Invalid or empty text input');
@@ -31,7 +52,7 @@ export async function handleTextResponse(text: string) {
 
   if (cachedResponse) {
     console.log('Cache hit in text handler');
-    return cachedResponse.response;
+    return formatResponseForSpeech(cachedResponse.response);
   }
 
   // Process greetings
@@ -39,23 +60,21 @@ export async function handleTextResponse(text: string) {
   for (const pattern of greetingPatterns) {
     if (pattern.test(lowerText)) {
       const randomResponse = greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
-      return randomResponse;
+      return formatResponseForSpeech(randomResponse);
     }
   }
 
   // Process thank you messages
   if (lowerText.includes('thank you') || lowerText.includes('thanks')) {
     const randomResponse = thankYouResponses[Math.floor(Math.random() * thankYouResponses.length)];
-    return randomResponse;
+    return formatResponseForSpeech(randomResponse);
   }
 
   try {
-    // First try to get the API key from environment variables
     let geminiKey = Deno.env.get('GEMINI_API_KEY');
     
     if (!geminiKey) {
       console.log('Gemini API key not found in environment variables, checking database...');
-      // If not in env, try to get from database
       const { data: apiKeyData, error: apiKeyError } = await supabase
         .from('api_keys')
         .select('gemini_key')
@@ -76,7 +95,6 @@ export async function handleTextResponse(text: string) {
       throw new Error('Gemini API key not configured');
     }
 
-    // Get knowledge base content
     const { data: knowledgeBase, error: knowledgeError } = await supabase
       .from('knowledge_base')
       .select('content')
@@ -89,35 +107,34 @@ export async function handleTextResponse(text: string) {
 
     const knowledgeBaseContent = knowledgeBase?.map(k => k.content).join('\n\n') || '';
 
-    // Calculate text complexity
     const complexity = calculateTextComplexity(text);
     console.log('Text complexity score:', complexity);
 
-    // Initialize Gemini with the API key
     console.log('Initializing Gemini AI...');
     const genAI = new GoogleGenerativeAI(geminiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
     console.log('Selected model: gemini-pro');
     
-    // Set max words based on complexity
     const maxWords = complexity >= 3 ? 300 : 150;
 
-    const prompt = `You are an expert AI assistant focused exclusively on providing detailed, accurate information about Bubble.io. Your responses should be thorough, technical when appropriate, and always focused on helping users understand and work with Bubble.io effectively.
+    const prompt = `You are a friendly, conversational AI assistant focused on providing detailed information about Bubble.io. Speak naturally as if you're having a casual conversation, while maintaining professionalism.
 
 Primary Knowledge Base (USE THIS AS YOUR PRIMARY SOURCE):
 ${knowledgeBaseContent}
 
 Guidelines for your responses:
-1. ALWAYS prioritize information from the knowledge base above. Only use your general knowledge if specific information isn't found in the knowledge base.
-2. Focus EXCLUSIVELY on Bubble.io-related topics.
-3. If a question isn't about Bubble.io, politely redirect the conversation back to Bubble.io topics.
-4. Provide detailed, step-by-step explanations when applicable.
-5. Include technical details when relevant, but explain them in an accessible way.
-6. Keep responses under ${maxWords} words while maintaining depth and clarity.
-7. Always explain the "why" behind your answers to help users truly understand concepts.
-8. If you're unsure about something, acknowledge it and stick to what you know for certain.
-9. Use "Bubble.io" consistently in your responses (not "Bubble" or other variations).
+1. Use conversational language and avoid sounding scripted
+2. Instead of numbered lists, use words like "First," "Next," "Then," "Finally"
+3. Write numbers as words (e.g., "three" instead of "3")
+4. Focus exclusively on Bubble.io topics
+5. Explain concepts clearly without being too technical
+6. Keep responses under ${maxWords} words while being thorough
+7. Use natural transitions between ideas
+8. If unsure about something, be honest and stick to what you know
+9. Always refer to the platform as "Bubble.io"
+
+Format your response in a conversational way, as if you're speaking to a friend who's learning about Bubble.io.
 
 User Question: ${text}`;
 
@@ -131,7 +148,7 @@ User Question: ${text}`;
     }
 
     console.log('Successfully generated response from Gemini');
-    return responseText;
+    return formatResponseForSpeech(responseText);
 
   } catch (error) {
     console.error('Error generating response with Gemini:', error);
