@@ -39,7 +39,7 @@ serve(async (req) => {
     }
 
     const polly = new Polly({
-      region: "af-south-1",  // Using af-south-1 with neural engine
+      region: "eu-central-1",  // Changed to eu-central-1 with generative engine
       credentials: {
         accessKeyId: apiKeys.aws_access_key!,
         secretAccessKey: apiKeys.aws_secret_key!
@@ -49,8 +49,8 @@ serve(async (req) => {
     const response = await polly.synthesizeSpeech({
       Text: text,
       OutputFormat: "mp3",
-      VoiceId: "Danielle",  // Changed to Danielle
-      Engine: "neural"  // Using neural engine
+      VoiceId: "Danielle",  // Using Danielle
+      Engine: "standard"  // Changed to standard engine
     });
 
     const audioStream = response.AudioStream;

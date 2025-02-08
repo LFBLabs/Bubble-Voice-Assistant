@@ -45,7 +45,7 @@ export async function synthesizeAudio(text: string): Promise<string> {
   try {
     console.log('Initializing Polly with AWS credentials');
     const polly = new Polly({
-      region: "af-south-1",  // Using af-south-1 with neural engine
+      region: "eu-central-1",  // Changed to eu-central-1 with generative engine
       credentials: {
         accessKeyId: Deno.env.get('AWS_ACCESS_KEY')!,
         secretAccessKey: Deno.env.get('AWS_SECRET_KEY')!
@@ -56,13 +56,13 @@ export async function synthesizeAudio(text: string): Promise<string> {
     const chunks = splitTextIntoChunks(text);
     console.log(`Split text into ${chunks.length} chunks`);
     
-    // Process chunks in parallel with neural engine
+    // Process chunks in parallel with generative engine
     const audioPromises = chunks.map(chunk => 
       polly.synthesizeSpeech({
         Text: chunk,
         OutputFormat: "mp3",
-        VoiceId: "Danielle",  // Changed to Danielle
-        Engine: "neural"  // Using neural engine
+        VoiceId: "Danielle",  // Using Danielle
+        Engine: "standard"  // Changed to standard engine
       })
     );
 
