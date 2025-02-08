@@ -1,3 +1,4 @@
+
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { Polly } from 'npm:@aws-sdk/client-polly';
@@ -38,7 +39,7 @@ serve(async (req) => {
     }
 
     const polly = new Polly({
-      region: "us-east-1",
+      region: "us-east-1",  // Changed back to us-east-1 which supports the generative engine
       credentials: {
         accessKeyId: apiKeys.aws_access_key!,
         secretAccessKey: apiKeys.aws_secret_key!

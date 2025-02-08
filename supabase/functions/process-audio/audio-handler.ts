@@ -45,7 +45,7 @@ export async function synthesizeAudio(text: string): Promise<string> {
   try {
     console.log('Initializing Polly with AWS credentials');
     const polly = new Polly({
-      region: "af-south-1",
+      region: "us-east-1",  // Changed back to us-east-1 which supports the generative engine
       credentials: {
         accessKeyId: Deno.env.get('AWS_ACCESS_KEY')!,
         secretAccessKey: Deno.env.get('AWS_SECRET_KEY')!
