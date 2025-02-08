@@ -1,3 +1,4 @@
+
 import { Polly } from "npm:@aws-sdk/client-polly";
 
 // Split text into manageable chunks for parallel processing
@@ -44,7 +45,7 @@ export async function synthesizeAudio(text: string): Promise<string> {
   try {
     console.log('Initializing Polly with AWS credentials');
     const polly = new Polly({
-      region: "us-east-1",
+      region: "af-south-1",
       credentials: {
         accessKeyId: Deno.env.get('AWS_ACCESS_KEY')!,
         secretAccessKey: Deno.env.get('AWS_SECRET_KEY')!
