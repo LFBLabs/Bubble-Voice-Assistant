@@ -1,3 +1,4 @@
+
 import React from "react";
 
 const HeroSection = () => {
@@ -14,7 +15,7 @@ const HeroSection = () => {
       </h1>
 
       <p className="text-xl text-[#4A4A4A] mb-8 max-w-2xl mx-auto leading-relaxed">
-        Get instant, voice-powered answers to your Bubble.io questions. Learn faster,
+        Get voice-powered answers to your Bubble.io questions in seconds. Learn faster,
         build better, and master no-code development with AI assistance.
       </p>
 
