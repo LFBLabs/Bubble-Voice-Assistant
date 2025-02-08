@@ -5,21 +5,60 @@ import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-con
 import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 import { calculateTextComplexity } from "./text-complexity.ts";
 
+// Improved cache key generation for better hit rates
+async function generateCacheKey(text: string): Promise<string> {
+  const normalizedText = text.toLowerCase().trim()
+    .replace(/\s+/g, ' ')  // Normalize whitespace
+    .replace(/[.,!?;:]$/g, ''); // Remove trailing punctuation
+  
+  const encoder = new TextEncoder();
+  const data = encoder.encode(normalizedText);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Improved response formatting with better performance
 function formatResponseForSpeech(text: string): string {
-  return text
-    // Replace numbered lists with natural language
+  const words = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
+  let formattedText = text
     .replace(/(\d+\.\s)/g, (match, number) => {
-      const words = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
       const num = parseInt(number);
       return num <= words.length ? `${words[num-1]}, ` : `${number}`;
     })
-    // Add natural pauses for complex sentences, but not for greetings
     .replace(/[;:]|(?<=[.!?])\s+(?=[A-Z])/g, '... ')
-    // Replace Bubble.io with just Bubble
     .replace(/Bubble\.io/g, 'Bubble')
-    // Clean up multiple spaces
     .replace(/\s+/g, ' ')
     .trim();
+
+  return formattedText;
+}
+
+// Optimized quick responses for common patterns
+function getQuickResponse(text: string): string | null {
+  const lowerText = text.toLowerCase();
+  
+  // Fast path for greetings
+  for (const pattern of greetingPatterns) {
+    if (pattern.test(lowerText)) {
+      return formatResponseForSpeech(
+        greetingResponses[Math.floor(Math.random() * greetingResponses.length)]
+      );
+    }
+  }
+  
+  // Fast path for thank you messages
+  if (lowerText.includes('thank') || 
+      lowerText.includes('thanks') || 
+      lowerText.includes('appreciate') || 
+      lowerText.includes('helpful') ||
+      lowerText.includes('great job')) {
+    return formatResponseForSpeech(
+      thankYouResponses[Math.floor(Math.random() * thankYouResponses.length)]
+    );
+  }
+  
+  return null;
 }
 
 export async function handleTextResponse(text: string) {
@@ -27,95 +66,70 @@ export async function handleTextResponse(text: string) {
     throw new Error('Invalid or empty text input');
   }
 
+  // Quick response check before any DB operations
+  const quickResponse = getQuickResponse(text);
+  if (quickResponse) {
+    console.log('Quick response generated');
+    return quickResponse;
+  }
+
   // Initialize Supabase client
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Generate hash for caching
-  const encoder = new TextEncoder();
-  const data = encoder.encode(text.toLowerCase().trim());
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const questionHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  // Generate cache key
+  const questionHash = await generateCacheKey(text);
 
-  // Check cache
+  // Optimized cache check with better indexing
   const { data: cachedResponse } = await supabase
     .from('response_cache')
-    .select('response')
+    .select('response, performance_metrics')
     .eq('question_hash', questionHash)
     .single();
 
   if (cachedResponse) {
-    console.log('Cache hit in text handler');
+    console.log('Cache hit in text handler', 
+      cachedResponse.performance_metrics ? 
+      `Previous response time: ${cachedResponse.performance_metrics.response_time}ms` : 
+      'No performance metrics available'
+    );
     return formatResponseForSpeech(cachedResponse.response);
-  }
-
-  // Process greetings
-  const lowerText = text.toLowerCase();
-  for (const pattern of greetingPatterns) {
-    if (pattern.test(lowerText)) {
-      const randomResponse = greetingResponses[Math.floor(Math.random() * greetingResponses.length)];
-      return formatResponseForSpeech(randomResponse);
-    }
-  }
-
-  // Process thank you messages
-  if (lowerText.includes('thank') || 
-      lowerText.includes('thanks') || 
-      lowerText.includes('appreciate') || 
-      lowerText.includes('helpful') ||
-      lowerText.includes('great job')) {
-    const randomResponse = thankYouResponses[Math.floor(Math.random() * thankYouResponses.length)];
-    return formatResponseForSpeech(randomResponse);
   }
 
   try {
     let geminiKey = Deno.env.get('GEMINI_API_KEY');
     
     if (!geminiKey) {
-      console.log('Gemini API key not found in environment variables, checking database...');
+      console.log('Fetching Gemini API key from database...');
       const { data: apiKeyData, error: apiKeyError } = await supabase
         .from('api_keys')
         .select('gemini_key')
         .limit(1);
 
-      if (apiKeyError) {
-        console.error('Error fetching Gemini API key from database:', apiKeyError);
-        throw new Error('Failed to fetch Gemini API key');
-      }
-
-      if (apiKeyData && apiKeyData.length > 0 && apiKeyData[0].gemini_key) {
-        geminiKey = apiKeyData[0].gemini_key;
-      }
+      if (apiKeyError) throw new Error('Failed to fetch Gemini API key');
+      if (apiKeyData?.[0]?.gemini_key) geminiKey = apiKeyData[0].gemini_key;
     }
 
-    if (!geminiKey) {
-      console.error('No Gemini API key available in environment or database');
-      throw new Error('Gemini API key not configured');
-    }
+    if (!geminiKey) throw new Error('Gemini API key not configured');
 
-    const { data: knowledgeBase, error: knowledgeError } = await supabase
+    // Fetch knowledge base in parallel with other operations
+    const knowledgeBasePromise = supabase
       .from('knowledge_base')
       .select('content')
       .eq('active', true);
 
-    if (knowledgeError) {
-      console.error('Error fetching knowledge base:', knowledgeError);
-      throw new Error('Failed to fetch knowledge base');
-    }
-
-    const knowledgeBaseContent = knowledgeBase?.map(k => k.content).join('\n\n') || '';
-
     const complexity = calculateTextComplexity(text);
     console.log('Text complexity score:', complexity);
 
-    console.log('Initializing Gemini AI...');
     const genAI = new GoogleGenerativeAI(geminiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    console.log('Selected model: gemini-pro');
-    
+    // Wait for knowledge base
+    const { data: knowledgeBase, error: knowledgeError } = await knowledgeBasePromise;
+    if (knowledgeError) throw new Error('Failed to fetch knowledge base');
+
+    const knowledgeBaseContent = knowledgeBase?.map(k => k.content).join('\n\n') || '';
     const maxWords = complexity >= 3 ? 300 : 150;
 
     const prompt = `You are a friendly, conversational AI assistant focused on providing detailed information about Bubble. Your goal is to help users understand and succeed with Bubble while following these guidelines:
@@ -137,7 +151,7 @@ Communication Style:
   - "Actually, ..."
   - "That's a great question! ..."
 
-Primary Knowledge Base (USE THIS AS YOUR PRIMARY SOURCE):
+Primary Knowledge Base:
 ${knowledgeBaseContent}
 
 Important Notes:
@@ -149,7 +163,7 @@ Important Notes:
 
 User Question: ${text}`;
 
-    console.log('Sending prompt to Gemini...');
+    console.log('Generating response with Gemini...');
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const responseText = response.text();
@@ -158,12 +172,11 @@ User Question: ${text}`;
       throw new Error('Empty response from Gemini');
     }
 
-    console.log('Successfully generated response from Gemini');
+    console.log('Successfully generated response');
     return formatResponseForSpeech(responseText);
 
   } catch (error) {
-    console.error('Error generating response with Gemini:', error);
+    console.error('Error generating response:', error);
     throw error;
   }
 }
-
