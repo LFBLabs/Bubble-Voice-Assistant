@@ -1,5 +1,5 @@
 
-import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
+import { greetingPatterns, greetingResponses, thankYouResponses, commonQuestionPatterns, fallbackResponse } from "./ai-config.ts";
 import { formatResponseForSpeech } from "./text-formatting.ts";
 
 export function getQuickResponse(text: string): string | null {
@@ -11,6 +11,13 @@ export function getQuickResponse(text: string): string | null {
       return formatResponseForSpeech(
         greetingResponses[Math.floor(Math.random() * greetingResponses.length)]
       );
+    }
+  }
+  
+  // Check for common questions
+  for (const { pattern, response } of commonQuestionPatterns) {
+    if (pattern.test(lowerText)) {
+      return formatResponseForSpeech(response);
     }
   }
   
