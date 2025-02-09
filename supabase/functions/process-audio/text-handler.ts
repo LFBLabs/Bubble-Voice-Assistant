@@ -70,8 +70,9 @@ function formatResponseForSpeech(text: string): string {
 }
 
 function getQuickResponse(text: string): string | null {
-  const lowerText = text.toLowerCase();
+  const lowerText = text.toLowerCase().trim();
   
+  // Check for greetings
   for (const pattern of greetingPatterns) {
     if (pattern.test(lowerText)) {
       return formatResponseForSpeech(
@@ -80,8 +81,18 @@ function getQuickResponse(text: string): string | null {
     }
   }
   
-  const gratitudeKeywords = ['thank', 'thanks', 'appreciate', 'grateful', 'helpful', 'great job', 'good job'];
-  if (gratitudeKeywords.some(keyword => lowerText.includes(keyword))) {
+  // Enhanced gratitude detection
+  const gratitudePatterns = [
+    /\b(?:thank|thanks)\b/i,
+    /\bthx\b/i,
+    /appreciate/i,
+    /grateful/i,
+    /helpful/i,
+    /(?:great|good)\s+(?:job|work|help)/i,
+    /well\s+done/i
+  ];
+  
+  if (gratitudePatterns.some(pattern => pattern.test(lowerText))) {
     return formatResponseForSpeech(
       thankYouResponses[Math.floor(Math.random() * thankYouResponses.length)]
     );
