@@ -4,14 +4,13 @@ import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-con
 import { crypto } from "https://deno.land/std@0.168.0/crypto/mod.ts";
 import { calculateTextComplexity } from "./text-complexity.ts";
 
-// Enhanced cache key generation with better normalization
 async function generateCacheKey(text: string): Promise<string> {
   const normalizedText = text.toLowerCase()
     .trim()
-    .replace(/\s+/g, ' ')  // Normalize whitespace
-    .replace(/[.,!?;:]$/g, '') // Remove trailing punctuation
-    .replace(/(?:the|a|an) /g, '')  // Remove articles
-    .replace(/\b(?:is|are|was|were)\b/g, '');  // Remove common verbs
+    .replace(/\s+/g, ' ')
+    .replace(/[.,!?;:]$/g, '')
+    .replace(/(?:the|a|an) /g, '')
+    .replace(/\b(?:is|are|was|were)\b/g, '');
   
   const encoder = new TextEncoder();
   const data = encoder.encode(normalizedText);
@@ -20,7 +19,6 @@ async function generateCacheKey(text: string): Promise<string> {
   return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 }
 
-// Enhanced response formatting for natural speech
 function formatResponseForSpeech(text: string): string {
   const abbreviationMap: Record<string, string> = {
     'e.g.': 'for example',
@@ -29,47 +27,50 @@ function formatResponseForSpeech(text: string): string {
     'viz.': 'namely',
     'vs.': 'versus',
     'w.r.t.': 'with respect to',
-    'approx.': 'approximately'
+    'approx.': 'approximately',
+    '>': 'greater than',
+    '<': 'less than',
+    '>=': 'greater than or equal to',
+    '<=': 'less than or equal to',
+    '==': 'equals',
+    '!=': 'not equal to',
+    '===': 'strictly equals',
+    '!==': 'strictly not equal to'
   };
   
   let formattedText = text
-    // Remove markdown formatting characters
-    .replace(/[*_~`]/g, '')
-    // Replace bracketed abbreviations with their spoken form
-    .replace(/\[(.*?)\]/g, (match, content) => {
-      // Check if the content is an abbreviation we want to replace
-      const lowerContent = content.toLowerCase();
-      return abbreviationMap[lowerContent] || content;
+    .replace(/[*_~`#]/g, '')
+    .replace(/\[(.*?)\]/g, '$1')
+    .replace(/^\s*[-•*]\s*/gm, 'Here is a point: ')
+    .replace(/^\s*(\d+)\.\s*/gm, (_, num) => {
+      return '';
     })
-    // Convert numbered lists
-    .replace(/(\d+\.\s)/g, (match, number) => {
-      const numberWords = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth'];
-      const num = parseInt(number);
-      return num <= numberWords.length ? `${numberWords[num-1]}, ` : `${number}`;
-    })
-    // Replace standard abbreviations outside brackets
-    .replace(/\b(e\.g\.|i\.e\.|etc\.|viz\.|vs\.|w\.r\.t\.|approx\.)\b/g, (match) => {
-      const key = match.toLowerCase();
-      return abbreviationMap[key] || match;
-    })
-    // Improve natural pauses
-    .replace(/[;:]|(?<=[.!?])\s+(?=[A-Z])/g, '... ')
-    // Product name consistency
-    .replace(/Bubble\.io/g, 'Bubble')
-    // Remove multiple spaces
+    .replace(/\b(e\.g\.|i\.e\.|etc\.|viz\.|vs\.|w\.r\.t\.|approx\.)\b/g, match => 
+      abbreviationMap[match.toLowerCase()] || match
+    )
+    .replace(/([<>]=?|={2,3}|!=={0,2})/g, match => 
+      abbreviationMap[match] || match
+    )
+    .replace(/\b(First|Second|Third|Fourth|Fifth|Next|Then),?\s*/g, '')
+    .replace(/^\s*>\s*/gm, '')
+    .replace(/https?:\/\/[^\s]+/g, 'the linked website')
+    .replace(/[;:]|(?<=[.!?])\s+(?=[A-Z])/g, '. ')
+    .replace(/,\s*/g, ', ')
     .replace(/\s+/g, ' ')
-    // Improve sentence breaks for speech
-    .replace(/(?<=[.!?])\s+/g, '... ')
+    .trim();
+
+  formattedText = formattedText
+    .replace(/\.{2,}/g, '.')  // Remove multiple periods
+    .replace(/\.\s*\./g, '.') // Remove consecutive periods with spaces
+    .replace(/\s+/g, ' ')     // Final whitespace cleanup
     .trim();
 
   return formattedText;
 }
 
-// Optimized quick response system with context awareness
 function getQuickResponse(text: string): string | null {
   const lowerText = text.toLowerCase();
   
-  // Enhanced greeting detection
   for (const pattern of greetingPatterns) {
     if (pattern.test(lowerText)) {
       return formatResponseForSpeech(
@@ -78,7 +79,6 @@ function getQuickResponse(text: string): string | null {
     }
   }
   
-  // Enhanced gratitude detection with context awareness
   const gratitudeKeywords = ['thank', 'thanks', 'appreciate', 'grateful', 'helpful', 'great job', 'good job'];
   if (gratitudeKeywords.some(keyword => lowerText.includes(keyword))) {
     return formatResponseForSpeech(
@@ -94,22 +94,18 @@ export async function handleTextResponse(text: string) {
     throw new Error('Invalid or empty text input');
   }
 
-  // Quick response check before any DB operations
   const quickResponse = getQuickResponse(text);
   if (quickResponse) {
     console.log('Quick response generated');
     return quickResponse;
   }
 
-  // Initialize Supabase client
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const supabase = createClient(supabaseUrl, supabaseKey);
 
-  // Generate cache key
   const questionHash = await generateCacheKey(text);
 
-  // Optimized cache check with better indexing
   const { data: cachedResponse } = await supabase
     .from('response_cache')
     .select('response, performance_metrics')
@@ -141,7 +137,6 @@ export async function handleTextResponse(text: string) {
 
     if (!geminiKey) throw new Error('Gemini API key not configured');
 
-    // Fetch knowledge base in parallel with other operations
     const knowledgeBasePromise = supabase
       .from('knowledge_base')
       .select('content')
@@ -153,7 +148,6 @@ export async function handleTextResponse(text: string) {
     const genAI = new GoogleGenerativeAI(geminiKey);
     const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-    // Wait for knowledge base
     const { data: knowledgeBase, error: knowledgeError } = await knowledgeBasePromise;
     if (knowledgeError) throw new Error('Failed to fetch knowledge base');
 
