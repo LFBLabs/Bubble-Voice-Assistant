@@ -5,6 +5,7 @@ import { calculateTextComplexity } from "./text-complexity.ts";
 import { formatResponseForSpeech } from "./text-formatting.ts";
 import { getQuickResponse } from "./quick-responses.ts";
 import { generateCacheKey } from "./cache-utils.ts";
+import { selectAIModel } from "./model-selection.ts";
 
 export async function handleTextResponse(text: string) {
   if (!text || typeof text !== 'string' || text.trim().length === 0) {
@@ -62,8 +63,12 @@ export async function handleTextResponse(text: string) {
     const complexity = calculateTextComplexity(text);
     console.log('Text complexity score:', complexity);
 
+    // Select the appropriate model based on complexity
+    const modelName = await selectAIModel(complexity);
+    console.log('Selected model:', modelName);
+
     const genAI = new GoogleGenerativeAI(geminiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+    const model = genAI.getGenerativeModel({ model: modelName });
 
     const { data: knowledgeBase, error: knowledgeError } = await knowledgeBasePromise;
     if (knowledgeError) throw new Error('Failed to fetch knowledge base');
@@ -106,7 +111,7 @@ Important Notes:
 
 User Question: ${text}`;
 
-    console.log('Generating response with Gemini...');
+    console.log('Generating response with model:', modelName);
     const result = await model.generateContent(prompt);
     const response = await result.response;
     const responseText = response.text();

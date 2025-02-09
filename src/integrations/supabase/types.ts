@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_models: {
+        Row: {
+          complexity_threshold: number
+          created_at: string
+          id: string
+          model_name: string
+          model_type: string
+          updated_at: string
+        }
+        Insert: {
+          complexity_threshold: number
+          created_at?: string
+          id?: string
+          model_name: string
+          model_type: string
+          updated_at?: string
+        }
+        Update: {
+          complexity_threshold?: number
+          created_at?: string
+          id?: string
+          model_name?: string
+          model_type?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       api_keys: {
         Row: {
           aws_access_key: string | null
