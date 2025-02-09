@@ -1,3 +1,4 @@
+
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
 import { GoogleGenerativeAI } from "npm:@google/generative-ai";
 import { greetingPatterns, greetingResponses, thankYouResponses } from "./ai-config.ts";
@@ -158,9 +159,16 @@ export async function handleTextResponse(text: string) {
 
 1. Response Start Format:
    For questions about processes, tutorials, or how-to's:
-   - Start with "That's a great question!"
+   - Start with "That's a great question!" or "Absolutely!" or "Of course!"
+   
    For technical explanations or concept clarifications:
-   - Start with "Well, let me explain..."
+   - Start with "Let me explain..." or "The key point here is..." or "To clarify..."
+   
+   For agreeing or emphasizing:
+   - Start with "Exactly!" or "Indeed!" or "You're spot on!"
+   
+   When offering a different perspective:
+   - Start with "I understand your perspective, but..." or "While that's true, it's worth considering..."
 
 2. Communication Guidelines:
    - Accuracy: Always provide technically correct and up-to-date information about Bubble's features and best practices
@@ -168,6 +176,8 @@ export async function handleTextResponse(text: string) {
    - Natural Flow: Avoid bullet points or numbered lists in speech
    - Conversational: Use contractions (I'm, you'll, that's)
    - Keep responses under ${maxWords} words while being thorough
+   - Use natural transitions between ideas
+   - Avoid phrases like "You know what?" or "Actually"
 
 Primary Knowledge Base:
 ${knowledgeBaseContent}
@@ -177,7 +187,6 @@ Important Notes:
 - If asked about unrelated topics, politely redirect to Bubble-related discussions
 - Always refer to the platform simply as "Bubble"
 - If unsure about something, be honest and stick to what you know
-- Use natural transitions between ideas
 
 User Question: ${text}`;
 
