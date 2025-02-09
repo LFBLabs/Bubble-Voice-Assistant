@@ -36,7 +36,23 @@ function formatResponseForSpeech(text: string): string {
     '==': 'equals',
     '!=': 'not equal to',
     '===': 'strictly equals',
-    '!==': 'strictly not equal to'
+    '!==': 'strictly not equal to',
+    '+': 'plus',
+    '-': 'minus',
+    '*': 'times',
+    '/': 'divided by',
+    '%': 'percent',
+    '=': 'equals',
+    '&': 'and',
+    '|': 'or',
+    '^': 'to the power of',
+    '√': 'square root of',
+    '∑': 'sum of',
+    '∏': 'product of',
+    '∆': 'delta',
+    '≈': 'approximately equal to',
+    '≠': 'not equal to',
+    '±': 'plus or minus'
   };
   
   let formattedText = text
@@ -49,7 +65,7 @@ function formatResponseForSpeech(text: string): string {
     .replace(/\b(e\.g\.|i\.e\.|etc\.|viz\.|vs\.|w\.r\.t\.|approx\.)\b/g, match => 
       abbreviationMap[match.toLowerCase()] || match
     )
-    .replace(/([<>]=?|={2,3}|!=={0,2})/g, match => 
+    .replace(/([<>]=?|={2,3}|!=={0,2}|[+\-*/%=&|^√∑∏∆≈≠±])/g, match => 
       abbreviationMap[match] || match
     )
     .replace(/\b(First|Second|Third|Fourth|Fifth|Next|Then),?\s*/g, '')
