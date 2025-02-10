@@ -58,6 +58,14 @@ export function formatResponseForSpeech(text: string): string {
     'IDE': 'I D E'
   };
   
+  const commonPhrases = {
+    'left-hand': 'left hand',
+    'right-hand': 'right hand',
+    'drop-down': 'drop down',
+    'drag-and-drop': 'drag and drop',
+    'step-by-step': 'step by step'
+  };
+  
   let formattedText = text
     // Remove markdown formatting
     .replace(/[*_~`#]/g, '')
@@ -66,6 +74,11 @@ export function formatResponseForSpeech(text: string): string {
     // Format lists
     .replace(/^\s*[-•*]\s*/gm, 'Here is a point: ')
     .replace(/^\s*(\d+)\.\s*/gm, '')
+    
+    // Replace common hyphenated phrases first
+    .replace(/\b(left-hand|right-hand|drop-down|drag-and-drop|step-by-step)\b/gi, match => 
+      commonPhrases[match.toLowerCase()] || match
+    )
     
     // Replace technical terms and abbreviations
     .replace(/\b(e\.g\.|i\.e\.|etc\.|viz\.|vs\.|w\.r\.t\.|approx\.)\b/g, match => 
@@ -94,7 +107,7 @@ export function formatResponseForSpeech(text: string): string {
     .replace(/[;:]|(?<=[.!?])\s+(?=[A-Z])/g, '. ')
     .replace(/,\s*/g, ', ')
     
-    // Fix CamelCase and kebab-case words
+    // Fix remaining CamelCase and kebab-case words AFTER handling common phrases
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/([A-Za-z])-([A-Za-z])/g, '$1 $2')
     
