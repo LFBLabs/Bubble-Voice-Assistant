@@ -63,7 +63,28 @@ export function formatResponseForSpeech(text: string): string {
     'right-hand': 'right hand',
     'drop-down': 'drop down',
     'drag-and-drop': 'drag and drop',
-    'step-by-step': 'step by step'
+    'step-by-step': 'step by step',
+    'built-in': 'built in',
+    'sign-in': 'sign in',
+    'sign-up': 'sign up',
+    'log-in': 'log in',
+    'log-out': 'log out',
+    'check-in': 'check in',
+    'check-out': 'check out',
+    'set-up': 'set up',
+    'clean-up': 'clean up'
+  };
+  
+  const pathPhrases = {
+    'edit/': 'edit',
+    'src/': 'source',
+    'docs/': 'docs',
+    'public/': 'public',
+    'components/': 'components',
+    'utils/': 'utilities',
+    'pages/': 'pages',
+    'assets/': 'assets',
+    'styles/': 'styles'
   };
   
   let formattedText = text
@@ -75,8 +96,18 @@ export function formatResponseForSpeech(text: string): string {
     .replace(/^\s*[-•*]\s*/gm, 'Here is a point: ')
     .replace(/^\s*(\d+)\.\s*/gm, '')
     
+    // Handle path-like strings first
+    .replace(/\b\w+\/\w+\b/g, match => {
+      for (const [pattern, replacement] of Object.entries(pathPhrases)) {
+        if (match.includes(pattern)) {
+          return match.replace(pattern, replacement + ' ');
+        }
+      }
+      return match.replace('/', ' ');
+    })
+    
     // Replace common hyphenated phrases first
-    .replace(/\b(left-hand|right-hand|drop-down|drag-and-drop|step-by-step)\b/gi, match => 
+    .replace(/\b(left-hand|right-hand|drop-down|drag-and-drop|step-by-step|built-in|sign-in|sign-up|log-in|log-out|check-in|check-out|set-up|clean-up)\b/gi, match => 
       commonPhrases[match.toLowerCase()] || match
     )
     
