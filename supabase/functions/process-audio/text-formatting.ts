@@ -17,9 +17,10 @@ export function formatResponseForSpeech(text: string): string {
     '===': 'strictly equals',
     '!==': 'strictly not equal to',
     '+': 'plus',
-    '-': 'minus',
+    '-': ' ',
     '*': 'times',
     '/': 'divided by',
+    '\\': ' ',
     '%': 'percent',
     '=': 'equals',
     '&': 'and',
@@ -97,13 +98,13 @@ export function formatResponseForSpeech(text: string): string {
     .replace(/^\s*(\d+)\.\s*/gm, '')
     
     // Handle path-like strings first
-    .replace(/\b\w+\/\w+\b/g, match => {
+    .replace(/\b\w+[/\\]\w+\b/g, match => {
       for (const [pattern, replacement] of Object.entries(pathPhrases)) {
         if (match.includes(pattern)) {
           return match.replace(pattern, replacement + ' ');
         }
       }
-      return match.replace('/', ' ');
+      return match.replace(/[/\\]/g, ' ');
     })
     
     // Replace common hyphenated phrases first
@@ -117,7 +118,7 @@ export function formatResponseForSpeech(text: string): string {
     )
     
     // Handle code-related symbols
-    .replace(/([<>]=?|={2,3}|!=={0,2}|[+\-*/%=&|^√∑∏∆≈≠±])/g, match => 
+    .replace(/([<>]=?|={2,3}|!=={0,2}|[+\-*/%=&|^√∑∏∆≈≠±\\])/g, match => 
       abbreviationMap[match] || match
     )
     
@@ -131,6 +132,9 @@ export function formatResponseForSpeech(text: string): string {
       abbreviationMap[match] || match
     )
     
+    // Handle multi-word hyphenated terms not covered by commonPhrases
+    .replace(/(\w+)-(\w+)/g, '$1 $2')
+    
     // Clean up remaining formatting
     .replace(/\b(First|Second|Third|Fourth|Fifth|Next|Then),?\s*/g, '')
     .replace(/^\s*>\s*/gm, '')
@@ -138,9 +142,8 @@ export function formatResponseForSpeech(text: string): string {
     .replace(/[;:]|(?<=[.!?])\s+(?=[A-Z])/g, '. ')
     .replace(/,\s*/g, ', ')
     
-    // Fix remaining CamelCase and kebab-case words AFTER handling common phrases
+    // Fix remaining CamelCase words AFTER handling common phrases
     .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/([A-Za-z])-([A-Za-z])/g, '$1 $2')
     
     // Clean up spaces
     .replace(/\s+/g, ' ')
