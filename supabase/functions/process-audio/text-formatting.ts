@@ -89,6 +89,11 @@ export function formatResponseForSpeech(text: string): string {
   };
   
   let formattedText = text
+    // Handle abbreviations first
+    .replace(/\b(e\.g\.|i\.e\.|etc\.|viz\.|vs\.|w\.r\.t\.|approx\.)\b/g, match => 
+      abbreviationMap[match.toLowerCase()]
+    )
+    
     // Remove markdown formatting
     .replace(/[*_~`#]/g, '')
     .replace(/\[(.*?)\]/g, '$1')
@@ -97,7 +102,7 @@ export function formatResponseForSpeech(text: string): string {
     .replace(/^\s*[-•*]\s*/gm, 'Here is a point: ')
     .replace(/^\s*(\d+)\.\s*/gm, '')
     
-    // Handle path-like strings first
+    // Handle path-like strings
     .replace(/\b\w+[/\\]\w+\b/g, match => {
       for (const [pattern, replacement] of Object.entries(pathPhrases)) {
         if (match.includes(pattern)) {
@@ -107,14 +112,9 @@ export function formatResponseForSpeech(text: string): string {
       return match.replace(/[/\\]/g, ' ');
     })
     
-    // Replace common hyphenated phrases first
+    // Replace common hyphenated phrases
     .replace(/\b(left-hand|right-hand|drop-down|drag-and-drop|step-by-step|built-in|sign-in|sign-up|log-in|log-out|check-in|check-out|set-up|clean-up)\b/gi, match => 
       commonPhrases[match.toLowerCase()] || match
-    )
-    
-    // Replace technical terms and abbreviations
-    .replace(/\b(e\.g\.|i\.e\.|etc\.|viz\.|vs\.|w\.r\.t\.|approx\.)\b/g, match => 
-      abbreviationMap[match.toLowerCase()] || match
     )
     
     // Handle code-related symbols
