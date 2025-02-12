@@ -16,16 +16,25 @@ const Header = ({ title, description }: HeaderProps) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  const isLandingPage = location.pathname === '/';
+
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-      setTheme(savedTheme as 'light' | 'dark');
-      document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-    } else if (systemPrefersDark) {
-      setTheme('dark');
-      document.documentElement.classList.add('dark');
+    // Only apply theme settings if not on landing page
+    if (!isLandingPage) {
+      const savedTheme = localStorage.getItem('theme');
+      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      if (savedTheme) {
+        setTheme(savedTheme as 'light' | 'dark');
+        document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+      } else if (systemPrefersDark) {
+        setTheme('dark');
+        document.documentElement.classList.add('dark');
+      }
+    } else {
+      // Force light mode on landing page
+      setTheme('light');
+      document.documentElement.classList.remove('dark');
     }
 
     const getUserEmail = async () => {
@@ -35,13 +44,15 @@ const Header = ({ title, description }: HeaderProps) => {
       }
     };
     getUserEmail();
-  }, []);
+  }, [isLandingPage]);
 
   const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    document.documentElement.classList.toggle('dark');
-    localStorage.setItem('theme', newTheme);
+    if (!isLandingPage) {
+      const newTheme = theme === 'light' ? 'dark' : 'light';
+      setTheme(newTheme);
+      document.documentElement.classList.toggle('dark');
+      localStorage.setItem('theme', newTheme);
+    }
   };
 
   const showHomeButton = location.pathname !== '/';
@@ -61,19 +72,21 @@ const Header = ({ title, description }: HeaderProps) => {
               <Home className="h-5 w-5" />
             </Button>
           )}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={toggleTheme}
-            className="w-10 h-10"
-            aria-label="Toggle theme"
-          >
-            {theme === 'light' ? (
-              <Moon className="h-5 w-5" />
-            ) : (
-              <Sun className="h-5 w-5" />
-            )}
-          </Button>
+          {!isLandingPage && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleTheme}
+              className="w-10 h-10"
+              aria-label="Toggle theme"
+            >
+              {theme === 'light' ? (
+                <Moon className="h-5 w-5" />
+              ) : (
+                <Sun className="h-5 w-5" />
+              )}
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="icon"
@@ -109,7 +122,7 @@ const Header = ({ title, description }: HeaderProps) => {
         </div>
       </div>
       <h1 className="text-3xl sm:text-4xl font-bold text-primary mb-4">{title}</h1>
-      <p className="text-gray-600 dark:text-gray-300">Ask questions about Bubble.io and get voice responses in seconds</p>
+      {description && <p className="text-gray-600 dark:text-gray-300">{description}</p>}
     </header>
   );
 };
