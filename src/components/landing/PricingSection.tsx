@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,7 +41,7 @@ const PricingSection = () => {
   
   return (
     <div className="w-full max-w-7xl mx-auto px-4 space-y-8">
-      <h2 className="text-3xl font-bold text-center text-[#1a1a1a] mb-8">Pricing</h2>
+      <h2 className="text-3xl font-bold text-center text-foreground mb-8">Pricing</h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         {pricingPlans.map((plan, index) => (
           <PricingCard
@@ -56,7 +57,7 @@ const PricingSection = () => {
       <div className="flex justify-center mt-8">
         <Button
           size="lg"
-          className="text-lg gap-2 bg-[#0037ff] hover:bg-[#0028bd] transition-all duration-300 transform hover:scale-105"
+          className="text-lg gap-2 bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 transform hover:scale-105"
           onClick={() => navigate("/login")}
         >
           Get Started Free

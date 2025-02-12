@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check } from "lucide-react";
@@ -29,7 +30,7 @@ export const PricingCard = ({
   showCheckbox = false,
 }: PricingCardProps) => {
   return (
-    <Card className={`relative w-full max-w-sm ${isPopular ? 'border-primary border-2' : 'border'}`}>
+    <Card className={`relative w-full max-w-sm bg-card ${isPopular ? 'border-primary border-2' : 'border'}`}>
       {isPopular && (
         <div className="absolute -top-3 left-0 right-0 mx-auto w-fit">
           <span className="bg-primary text-primary-foreground text-sm font-medium px-6 py-1 rounded-full">
@@ -40,7 +41,7 @@ export const PricingCard = ({
       <CardHeader className="text-center pt-8">
         {showCheckbox ? (
           <div className="flex items-center justify-between mb-4">
-            <CardTitle className="text-xl font-semibold">{title}</CardTitle>
+            <CardTitle className="text-xl font-semibold text-card-foreground">{title}</CardTitle>
             <Checkbox
               checked={isSelected}
               onCheckedChange={onSelect}
@@ -48,12 +49,12 @@ export const PricingCard = ({
             />
           </div>
         ) : (
-          <CardTitle className="text-xl font-semibold mb-4">{title}</CardTitle>
+          <CardTitle className="text-xl font-semibold mb-4 text-card-foreground">{title}</CardTitle>
         )}
         <div className="flex items-baseline justify-center gap-1">
-          <span className="text-4xl font-bold">{price}</span>
+          <span className="text-4xl font-bold text-card-foreground">{price}</span>
           {priceDetail && (
-            <span className="text-gray-600 dark:text-gray-400">{priceDetail}</span>
+            <span className="text-muted-foreground">{priceDetail}</span>
           )}
         </div>
       </CardHeader>
@@ -62,7 +63,7 @@ export const PricingCard = ({
           {features.map((feature, index) => (
             <li key={index} className="flex items-center gap-3">
               <Check className="h-5 w-5 text-primary flex-shrink-0" />
-              <span className="text-gray-600 dark:text-gray-300 text-sm whitespace-nowrap overflow-hidden text-ellipsis">{feature.text}</span>
+              <span className="text-muted-foreground text-sm whitespace-nowrap overflow-hidden text-ellipsis">{feature.text}</span>
             </li>
           ))}
         </ul>

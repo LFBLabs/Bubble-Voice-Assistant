@@ -1,3 +1,4 @@
+
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -12,13 +13,13 @@ const Landing = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <nav className="flex justify-between items-center mb-16">
-          <div className="text-2xl font-bold text-[#1a1a1a]">BubbleVoice</div>
+          <div className="text-2xl font-bold text-foreground">BubbleVoice</div>
           <Button
             variant="ghost"
-            className="text-[#1a1a1a] hover:bg-gray-100 transition-all duration-300"
+            className="text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300"
             onClick={() => navigate("/login")}
           >
             Already subscribed?
