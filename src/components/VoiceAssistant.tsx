@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import AuthUI from "./AuthUI";
@@ -8,6 +9,7 @@ import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { useVoiceRecording } from "@/hooks/useVoiceRecording";
 import { useAudioResponse } from "@/hooks/useAudioResponse";
 import { useVoiceInteraction } from "@/hooks/useVoiceInteraction";
+import { useKnowledgeBase } from "@/hooks/useKnowledgeBase";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
 
@@ -16,6 +18,7 @@ const VoiceAssistant = () => {
   const { isProcessing, response, processAudioResponse } = useAudioResponse();
   const { checkInteractionLimit, recordInteraction } = useVoiceInteraction();
   const { isRecording, transcript, toggleRecording: originalToggleRecording } = useVoiceRecording(processAudioResponse);
+  const { knowledgeBase, isLoading: isLoadingKnowledgeBase } = useKnowledgeBase();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -46,7 +49,7 @@ const VoiceAssistant = () => {
     originalToggleRecording();
   };
 
-  if (loading) {
+  if (loading || isLoadingKnowledgeBase) {
     return (
       <div className="min-h-screen flex items-center justify-center dark:bg-gray-900">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -58,12 +61,14 @@ const VoiceAssistant = () => {
     return <AuthUI />;
   }
 
+  const activeKnowledgeBase = knowledgeBase?.filter(entry => entry.active) || [];
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col min-h-screen">
         <Header 
           title="Bubble.io Voice Assistant"
-          description="Ask questions about Bubble.io and get instant voice responses"
+          description={`Ask questions about Bubble.io and get instant voice responses (${activeKnowledgeBase.length} knowledge base entries active)`}
         />
 
         <div className="flex-1 flex flex-col gap-6">
