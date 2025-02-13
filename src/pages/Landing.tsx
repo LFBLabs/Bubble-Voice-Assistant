@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import HeroSection from "@/components/landing/HeroSection";
 import FeatureGrid from "@/components/landing/FeatureGrid";
-import PricingSection from "@/components/landing/PricingSection";
 import PreviewImage from "@/components/landing/PreviewImage";
 
 const Landing = () => {
@@ -28,20 +27,8 @@ const Landing = () => {
 
         <main className="w-full max-w-7xl mx-auto">
           <HeroSection />
-
-          {/* First Pricing Section - After Hero */}
-          <div className="mb-20">
-            <PricingSection />
-          </div>
-
           <FeatureGrid />
-
           {!isMobile && <PreviewImage />}
-
-          {/* Bottom Pricing Section */}
-          <div className="mb-20">
-            <PricingSection />
-          </div>
         </main>
       </div>
     </div>
