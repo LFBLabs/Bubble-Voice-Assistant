@@ -10,7 +10,7 @@ const Landing = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   return <div className="min-h-screen bg-background">
-      <div className="max-w-7xl mx-auto px-4 rounded-3xl bg-gray-50 py-[16px]">
+      <div className="max-w-7xl mx-auto rounded-3xl bg-gray-50 px-0 py-0">
         <nav className="flex justify-between items-center mb-16">
           <div className="text-2xl font-bold text-foreground">BubbleVoice</div>
           <Button variant="ghost" className="text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300" onClick={() => navigate("/login")}>
