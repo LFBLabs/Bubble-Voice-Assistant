@@ -1,7 +1,11 @@
 
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const HeroSection = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="text-center mb-20 space-y-8">
       <h1 className="text-4xl sm:text-6xl font-bold text-[#1a1a1a] mb-6 leading-tight">
@@ -24,6 +28,13 @@ const HeroSection = () => {
       </p>
 
       <div className="flex flex-col sm:flex-row items-center gap-4 justify-center">
+        <Button 
+          size="lg"
+          className="bg-[#0037ff] hover:bg-[#0037ff]/90 text-white font-semibold px-8 py-6 text-lg"
+          onClick={() => navigate("/login")}
+        >
+          Sign Up Now
+        </Button>
       </div>
     </div>
   );
