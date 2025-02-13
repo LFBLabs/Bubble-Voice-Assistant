@@ -11,6 +11,7 @@ export const pricingPlans = [
     price: "$15",
     priceDetail: "/month",
     features: [
+      { text: "3 days free trial" },
       { text: "10 voice interactions per day" },
       { text: "Limited support" },
       { text: "Limited updates" },
@@ -21,6 +22,7 @@ export const pricingPlans = [
     price: "$24",
     priceDetail: "/month",
     features: [
+      { text: "5 days free trial" },
       { text: "Unlimited voice interactions" },
       { text: "Priority support" },
       { text: "Unlimited updates" },
