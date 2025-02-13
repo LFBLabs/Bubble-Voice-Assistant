@@ -14,6 +14,10 @@ const HeroSection = () => {
         </span>
       </h1>
 
+      <h2 className="text-2xl sm:text-3xl font-semibold text-[#1a1a1a]/80 mb-6">
+        Build your Bubble.io apps 3x faster with voice-powered AI assistance
+      </h2>
+
       <p className="text-xl text-[#4A4A4A] mb-8 max-w-2xl mx-auto leading-relaxed">
         Get voice-powered answers to your Bubble.io questions in seconds. Learn faster,
         build better, and master no-code development with AI assistance.
