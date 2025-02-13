@@ -1,3 +1,4 @@
+
 import { Auth } from '@supabase/auth-ui-react';
 import { ThemeSupa } from '@supabase/auth-ui-shared';
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -5,11 +6,12 @@ import { supabase } from '@/integrations/supabase/client';
 
 interface AuthFormProps {
   errorMessage: string;
+  className?: string;
 }
 
-const AuthForm = ({ errorMessage }: AuthFormProps) => {
+const AuthForm = ({ errorMessage, className }: AuthFormProps) => {
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 border border-border">
+    <div className={`bg-white rounded-lg shadow-sm p-6 border border-border ${className || ''}`}>
       {errorMessage && (
         <Alert variant="destructive" className="mb-6">
           <AlertDescription>{errorMessage}</AlertDescription>
