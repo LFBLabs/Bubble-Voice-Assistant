@@ -28,12 +28,6 @@ const Landing = () => {
 
         <main className="w-full max-w-7xl mx-auto">
           <HeroSection />
-
-          {/* First Pricing Section - After Hero */}
-          <div className="mb-20">
-            <PricingSection />
-          </div>
-
           <FeatureGrid />
 
           {!isMobile && <PreviewImage />}
