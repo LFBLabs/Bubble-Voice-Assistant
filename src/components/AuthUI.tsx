@@ -35,7 +35,7 @@ const AuthUI = () => {
   return <div className="container flex min-h-screen items-center justify-center bg-[#F5F6F7] rounded-3xl">
       <div className="w-full max-w-md">
         <AuthHeader />
-        <AuthForm errorMessage={errorMessage} />
+        <AuthForm errorMessage={errorMessage} className="bg-gray-50" />
       </div>
     </div>;
 };
