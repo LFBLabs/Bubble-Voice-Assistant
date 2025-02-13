@@ -60,7 +60,7 @@ const PricingSection = () => {
           className="text-lg gap-2 bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-300 transform hover:scale-105"
           onClick={() => navigate("/login")}
         >
-          Get Started Free
+          Start Free Trial
           <ArrowRight className="w-5 h-5" />
         </Button>
       </div>
