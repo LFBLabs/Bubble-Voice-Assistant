@@ -22,19 +22,19 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto rounded-3xl bg-gray-50 px-0 py-0">
-        <nav className="flex justify-center items-center mb-8 mx-0 px-0 py-[10px]">
-          <Button 
-            size="lg"
-            className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300" 
-            onClick={scrollToPricing}
-          >
-            View Pricing
-          </Button>
-        </nav>
-
         <main className="w-full max-w-7xl mx-auto">
           <HeroSection />
           <FeatureGrid />
+
+          <div className="flex justify-center mb-16">
+            <Button 
+              size="lg"
+              className="bg-[#0037ff] hover:bg-[#0037ff]/90 text-white font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300" 
+              onClick={scrollToPricing}
+            >
+              View Pricing
+            </Button>
+          </div>
 
           {!isMobile && <PreviewImage />}
 

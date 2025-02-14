@@ -35,8 +35,8 @@ const HeroSection = () => {
           Try It For Free
         </Button>
         <Button 
-          variant="ghost" 
-          className="text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300" 
+          size="lg"
+          className="bg-[#0037ff] hover:bg-[#0037ff]/90 text-white font-semibold px-8 py-6 text-lg" 
           onClick={() => navigate("/login")}
         >
           Already subscribed?
