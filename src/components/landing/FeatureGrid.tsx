@@ -16,12 +16,12 @@ export const features = [
   {
     icon: Zap,
     title: "Quick Learning",
-    description: "Reduce your learning curve by 60%. Get contextual answers to your Bubble.io questions in under 2 seconds, complete with code examples.",
+    description: "Reduce your learning curve by 60%. Get contextual answers to your Bubble.io questions in under 20 seconds, complete with code examples.",
   },
   {
     icon: Clock,
     title: "24/7 Available",
-    description: "Instant access to AI assistance whenever you need it. Join 5000+ developers who rely on our platform for round-the-clock Bubble.io support.",
+    description: "Instant access to AI assistance whenever you need it. Join other developers who rely on our platform for round-the-clock Bubble.io support.",
   },
 ];
 
