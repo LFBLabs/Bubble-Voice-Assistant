@@ -18,7 +18,7 @@ const Landing = () => {
   return <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto rounded-3xl bg-gray-50 px-0 py-0">
         <nav className="flex justify-between items-center mb-16 mx-0 px-0 py-[10px]">
-          
+          <div className="text-2xl font-bold text-foreground px-[20px] py-[20px]">BubbleVoice</div>
           <div className="flex items-center gap-4">
             <Button variant="ghost" className="text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300" onClick={scrollToPricing}>
               Pricing
