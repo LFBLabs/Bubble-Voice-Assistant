@@ -16,7 +16,7 @@ export const features = [
   {
     icon: Zap,
     title: "Quick Learning",
-    description: "Reduce your learning curve by 60%. Get contextual answers to your Bubble.io questions in under 20 seconds, complete with code examples.",
+    description: "Reduce your learning curve by 60%. Get contextual answers to your Bubble.io questions in under 20 seconds.",
   },
   {
     icon: Clock,
