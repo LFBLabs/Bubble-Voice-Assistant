@@ -22,24 +22,14 @@ const Landing = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto rounded-3xl bg-gray-50 px-0 py-0">
-        <nav className="flex justify-between items-center mb-16 mx-0 px-0 py-[10px]">
-          <div className="px-[20px] py-[20px]"></div>
-          <div className="flex items-center gap-4">
-            <Button 
-              variant="ghost" 
-              className="text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300" 
-              onClick={scrollToPricing}
-            >
-              Pricing
-            </Button>
-            <Button 
-              variant="ghost" 
-              className="text-foreground hover:bg-accent hover:text-accent-foreground transition-all duration-300" 
-              onClick={() => navigate("/login")}
-            >
-              Already subscribed?
-            </Button>
-          </div>
+        <nav className="flex justify-center items-center mb-8 mx-0 px-0 py-[10px]">
+          <Button 
+            size="lg"
+            className="bg-primary hover:bg-primary/90 text-white font-semibold px-8 py-6 text-lg shadow-lg hover:shadow-xl transition-all duration-300" 
+            onClick={scrollToPricing}
+          >
+            View Pricing
+          </Button>
         </nav>
 
         <main className="w-full max-w-7xl mx-auto">
