@@ -1,19 +1,20 @@
+
 import React from "react";
 import { Button } from "@/components/ui/button";
 import { useKnowledgeBase } from "@/hooks/useKnowledgeBase";
 import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
 
 const NotesSection = () => {
-  const { data: knowledgeBaseData, isLoading: isKnowledgeBaseLoading } = useKnowledgeBase();
+  const { knowledgeBase, isLoading } = useKnowledgeBase();
   const { data: subscription } = useSubscriptionStatus();
 
   const isStarterPlan = !subscription?.plan_type || subscription.plan_type === 'starter';
 
-  if (isKnowledgeBaseLoading) {
+  if (isLoading) {
     return <div>Loading knowledge base...</div>;
   }
 
-  const activeCount = knowledgeBaseData?.filter(item => item.active).length || 0;
+  const activeCount = knowledgeBase?.filter(item => item.active).length || 0;
 
   return (
     <div className="border rounded-lg p-4 bg-white dark:bg-gray-800">
@@ -34,7 +35,7 @@ const NotesSection = () => {
         </Button>
       </div>
       
-      {knowledgeBaseData?.map(item => (
+      {knowledgeBase?.map(item => (
         <div key={item.id} className="mb-2">
           <h3 className="font-medium">{item.title}</h3>
           <p className="text-sm text-gray-600">{item.content}</p>
