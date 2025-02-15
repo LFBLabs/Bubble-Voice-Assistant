@@ -1,7 +1,9 @@
 
+import { PlanType } from "./plan-config";
+
 export const PLAN_IDS = {
-  starter: "P-4G6798465L501993KM6YP6PQ", // Updated starter plan ID
-  pro: "P-5KF35011AK525611SM6OZQNY",
+  starter: "P-4G6798465L501993KM6YP6PQ",
+  pro: "P-4KK601900U107132MM6YP7XY", // Updated pro plan ID
   annual: "P-7TP45305AJ1806514M6OZSSI",
 } as const;
 
