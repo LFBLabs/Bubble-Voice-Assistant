@@ -1,7 +1,8 @@
 import { PayPalButtons } from "@paypal/react-paypal-js";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { PLAN_IDS, PlanType } from "@/utils/paypal-config";
+import { PLAN_IDS } from "@/utils/paypal-config";
+import type { PlanType } from "@/utils/plan-config";
 import { usePayPalSubscriptionHandler } from "./PayPalSubscriptionHandler";
 
 interface PayPalButtonProps {

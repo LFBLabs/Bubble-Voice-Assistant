@@ -41,3 +41,6 @@ export const calculateValidUntil = (planType: PlanType): Date => {
   }
   return validUntil;
 };
+
+// Re-export PlanType to maintain backward compatibility
+export type { PlanType };

@@ -1,7 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-import { PlanType, calculateValidUntil, getPlanAmount } from "@/utils/paypal-config";
+import type { PlanType } from "@/utils/plan-config";
+import { calculateValidUntil, getPlanAmount } from "@/utils/paypal-config";
 
 interface PayPalSubscriptionHandlerProps {
   planType: PlanType;
