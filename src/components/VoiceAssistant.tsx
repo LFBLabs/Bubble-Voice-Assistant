@@ -1,4 +1,3 @@
-
 import React, { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import AuthUI from "./AuthUI";
@@ -12,73 +11,67 @@ import { useVoiceInteraction } from "@/hooks/useVoiceInteraction";
 import { useKnowledgeBase } from "@/hooks/useKnowledgeBase";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
-
 const VoiceAssistant = () => {
-  const { session, loading } = useSupabaseAuth();
-  const { isProcessing, response, processAudioResponse } = useAudioResponse();
-  const { checkInteractionLimit, recordInteraction } = useVoiceInteraction();
-  const { isRecording, transcript, toggleRecording: originalToggleRecording } = useVoiceRecording(processAudioResponse);
-  const { knowledgeBase, isLoading: isLoadingKnowledgeBase } = useKnowledgeBase();
-  const { toast } = useToast();
+  const {
+    session,
+    loading
+  } = useSupabaseAuth();
+  const {
+    isProcessing,
+    response,
+    processAudioResponse
+  } = useAudioResponse();
+  const {
+    checkInteractionLimit,
+    recordInteraction
+  } = useVoiceInteraction();
+  const {
+    isRecording,
+    transcript,
+    toggleRecording: originalToggleRecording
+  } = useVoiceRecording(processAudioResponse);
+  const {
+    knowledgeBase,
+    isLoading: isLoadingKnowledgeBase
+  } = useKnowledgeBase();
+  const {
+    toast
+  } = useToast();
   const navigate = useNavigate();
-
   useEffect(() => {
     if (session?.user?.user_metadata?.should_change_password) {
       toast({
         title: "Security Notice",
         description: "Please change your password for security purposes.",
-        action: (
-          <button
-            onClick={() => navigate("/settings")}
-            className="bg-primary text-white px-3 py-1 rounded-md text-sm"
-          >
+        action: <button onClick={() => navigate("/settings")} className="bg-primary text-white px-3 py-1 rounded-md text-sm">
             Change Password
           </button>
-        ),
       });
     }
   }, [session, navigate, toast]);
-
   const toggleRecording = async () => {
     if (!isRecording) {
       const canProceed = await checkInteractionLimit();
       if (!canProceed) return;
-      
       await recordInteraction();
     }
     originalToggleRecording();
   };
-
   if (loading || isLoadingKnowledgeBase) {
-    return (
-      <div className="min-h-screen flex items-center justify-center dark:bg-gray-900">
+    return <div className="min-h-screen flex items-center justify-center dark:bg-gray-900">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
-      </div>
-    );
+      </div>;
   }
-
   if (!session) {
     return <AuthUI />;
   }
-
   const activeKnowledgeBase = knowledgeBase?.filter(entry => entry.active) || [];
-
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col min-h-screen">
-        <Header 
-          title="Bubble.io Voice Assistant"
-          description={`Ask questions about Bubble.io and get instant voice responses (${activeKnowledgeBase.length} knowledge base entries active)`}
-        />
+  return <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col min-h-screen bg-gray-50 rounded-3xl">
+        <Header title="Bubble.io Voice Assistant" description={`Ask questions about Bubble.io and get instant voice responses (${activeKnowledgeBase.length} knowledge base entries active)`} />
 
         <div className="flex-1 flex flex-col gap-6">
-          <VoiceContainer
-            isRecording={isRecording}
-            isProcessing={isProcessing}
-            toggleRecording={toggleRecording}
-            transcript={transcript}
-            response={response}
-          />
+          <VoiceContainer isRecording={isRecording} isProcessing={isProcessing} toggleRecording={toggleRecording} transcript={transcript} response={response} />
 
           <NotesSection />
         </div>
@@ -87,8 +80,6 @@ const VoiceAssistant = () => {
           <p className="px-4">Tip: Click the microphone button to start asking your question about Bubble.io</p>
         </div>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default VoiceAssistant;
