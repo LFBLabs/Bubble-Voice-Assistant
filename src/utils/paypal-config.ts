@@ -3,8 +3,8 @@ import { PlanType } from "./plan-config";
 
 export const PLAN_IDS = {
   starter: "P-4G6798465L501993KM6YP6PQ",
-  pro: "P-4KK601900U107132MM6YP7XY", // Updated pro plan ID
-  annual: "P-7TP45305AJ1806514M6OZSSI",
+  pro: "P-4KK601900U107132MM6YP7XY",
+  annual: "P-3NF82657M0201123XM6YQARY", // Updated annual plan ID
 } as const;
 
 export const PAYPAL_OPTIONS = {
