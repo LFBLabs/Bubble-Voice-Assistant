@@ -1,3 +1,4 @@
+
 export const PLAN_IDS = {
   starter: "P-0ED97087CN9355402M6OZN4Y",
   pro: "P-5KF35011AK525611SM6OZQNY",
@@ -19,11 +20,11 @@ export type PlanType = keyof typeof PLAN_IDS;
 export const getPlanAmount = (planType: PlanType): number => {
   switch (planType) {
     case "starter":
-      return 15.00;
+      return 10.00;
     case "pro":
-      return 24.00;
+      return 20.00;
     case "annual":
-      return 230.00;
+      return 195.00;
   }
 };
 

@@ -8,7 +8,7 @@ import { PricingCard } from "@/components/PricingCard";
 export const pricingPlans = [
   {
     title: "Starter",
-    price: "$15",
+    price: "$10",
     priceDetail: "/month",
     features: [
       { text: "3 days free trial" },
@@ -19,7 +19,7 @@ export const pricingPlans = [
   },
   {
     title: "Pro",
-    price: "$24",
+    price: "$20",
     priceDetail: "/month",
     features: [
       { text: "5 days free trial" },
@@ -31,7 +31,7 @@ export const pricingPlans = [
   },
   {
     title: "Annual",
-    price: "$230",
+    price: "$195",
     features: [
       { text: "Everything in pro" },
     ],
