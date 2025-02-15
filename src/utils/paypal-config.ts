@@ -12,7 +12,7 @@ export const PAYPAL_OPTIONS = {
   components: "buttons",
   "enable-funding": "card",
   "disable-funding": "paylater,venmo",
-  environment: "sandbox"
+  environment: "live" // Changed from 'sandbox' to 'live'
 } as const;
 
 export type PlanType = keyof typeof PLAN_IDS;
