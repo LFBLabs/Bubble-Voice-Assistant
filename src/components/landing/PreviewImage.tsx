@@ -8,7 +8,7 @@ const PreviewImage = () => {
       <div className="relative rounded-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
         <div className="absolute inset-0 bg-gradient-to-r from-[#0037ff]/10 to-transparent pointer-events-none"></div>
         <img
-          src="/lovable-uploads/5cb0ec5b-2701-423e-a4e3-51ae4b64d618.png"
+          src="/lovable-uploads/e6dbb73e-ed4f-4a92-b4b1-f21d28807042.png"
           alt="Bubble.io Task Flow Interface"
           className="w-full object-cover rounded-xl shadow-lg"
           style={{ height: "600px" }}
@@ -19,7 +19,7 @@ const PreviewImage = () => {
       <div className="relative rounded-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
         <div className="absolute inset-0 bg-gradient-to-r from-[#0037ff]/10 to-transparent pointer-events-none"></div>
         <img
-          src="/lovable-uploads/a0e4636a-0484-4785-bf31-9a1f7fcde80b.png"
+          src="/lovable-uploads/0ac88ef3-19e1-4ce2-90cb-d480accdfe4a.png"
           alt="Bubble.io Employee Search Interface"
           className="w-full object-cover rounded-xl shadow-lg"
           style={{ height: "600px" }}
