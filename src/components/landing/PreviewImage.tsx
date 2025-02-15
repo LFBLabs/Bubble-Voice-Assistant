@@ -8,8 +8,8 @@ const PreviewImage = () => {
       <div className="relative rounded-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
         <div className="absolute inset-0 bg-gradient-to-r from-[#0037ff]/10 to-transparent pointer-events-none"></div>
         <img
-          src="/lovable-uploads/e6dbb73e-ed4f-4a92-b4b1-f21d28807042.png"
-          alt="Bubble.io Task Flow Interface"
+          src="/lovable-uploads/2c3bd22e-75ae-425f-ac2c-ab007e4a64a6.png"
+          alt="Bubble.io Authentication Interface"
           className="w-full object-cover rounded-xl shadow-lg"
           style={{ height: "600px" }}
         />
@@ -19,8 +19,8 @@ const PreviewImage = () => {
       <div className="relative rounded-xl overflow-hidden transform hover:scale-[1.02] transition-transform duration-300">
         <div className="absolute inset-0 bg-gradient-to-r from-[#0037ff]/10 to-transparent pointer-events-none"></div>
         <img
-          src="/lovable-uploads/0ac88ef3-19e1-4ce2-90cb-d480accdfe4a.png"
-          alt="Bubble.io Employee Search Interface"
+          src="/lovable-uploads/d898329e-927d-425d-b0bc-67a244add311.png"
+          alt="Bubble.io Voice Assistant Interface"
           className="w-full object-cover rounded-xl shadow-lg"
           style={{ height: "600px" }}
         />
