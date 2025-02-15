@@ -1,46 +1,63 @@
 
 import React from "react";
-import { Button } from "@/components/ui/button";
-import { useKnowledgeBase } from "@/hooks/useKnowledgeBase";
-import { useSubscriptionStatus } from "@/hooks/useSubscriptionStatus";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import NoteTabContent from "./NoteTabContent";
+import { useNotes } from "@/hooks/useNotes";
 
 const NotesSection = () => {
-  const { knowledgeBase, isLoading } = useKnowledgeBase();
-  const { data: subscription } = useSubscriptionStatus();
-
-  const isStarterPlan = !subscription?.plan_type || subscription.plan_type === 'starter';
+  const { 
+    notes, 
+    isLoading, 
+    handleNoteChange, 
+    handleSave, 
+    getNoteContent,
+    isUpdating 
+  } = useNotes();
 
   if (isLoading) {
-    return <div>Loading knowledge base...</div>;
+    return <div>Loading notes...</div>;
   }
-
-  const activeCount = knowledgeBase?.filter(item => item.active).length || 0;
 
   return (
     <div className="border rounded-lg p-4 bg-white dark:bg-gray-800">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
-          Knowledge Base
-          {isStarterPlan && (
-            <span className="text-sm font-normal text-gray-500">
-              ({activeCount} knowledge base entries active)
-            </span>
-          )}
-        </h2>
-        <Button
-          variant="outline"
-          onClick={() => window.open("https://bubble.io/documentation", "_blank")}
-        >
-          Add From Bubble.io Docs
-        </Button>
-      </div>
-      
-      {knowledgeBase?.map(item => (
-        <div key={item.id} className="mb-2">
-          <h3 className="font-medium">{item.title}</h3>
-          <p className="text-sm text-gray-600">{item.content}</p>
-        </div>
-      ))}
+      <h2 className="text-xl font-semibold mb-4">Notes</h2>
+      <Tabs defaultValue="general" className="w-full">
+        <TabsList className="w-full">
+          <TabsTrigger value="general" className="flex-1">General</TabsTrigger>
+          <TabsTrigger value="features" className="flex-1">Features</TabsTrigger>
+          <TabsTrigger value="ideas" className="flex-1">Ideas</TabsTrigger>
+        </TabsList>
+        <TabsContent value="general">
+          <NoteTabContent
+            category="general"
+            placeholder="Write your general notes here..."
+            content={getNoteContent('general')}
+            onChange={(content) => handleNoteChange('general', content)}
+            onSave={() => handleSave('general')}
+            isDisabled={isUpdating}
+          />
+        </TabsContent>
+        <TabsContent value="features">
+          <NoteTabContent
+            category="features"
+            placeholder="Write your feature notes here..."
+            content={getNoteContent('features')}
+            onChange={(content) => handleNoteChange('features', content)}
+            onSave={() => handleSave('features')}
+            isDisabled={isUpdating}
+          />
+        </TabsContent>
+        <TabsContent value="ideas">
+          <NoteTabContent
+            category="ideas"
+            placeholder="Write your ideas here..."
+            content={getNoteContent('ideas')}
+            onChange={(content) => handleNoteChange('ideas', content)}
+            onSave={() => handleSave('ideas')}
+            isDisabled={isUpdating}
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
