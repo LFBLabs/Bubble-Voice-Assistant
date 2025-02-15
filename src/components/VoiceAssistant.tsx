@@ -58,8 +58,8 @@ const VoiceAssistant = () => {
   const activeKnowledgeBase = knowledgeBase?.filter(entry => entry.active) || [];
   const isStarterPlan = !subscription?.plan_type || subscription.plan_type === 'starter';
   const description = isStarterPlan 
-    ? `Ask questions about Bubble.io and get instant voice responses (${activeKnowledgeBase.length} knowledge base entries active)`
-    : "Ask questions about Bubble.io and get instant voice responses";
+    ? `Ask questions about Bubble.io and get voice responses in seconds (${activeKnowledgeBase.length} knowledge base entries active)`
+    : "Ask questions about Bubble.io and get voice responses in seconds";
 
   return <div className="min-h-screen bg-gradient-to-b from-purple-50 to-white dark:from-gray-900 dark:to-gray-800 bg-inherit rounded-3xl">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 sm:py-6 flex flex-col min-h-screen rounded-3xl bg-inherit">
