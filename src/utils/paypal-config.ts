@@ -1,6 +1,6 @@
 
 export const PLAN_IDS = {
-  starter: "P-0ED97087CN9355402M6OZN4Y",
+  starter: "P-4G6798465L501993KM6YP6PQ", // Updated starter plan ID
   pro: "P-5KF35011AK525611SM6OZQNY",
   annual: "P-7TP45305AJ1806514M6OZSSI",
 } as const;
@@ -12,10 +12,8 @@ export const PAYPAL_OPTIONS = {
   components: "buttons",
   "enable-funding": "card",
   "disable-funding": "paylater,venmo",
-  environment: "production" // Changed from 'live' to 'production' to match PayPal's type definition
+  environment: "production"
 } as const;
-
-export type PlanType = keyof typeof PLAN_IDS;
 
 export const getPlanAmount = (planType: PlanType): number => {
   switch (planType) {
