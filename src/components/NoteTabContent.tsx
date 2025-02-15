@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ interface NoteTabContentProps {
   onChange: (content: string) => void;
   onSave: () => void;
   isDisabled: boolean;
+  displayName: string;
 }
 
 const NoteTabContent = ({
@@ -19,6 +21,7 @@ const NoteTabContent = ({
   onChange,
   onSave,
   isDisabled,
+  displayName,
 }: NoteTabContentProps) => {
   return (
     <div className="space-y-4">
@@ -34,7 +37,7 @@ const NoteTabContent = ({
         disabled={isDisabled}
       >
         <Save className="mr-2" />
-        Save {category} Notes
+        Save {displayName} Notes
       </Button>
     </div>
   );
